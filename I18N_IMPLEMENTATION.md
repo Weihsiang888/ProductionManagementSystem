@@ -172,7 +172,9 @@ Consider implementing a feature flag to disable i18n without code changes.
 - Path: `/` (site-wide)
 - Expires: 1 year
 - IsEssential: true
-- Secure: Inherits from app settings
+- Secure: true (HTTPS only)
+- HttpOnly: true (not accessible via JavaScript)
+- SameSite: Lax (CSRF protection)
 
 ## Future Improvements
 
