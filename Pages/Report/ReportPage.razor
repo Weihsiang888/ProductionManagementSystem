@@ -1,0 +1,50 @@
+﻿@page "/ReportPage"
+@using DxBlazorApplication7.Data
+@inject AuthenticationStateProvider authenticationStateProvider
+@inherits AuthComponentBase
+@inject DataService DataService
+@inject NavigationManager navigationManager
+
+<DxTabs @bind-ActiveTabIndex="@ActiveTabIndex" SizeMode="SizeMode.Large" RenderMode="TabsRenderMode.OnDemand">
+    <DxTabPage Text="【實際工作】">
+        <ReportPage3></ReportPage3>
+    </DxTabPage>
+    <DxTabPage Text="報表【未接收】">
+        <ReportPage2></ReportPage2>
+    </DxTabPage>
+    <DxTabPage Text="報表【未報工】">
+        <ReportPage1></ReportPage1>
+    </DxTabPage>
+    @* <DxTabPage Text="報表【工時】">
+        <ReportPage4></ReportPage4>
+    </DxTabPage> *@
+    <DxTabPage Text="詳細報表【工時-工單】">
+        <ReportPage5></ReportPage5>
+    </DxTabPage>
+@*     <DxTabPage Text="詳細報表【工時-工站】">
+        <ReportPage6></ReportPage6>
+    </DxTabPage> *@
+    <DxTabPage Text="Personal Production Data">
+        <ReportPage71></ReportPage71>
+    </DxTabPage>
+</DxTabs>
+
+@* <p>&nbsp;</p>
+
+<DxTabs @bind-ActiveTabIndex="@ActiveTabIndex" SizeMode="SizeMode.Large" RenderMode="TabsRenderMode.OnDemand">
+    <DxTabPage Text="報表【未接收】">
+        <ReportPage2></ReportPage2>
+    </DxTabPage>
+</DxTabs> *@
+
+@* <p>&nbsp;</p>
+
+<DxTabs @bind-ActiveTabIndex="@ActiveTabIndex" SizeMode="SizeMode.Large" RenderMode="TabsRenderMode.OnDemand">
+    <DxTabPage Text="報表【未報工】">
+        <ReportPage1></ReportPage1>
+    </DxTabPage>
+</DxTabs> *@
+
+@code {
+    int ActiveTabIndex { get; set; } = 0;
+}

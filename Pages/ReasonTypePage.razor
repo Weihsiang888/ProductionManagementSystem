@@ -1,0 +1,70 @@
+﻿@page "/-ReasonTypePage-"
+@using DxBlazorApplication7.Data
+@inject AuthenticationStateProvider authenticationStateProvider
+@inherits AuthComponentBase
+@inject DataService DataService
+
+<br />
+<h3>工時調整原因</h3>
+<br />
+
+<DxGrid Data="_ReasonTypes"
+        @ref="MyGrid"
+        PageSize="24"
+        KeyFieldName="ReasonName"
+        EditModelSaving="OnEditModelSaving">
+    <Columns>
+        @if (customAuth.user.role != Role.Guest && customAuth.user.department == "Manager")
+        {
+            <DxGridCommandColumn Width="90">
+                <HeaderTemplate>
+                    <a class="oi oi-plus" @onclick="@(() => MyGrid.StartEditNewRowAsync())" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </HeaderTemplate>
+                <CellDisplayTemplate>
+                    @*<a class="oi oi-pencil" @onclick="@(() => MyGrid.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>*@
+                    <a class="oi oi-x" @onclick="@(() => Delete((ReasonType)context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </CellDisplayTemplate>
+            </DxGridCommandColumn>
+        }
+        <DxGridDataColumn FieldName=@nameof(ReasonType.ReasonCode) Caption="代碼" MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(ReasonType.ReasonName) Caption="名稱" MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(ReasonType.Description) Caption="敘述" MinWidth="90" />
+    </Columns>
+    <EditFormTemplate Context="EditFormContext">
+        @{
+            var _ReasonType = (ReasonType)EditFormContext.EditModel;
+        }
+        <DxFormLayout>
+            <DxFormLayoutItem Caption="代碼 :">
+                <DxTextBox @bind-Text=_ReasonType.ReasonCode />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="名稱 :">
+                <DxTextBox @bind-Text=_ReasonType.ReasonName />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="敘述 :">
+                <DxTextBox @bind-Text=_ReasonType.Description />
+            </DxFormLayoutItem>
+        </DxFormLayout>
+    </EditFormTemplate>
+</DxGrid>
+@code {
+    private List<ReasonType>? _ReasonTypes;
+    DxGrid? MyGrid;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _ReasonTypes = await DataService.GetReasonTypesAsync();
+    }
+    async Task OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (ReasonType)e.EditModel;
+    }
+    async Task Delete(ReasonType item)
+    {
+        if (item != null)
+        {
+            await DataService.Remove(item);
+            _ReasonTypes = await DataService.GetReasonTypesAsync();
+        }
+    }
+}

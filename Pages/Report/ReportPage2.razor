@@ -1,0 +1,42 @@
+﻿@using DevExpress.Export
+@using DxBlazorApplication7.Data
+@inject DataService DataService
+
+<DxGrid Data="_WorkingOrderLists"
+        @ref="MyGrid"
+        PageSize="12"
+        SizeMode="SizeMode.Large"
+        ValidationEnabled="false"
+        ColumnCaptionAlignment="GridTextAlignment.Center">
+    <Columns>
+        <DxGridDataColumn FieldName=@nameof(WorkingOrderList.AddTime) Caption="建立時間" MinWidth="210" ReadOnly="true" DisplayFormat="G" />
+        <DxGridDataColumn FieldName=@nameof(WorkingOrderList.StationName) Caption="站別" MinWidth="210" ReadOnly="true" />
+        <DxGridDataColumn FieldName=@nameof(WorkingOrderList.WorkOrder) Caption="工單" MinWidth="210" ReadOnly="true" />
+        <DxGridDataColumn FieldName=@nameof(WorkingOrderList.SerialNumber) Caption="序號" MinWidth="150" ReadOnly="true" />
+        <DxGridDataColumn FieldName=@nameof(WorkingOrderList.OPNO) Caption="作業人員" MinWidth="210" />
+    </Columns>
+    <ToolbarTemplate>
+        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+                <DxToolbarItem Text="未接收" BeginGroup="true" Alignment="ToolbarItemAlignment.Left" />
+            </DxToolbar>
+        </DxToolbar>
+    </ToolbarTemplate>
+</DxGrid>
+<p>&nbsp;</p>
+
+@code {
+    DxGrid? MyGrid;
+    List<WorkingOrderList> _WorkingOrderLists = new List<WorkingOrderList>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ReadPageData();
+    }
+
+    public async Task ReadPageData()
+    {
+        _WorkingOrderLists = await DataService.GetWorkingOrderListAsync();
+        _WorkingOrderLists = _WorkingOrderLists.Where(x => x.ReceiveTime == null && x.ResponseTime == null).ToList();
+    }
+}

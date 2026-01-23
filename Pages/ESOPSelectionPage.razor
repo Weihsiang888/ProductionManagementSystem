@@ -1,0 +1,387 @@
+﻿@using DxBlazorApplication7.Data
+@inject DataService DataService
+@inject NavigationManager navigationManager
+
+<br />
+
+<DxGridLayout RowSpacing="0.8rem" ColumnSpacing="3rem">
+                <Rows>
+                    <DxGridLayoutRow Height="auto"></DxGridLayoutRow>
+                    <DxGridLayoutRow Height="auto"></DxGridLayoutRow>
+                    <DxGridLayoutRow Height="auto"></DxGridLayoutRow>
+                </Rows>
+                <Columns>
+                    <DxGridLayoutColumn></DxGridLayoutColumn>
+                    <DxGridLayoutColumn></DxGridLayoutColumn>
+                    <DxGridLayoutColumn></DxGridLayoutColumn>
+                </Columns>
+                <Items>
+                    <DxGridLayoutItem Row="0" Column="0">
+                        <Template>
+                <h3 style="color:dodgerblue">作業站:</h3>
+                        <DxComboBox Data="@_ESOPStationSelection"
+                                    TextFieldName="@nameof(ESOPStationSelection.StationName)"
+                                    NullText="請選擇作業站 ..."
+                                    ValueChanged="@((ESOPStationSelection eSOPStationSelection) => SelectedStationIDChanged(eSOPStationSelection))"
+                                    Value="@ESOPStationSelectionValue"
+                                    CssClass="cw-240 mt">
+                        </DxComboBox>
+                        </Template>
+                    </DxGridLayoutItem>
+                    <DxGridLayoutItem Row="0" Column="1">
+                        <Template>
+                <h3 style="color:dodgerblue">作業:</h3>
+                        <DxComboBox Data="@_ESOPProcedureSelection"
+                                    TextFieldName="@nameof(ESOPProcedureSelection.ProcedureName)"
+                                    NullText="請選擇作業 ..."
+                                    ValueChanged="@((ESOPProcedureSelection eSOPProcedureSelection) => SelectedProcedureIDChanged(eSOPProcedureSelection))"
+                                    Value="@ESOPProcedureSelectionValue"
+                                    CssClass="cw-240 mt">
+                        </DxComboBox>
+                        </Template>
+                    </DxGridLayoutItem>
+                    <DxGridLayoutItem Row="0" Column="2">
+                        <Template>
+                <h3 style="color:dodgerblue">模組:</h3>
+                        <DxComboBox Data="@_ESOPModelSelection"
+                                    TextFieldName="@nameof(ESOPModelSelection.ModelName)"
+                                    NullText="請選擇模組 ..."
+                                    ValueChanged="@((ESOPModelSelection eSOPModelSelection) => SelectedModelIDChanged(eSOPModelSelection))"
+                                    Value="@ESOPModelSelectionValue"
+                                    CssClass="cw-240 mt"
+                                    Enabled="@ESOPProcedureIsSelect">
+                        </DxComboBox>
+                        </Template>
+                    </DxGridLayoutItem>
+                </Items>
+            </DxGridLayout>
+
+@* <DxStackLayout>
+    <Items>
+        <DxStackLayoutItem Length="240px">
+            <Template>
+                <DxComboBox Data="@_ESOPStationSelection"
+                            TextFieldName="@nameof(ESOPStationSelection.StationName)"
+                            NullText="請選擇作業站 ..."
+                            ValueChanged="@((ESOPStationSelection eSOPStationSelection) => SelectedStationIDChanged(eSOPStationSelection))"
+                            Value="@ESOPStationSelectionValue"
+                            CssClass="cw-240 mt">
+                </DxComboBox>
+            </Template>
+        </DxStackLayoutItem>
+        <DxStackLayoutItem Length="240px">
+            <Template>
+                <DxComboBox Data="@_ESOPProcedureSelection"
+                            TextFieldName="@nameof(ESOPProcedureSelection.ProcedureName)"
+                            NullText="請選擇作業 ..."
+                            ValueChanged="@((ESOPProcedureSelection eSOPProcedureSelection) => SelectedProcedureIDChanged(eSOPProcedureSelection))"
+                            Value="@ESOPProcedureSelectionValue"
+                            CssClass="cw-240 mt">
+                </DxComboBox>
+            </Template>
+        </DxStackLayoutItem>
+        <DxStackLayoutItem Length="240px">
+            <Template>
+                <DxComboBox Data="@_ESOPModelSelection"
+                            TextFieldName="@nameof(ESOPModelSelection.ModelName)"
+                            NullText="請選擇模組 ..."
+                            ValueChanged="@((ESOPModelSelection eSOPModelSelection) => SelectedModelIDChanged(eSOPModelSelection))"
+                            Value="@ESOPModelSelectionValue"
+                            CssClass="cw-240 mt"
+                            Enabled="@ESOPProcedureIsSelect">
+                </DxComboBox>
+            </Template>
+        </DxStackLayoutItem>
+    </Items>
+</DxStackLayout> *@
+
+<DxPopup Width="100%" Height="100%" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center" @bind-Visible="@EsopPopupVisible"
+         ShowHeader="false"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         BodyText="@_ESOPMsg">
+    <BodyContentTemplate Context="PopupContext">
+        @*<img class="fit-width" src="images/Techman Robot.png" style="height: 24%; width: 24%; float:right" align="bottom" />*@
+        @* <div style="width:100%; height:100%;">
+            <object data="@_ESOPData" type="application/pdf" style="width:100%; height:100%;"></object>
+            @*<iframe src='../Uploads/S00/P00/M01/更新License.pdf' width="500" height="678"> </iframe>
+        </div> *@
+        <div style="width:100%; height:100%;">
+            @if (!string.IsNullOrEmpty(_ESOPData))
+            {
+                @* <object data="@_ESOPData" type="application/pdf" style="width:100%; height:100%;" @key="_ESOPData"></object> *@
+                @* <iframe src="/pdfjs/web/viewer.html?file=@Uri.EscapeDataString(_ESOPData)"
+                        style="width:100%; height:100%; border:none;">
+                </iframe> *@
+                <iframe src="/pdfjs/web/viewer.html?file=@Uri.EscapeDataString(_ESOPData)#zoom=page-width"
+                        style="width:100%; height:100%; border:none;">
+                </iframe>
+
+            }
+        </div>
+    </BodyContentTemplate>
+    <FooterContentTemplate Context="Context">
+        <div class="d-flex align-items-center w-100">
+            <!-- 第一個靠左的按鈕 -->
+            <DxButton CssClass="popup-button my-1 me-2"
+                      RenderStyle="ButtonRenderStyle.Secondary"
+                      Text="繁體中文"
+                      Click="Selected_LanguageChanged" />
+
+            <!-- 第二個靠左的按鈕 -->
+            <DxButton CssClass="popup-button my-1 me-2"
+                      RenderStyle="ButtonRenderStyle.Secondary"
+                      Text="English"
+                      Click="Selected_LanguageChanged" />
+
+            <!-- 第三個靠最右的按鈕 -->
+            <DxButton CssClass="popup-button my-1 ms-auto"
+                      RenderStyle="ButtonRenderStyle.Primary"
+                      Text="Close"
+                      Click="CloseEulaClick" />
+        </div>
+
+
+@*         <div class="d-flex justify-content-start w-100">
+            <!-- 第一個靠左的按鈕 -->
+            <DxButton CssClass="popup-button my-1 me-2"
+                      RenderStyle="ButtonRenderStyle.Secondary"
+                      Text="繁體中文"
+                      Click="CloseEulaClick" />
+
+            <!-- 第二個靠左的按鈕 -->
+            <DxButton CssClass="popup-button my-1"
+                      RenderStyle="ButtonRenderStyle.Secondary"
+                      Text="English"
+                      Click="CloseEulaClick" />
+        </div>
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="Close" Click="CloseEulaClick" />
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="Cancel" Click="CancelEulaClick" />*@
+    </FooterContentTemplate>
+</DxPopup>
+
+<DxPopup @bind-Visible="@ErrorPopupVisible"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         HeaderText="錯誤提示"
+         BodyText="@_ErrorMsg">
+    <FooterContentTemplate Context="Context">
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="OK" Click="CloseErrorClick" />
+        @*<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="Cancel" Click="CancelEulaClick" />*@
+    </FooterContentTemplate>
+</DxPopup>
+
+@code {
+    private List<WorkingList>? _WorkingLists;
+    WorkingList WorkingListValue { get; set; }
+    DxGrid? MyGrid;
+
+    List<OperatorWorkTime>? _OperatorWorkTimes { get; set; }
+    string? OperatorWorkTimeValue { get; set; }
+
+    List<Operator>? _Operators { get; set; }
+    string? OperatorValue { get; set; }
+
+    List<OperatorProcedure>? _OperatorProcedures { get; set; }
+    string? OperatorProcedureValue { get; set; }
+
+    private List<ReasonType>? _ReasonTypes;
+    ReasonType ReasonTypeValue { get; set; }
+
+    WorkingList _EditModel;
+
+    bool PopupVisible { get; set; } = false;
+
+    bool EsopPopupVisible { get; set; } = false;
+
+    bool ErrorPopupVisible { get; set; } = false;
+
+    string _ErrorMsg;
+
+    string _ESOPMsg;
+
+    string _ESOPData;
+
+    string _ESOPFolder;
+    string _ESOPFile;
+
+    private List<ESOPStatus>? _ESOPStatus;
+    private List<ESOPStatus>? _SelectESOPStatus;
+
+    ESOPStatus ESOPStatusValue { get; set; }
+
+    private List<ProcedureSelection>? _ProcedureSelection;
+    private List<StationSelection>? _StationSelection;
+    private List<ModelSelection>? _ModelSelection;
+
+    private List<ESOPStationSelection>? _ESOPStationSelection;
+    private List<ESOPProcedureSelection>? _ESOPProcedureSelection;
+    private List<ESOPModelSelection>? _ESOPModelSelection;
+
+    ESOPStationSelection ESOPStationSelectionValue;
+    ESOPProcedureSelection ESOPProcedureSelectionValue;
+    ESOPModelSelection ESOPModelSelectionValue;
+
+    bool ESOPProcedureIsSelect;
+
+    string WorkingStationName;
+
+    private Tuple<List<DirectoryStatus>, List<FolderStatus>> _Tuple;
+    private List<DirectoryStatus>? _DirectoryStatus;
+
+    private List<WorkingTypeGroup>? _WorkingTypeGroups;
+    string ManufactureValue;
+
+    private List<StationStatus>? _StationStatus;
+
+    async Task CloseEulaClick()
+    {
+        EsopPopupVisible = false;
+    }
+
+    async Task CloseErrorClick()
+    {
+        ErrorPopupVisible = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _ESOPStatus = await DataService.GetESOPStatusAsync();
+        // _StationStatus = await DataService.GetStationStatusAsync();
+        // _StationSelection = await DataService.GetStationSelectionAsync();
+        // _Tuple = await DataService.GetESOPDirectoryStatusAsync();
+        // _DirectoryStatus = _Tuple.Item1;
+
+        _DirectoryStatus = DataService._DirectoryItem;
+
+        _StationStatus = await DataService.GetStationStatusAsync();
+        _ESOPStationSelection = new List<ESOPStationSelection>();
+        foreach (var items in _StationStatus)
+        {
+            _ESOPStationSelection.Add(new ESOPStationSelection
+                {
+                    StationID = items.StationKey + items.StationID.ToString(),
+                    StationName = items.StationName,
+                    IsSelect = false
+                });
+        }
+    }
+
+    async Task SelectedStationIDChanged(ESOPStationSelection item)
+    {
+        ESOPModelSelectionValue = null;
+        ESOPProcedureSelectionValue = null;
+        ESOPStationSelectionValue = item;
+        if (_ESOPStatus != null && _ESOPStatus.Count > 0)
+        {
+            _ProcedureSelection = await DataService.GetProcedureSelectionAsync(item.StationID);
+            _ESOPProcedureSelection = new List<ESOPProcedureSelection>();
+
+            foreach (var items in _ProcedureSelection)
+            {
+                _ESOPProcedureSelection.Add(new ESOPProcedureSelection
+                    {
+                        StationID = items.StationID,
+                        ProcedureID = items.ProcedureID,
+                        ProcedureName = _ProcedureSelection.SingleOrDefault(x => x.ProcedureID == items.ProcedureID).ProcedureName,
+                        IsSelect = false
+                    });
+            }
+            // foreach (var items in _ESOPStatus.Where(x => x.StationID == "S" + WorkingStationName && x.ProcedureID == _ProcedureSelection.SingleOrDefault(x => x.ProcedureName == item.ProcedureID).ProcedureID))
+            // {
+            //     _ESOPModelSelection.Add(new ESOPModelSelection
+            //         {
+            //             ProcedureID = item.ProcedureID,
+            //             ModelName = items.ModelID,
+            //             IsSelect = false
+            //         });
+            // }
+
+            //ESOPProcedureIsSelect = true;
+        }
+    }
+
+    async Task SelectedProcedureIDChanged(ESOPProcedureSelection item)
+    {
+        ESOPModelSelectionValue = null;
+        ESOPProcedureSelectionValue = item;
+        if (_ESOPStatus != null && _ESOPStatus.Count > 0)
+        {
+            _ModelSelection = await DataService.GetModelSelectionAsync();
+            _ESOPModelSelection = new List<ESOPModelSelection>();
+
+            foreach (var items in _ESOPStatus.Where(x => x.StationID == ESOPProcedureSelectionValue.StationID && x.ProcedureID == ESOPProcedureSelectionValue.ProcedureID))
+            {
+                _ESOPModelSelection.Add(new ESOPModelSelection
+                    {
+                        ModelID = items.ModelID,
+                        ModelName = _ModelSelection.SingleOrDefault(x => x.ModelKey + x.ModelID.ToString() == items.ModelID).ModelName,
+                        IsSelect = false
+                    });
+            }
+
+            // foreach (var items in _ModelSelection)
+            // {
+            //     _ESOPModelSelection.Add(new ESOPModelSelection
+            //     {
+            //         ModelID = items.ModelKey + items.ModelID.ToString(),
+            //         ModelName = items.ModelName,
+            //         IsSelect = false
+            //     });
+            // }
+            // foreach (var items in _ESOPStatus.Where(x => x.StationID == "S" + WorkingStationName && x.ProcedureID == _ProcedureSelection.SingleOrDefault(x => x.ProcedureName == item.ProcedureID).ProcedureID))
+            // {
+            //     _ESOPModelSelection.Add(new ESOPModelSelection
+            //     {
+            //         ProcedureID = item.ProcedureID,
+            //         ModelName = items.ModelID,
+            //         IsSelect = false
+            //     });
+            // }
+
+            ESOPProcedureIsSelect = true;
+        }
+    }
+
+    async Task SelectedModelIDChanged(ESOPModelSelection item)
+    {
+        ESOPModelSelectionValue = item;
+        //var ModelName = _ESOPStatus.SingleOrDefault(x => x.ProcedureID == _ProcedureSelection.SingleOrDefault(x => x.ProcedureName == ESOPProcedureSelectionValue.ProcedureID).ProcedureID && x.ModelID == ESOPModelSelectionValue.ModelName);
+        var ModelName = _ESOPStatus.SingleOrDefault(x => x.StationID == ESOPStationSelectionValue.StationID && x.ProcedureID == ESOPProcedureSelectionValue.ProcedureID && x.ModelID == ESOPModelSelectionValue.ModelID);
+        if (ModelName != null)
+        {
+            EsopPopupVisible = true;
+            // _ESOPData = "../esop/" + ModelName.ESOPCode + "/" + _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == ModelName.ESOPCode).DirectoryMax + "/" + _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == ModelName.ESOPCode).FileName;
+            //_ESOPData = "/esop/" + ModelName.ESOPCode + "/" + _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == ModelName.ESOPCode).DirectoryMax + "/" + _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == ModelName.ESOPCode).FileName;
+            _ESOPFolder = "/esop/" + ModelName.ESOPCode + "/" + _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == ModelName.ESOPCode).DirectoryMax;
+            _ESOPFile = _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == ModelName.ESOPCode).FileName;
+            _ESOPData = _ESOPFolder + "//" + _ESOPFile;
+        }
+        else
+        {
+            _ErrorMsg = "沒有任何ESOP文件";
+            ErrorPopupVisible = true;
+        }
+        //ESOPProcedureIsSelect = false;
+    }
+
+    async Task Selected_LanguageChanged()
+    {
+        if (!string.IsNullOrEmpty(_ESOPData))
+        {
+            if (_ESOPFile.StartsWith("EN_"))
+            {
+                _ESOPData = _ESOPFolder + "//" + _ESOPFile.Replace("EN_", "");
+                _ESOPFile = _ESOPFile.Replace("EN_", "");
+            }
+            else
+            {
+                _ESOPData = _ESOPFolder + "//" + "EN_" + _ESOPFile;
+                _ESOPFile = "EN_" + _ESOPFile;
+            }
+        }
+        StateHasChanged();
+    }
+}

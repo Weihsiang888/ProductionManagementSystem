@@ -1,0 +1,94 @@
+﻿@page "/ComparisonPage"
+@using DxBlazorApplication7.Data
+@inject AuthenticationStateProvider authenticationStateProvider
+@inherits AuthComponentBase
+@inject DataService DataService
+
+<br />
+<h3>工站對照表</h3>
+<br />
+
+<DxGrid Data="_ComparisonTables"
+        @ref="MyGrid"
+        PageSize="24"
+        EditModelSaving="OnEditModelSaving"
+        @bind-SelectedDataItems="SelectedDataItems">
+    <Columns>
+        @if (customAuth.user.role != Role.Guest && customAuth.user.department == "Manager")
+        {
+            <DxGridCommandColumn Width="90">
+                <HeaderTemplate>
+                    <a class="oi oi-plus" @onclick="@(() => MyGrid.StartEditNewRowAsync())" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </HeaderTemplate>
+                <CellDisplayTemplate>
+                    <a class="oi oi-pencil" @onclick="@(() => MyGrid.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                    <a class="oi oi-x" @onclick="@(() => Delete((ComparisonTable)context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </CellDisplayTemplate>
+            </DxGridCommandColumn>
+        }
+        <DxGridDataColumn FieldName=@nameof(ComparisonTable.ProcessName) Caption="作業" MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(ComparisonTable.StationName) Caption="工站" MinWidth="120" />
+    </Columns>
+    <EditFormTemplate Context="EditFormContext">
+        @{
+            var _ComparisonTable = (ComparisonTable)EditFormContext.EditModel;
+        }
+        <DxFormLayout>
+            <DxFormLayoutItem Caption="作業:" ColSpanMd="6">
+                <DxComboBox Data="@_ProcessNames"
+                            AllowUserInput="true"
+                            NullText="作業選擇..."
+                            TextFieldName="@nameof(ComparisonTable.ProcessName)"
+                            @bind-Text=_ComparisonTable.ProcessName
+                            @bind-Value="@Value">
+                </DxComboBox>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="工站 :">
+                <DxTextBox @bind-Text=_ComparisonTable.StationName />
+            </DxFormLayoutItem>
+        </DxFormLayout>
+    </EditFormTemplate>
+</DxGrid>
+@code {
+    private List<ComparisonTable>? _ComparisonTables;
+    DxGrid? MyGrid;
+    IReadOnlyList<object>? SelectedDataItems { get; set; }
+    List<string>? _ProcessNames { get; set; }
+    string? Value { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _ComparisonTables = await DataService.GetComparisonTableAsync();
+        _ProcessNames = _ComparisonTables.Select(x => x.ProcessName).Distinct().ToList();
+    }
+
+    async Task OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (ComparisonTable)e.EditModel;
+        //editModel.UserName = "Test"; //Login User
+        if (!string.IsNullOrEmpty(editModel.ProcessName) && !string.IsNullOrEmpty(editModel.StationName))
+        {
+            if (_ComparisonTables.Where(x => x.ProcessName == editModel.ProcessName && x.StationName == editModel.StationName).ToList().Count == 0)
+            {
+                _ComparisonTables = await DataService.ChangeComparisonTableAsync((ComparisonTable)e.EditModel);
+                _ProcessNames = _ComparisonTables.Select(x => x.ProcessName).Distinct().ToList();
+            }
+            else
+            {
+                
+            }
+        }
+        //Departments = await DataService.GetDepartmentsAsync();
+        //_OperatorInformations = _OperatorInformations.Where(x => x.IsDel == false).ToList();
+    }
+
+    async Task Delete(ComparisonTable item)
+    {
+        if (item != null)
+        {
+            //await DataService.Remove(item);
+            _ComparisonTables = await DataService.Remove(item);
+            _ProcessNames = _ComparisonTables.Select(x => x.ProcessName).Distinct().ToList();
+        }
+    }
+}

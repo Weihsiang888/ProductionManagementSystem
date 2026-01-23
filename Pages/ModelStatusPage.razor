@@ -1,0 +1,163 @@
+﻿@page "/-ModelStatus-"
+@using DxBlazorApplication7.Data
+@inject AuthenticationStateProvider authenticationStateProvider
+@inherits AuthComponentBase
+@inject DataService DataService
+
+<br />
+<h3 style="color:dodgerblue">機種設定</h3>
+<br />
+
+<DxGrid Data="_ModelStatus"
+        @ref="MyGrid"
+        PageSize="24"
+        KeyFieldName="ModelID"
+        EditModelSaving="OnEditModelSaving"
+        CustomizeEditModel="Grid_CustomizeEditModel">
+    <Columns>
+        @if (customAuth.user.role != Role.Guest && customAuth.user.department == "Manager")
+        {
+            <DxGridCommandColumn Width="90">
+                <HeaderTemplate>
+                    <a class="oi oi-plus" @onclick="@(() => MyGrid.StartEditNewRowAsync())" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </HeaderTemplate>
+                <CellDisplayTemplate>
+                    <a class="oi oi-pencil" @onclick="@(() => MyGrid.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                    <a class="oi oi-x" @onclick="@(() => Delete((ModelStatus)context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </CellDisplayTemplate>
+            </DxGridCommandColumn>
+        }
+        @* <DxGridDataColumn FieldName=@nameof(ModelStatus.ModelID) TextAlignment="GridTextAlignment.Left" Caption="機種編號" MinWidth="90" /> *@
+        <DxGridDataColumn FieldName=@nameof(ModelStatus.ModelName) Caption="機種名稱" MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(ModelStatus.Description) Caption="描述" MinWidth="90" />
+    </Columns>
+    <EditFormTemplate Context="EditFormContext">
+        @{
+            var _ModelStatus = (ModelStatus)EditFormContext.EditModel;
+        }
+        <DxFormLayout>
+            @* <DxFormLayoutItem Caption="機種編號:">
+                <DxSpinEdit @bind-Value=_ModelStatus.ModelID ReadOnly="true" />
+            </DxFormLayoutItem> *@
+            <DxFormLayoutItem Caption="機種名稱 :">
+                <DxTextBox @bind-Text=_ModelStatus.ModelName />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="描述 :" ColSpanMd="6">
+                <DxTextBox @bind-Text=_ModelStatus.Description />
+                @* <DxComboBox Data="@_ProcedureStatus"
+                            AllowUserInput="false"
+                            NullText="程序名稱..."
+                            TextFieldName="@nameof(ProcedureStatus.ProcedureName)"
+                            @bind-Text=_ModelStatus.Description
+                            @bind-Value="@ProcedureIDVaule">
+                </DxComboBox> *@
+            </DxFormLayoutItem>
+        </DxFormLayout>
+    </EditFormTemplate>
+</DxGrid>
+
+<DxPopup @bind-Visible="@PopupVisible"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         HeaderText="錯誤提示"
+         BodyText="@_ErrorMsg">
+    <FooterContentTemplate Context="Context">
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="OK" Click="OkEulaClick" />
+        @*<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="Cancel" Click="CancelEulaClick" />*@
+    </FooterContentTemplate>
+</DxPopup>
+
+<DxPopup @bind-Visible="@DelPopupVisible"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         HeaderText="是否確認要刪除"
+         BodyText="@_DelMsg">
+    <FooterContentTemplate Context="Context">
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="OK" Click="ConfirmEulaClick" />
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="Cancel" Click="CancelEulaClick" />
+    </FooterContentTemplate>
+</DxPopup>
+
+@code {
+    DxGrid? MyGrid;
+    private List<ModelStatus>? _ModelStatus;
+    private List<ESOPStatus>? _ESOPStatus;
+    //private List<ProcedureStatus>? _ProcedureStatus;
+    bool IsEdit;
+    //ProcedureStatus ProcedureIDVaule;
+    string _ErrorMsg;
+    string _DelMsg;
+    bool PopupVisible { get; set; } = false;
+    bool DelPopupVisible { get; set; } = false;
+    ModelStatus ModelStatusValue;
+
+    protected override async Task OnInitializedAsync()
+    {
+        //_ProcedureStatus = await DataService.GetProcedureStatusAsync();
+        _ModelStatus = await DataService.GetModelStatusAsync();
+        _ESOPStatus = await DataService.GetESOPStatusAsync();
+    }
+    async Task OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (ModelStatus)e.EditModel;
+        _ModelStatus = await DataService.UpdateModelStatusStatusAsync(editModel);
+    }
+    async Task Delete(ModelStatus item)
+    {
+        ModelStatusValue = item;
+        _DelMsg = "是否要刪除模組, " + item.ModelName;
+        DelPopupVisible = true;
+        // if (item != null)
+        // {
+        //     int ESOPCount = _ESOPStatus.Where(x => x.ModelID == (item.ModelKey + item.ModelID.ToString())).Count();
+        //     if (ESOPCount != 0)
+        //     {
+        //         _ErrorMsg = "無法刪除模組，因已綁定SOP文件";
+        //         PopupVisible = true;
+        //     }
+        //     else
+        //     {
+        //         await DataService.Remove(item);
+        //     }
+        // }
+    }
+    async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+        if (e.IsNew)
+        {
+            IsEdit = false;
+        }
+        else
+        {
+            IsEdit = true;
+        }
+    }
+    async Task OkEulaClick()
+    {
+        PopupVisible = false;
+    }
+
+    async Task ConfirmEulaClick()
+    {
+        if (ModelStatusValue != null)
+        {
+            int ESOPCount = _ESOPStatus.Where(x => x.ModelID == (ModelStatusValue.ModelKey + ModelStatusValue.ModelID.ToString())).Count();
+            if (ESOPCount != 0)
+            {
+                _ErrorMsg = "無法刪除模組，因已綁定SOP文件";
+                PopupVisible = true;
+            }
+            else
+            {
+                await DataService.Remove(ModelStatusValue);
+            }
+        }
+    }
+
+    async Task CancelEulaClick()
+    {
+        DelPopupVisible = false;
+    }
+}

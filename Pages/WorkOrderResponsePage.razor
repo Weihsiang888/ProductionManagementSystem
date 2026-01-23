@@ -1,0 +1,713 @@
+﻿@page "/WorkingResponsePage"
+@using DxBlazorApplication7.Data
+@inject AuthenticationStateProvider authenticationStateProvider
+@inherits AuthComponentBase
+@inject DataService DataService
+@inject NavigationManager navigationManager
+
+<style>
+    .main_nav {
+        left: -42%;
+        top: 0;
+    }
+
+    .divstyle {
+        padding: 6px 0 0 0;
+        word-break: break-all;
+    }
+</style>
+
+
+@if (!string.IsNullOrEmpty(customAuth.user.userName) && customAuth.user.role != 0)
+{
+<br />
+<h3>作業員 - @OPID - 線上報工作業</h3>
+<br />
+}
+<DxGrid Data="_WorkingLists"
+        @ref="MyGrid"
+        PageSize="24"
+        EditModelSaving="OnEditModelSaving">
+    <Columns>
+        @*        <DxGridCommandColumn Width="90">
+        <HeaderTemplate>
+        <a class="oi oi-plus" @onclick="@(() => MyGrid.StartEditNewRowAsync())" style="text-decoration: none;" href="javascript:void(0);"></a>
+        </HeaderTemplate>
+        <CellDisplayTemplate>
+        <a class="oi oi-pencil" @onclick="@(() => MyGrid.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
+        <a class="oi oi-x" @onclick="@(() => Delete((WorkingList)context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+        </CellDisplayTemplate>
+        </DxGridCommandColumn>*@
+        <DxGridDataColumn FieldName=@nameof(WorkingList.WorkingTime) Caption="工作日" MinWidth="60" />
+        @*<DxGridDataColumn FieldName=@nameof(WorkingList.WorkingID) Caption="作業序號" MinWidth="90" />*@
+        @*<DxGridDataColumn FieldName=@nameof(WorkingList.WorkingPeriod) Caption="工作時段" MinWidth="90" />*@
+        @*<DxGridDataColumn FieldName=@nameof(WorkingList.WorkingName) Caption="作業程序" MinWidth="150" />*@
+        <DxGridDataColumn FieldName=@nameof(WorkingList.WorkingDescription) Caption="作業程序" MinWidth="150" />
+        <DxGridDataColumn FieldName=@nameof(WorkingList.OPName) Caption="作業人員" MinWidth="150" />
+
+        <DxGridDataColumn FieldName=@nameof(WorkingList.IsAssign) Caption="工作分配" MinWidth="120">
+            <CellDisplayTemplate>
+                @if (!(bool)context.Value)
+                {
+                    <button class="dxbl-btn dxbl-btn-outline-primary w-100" type="button">
+                        <span>未分配</span>
+                    </button>
+                }
+                else
+                {
+                    <button class="dxbl-btn dxbl-btn-primary w-100" type="button">
+                        <span>已分配</span>
+                    </button>
+                }
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+
+        <DxGridDataColumn FieldName=@nameof(WorkingList.IsReceive) Caption="工作接收" MinWidth="120">
+            <CellDisplayTemplate>
+                @if (!(bool)context.Value)
+                {
+                    <button class="dxbl-btn dxbl-btn-outline-info w-100" type="button" @onclick="@(() => GetReceive((WorkingList)context.DataItem))">
+                        <span>未接收 / SOP</span>
+                    </button>
+                }
+                else
+                {
+                    <button class="dxbl-btn dxbl-btn-info w-100" type="button" @onclick="@(() => GetReceive((WorkingList)context.DataItem))">
+                        <span>已接收 / SOP</span>
+                    </button>
+                }
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+
+        <DxGridDataColumn FieldName=@nameof(WorkingList.IsResponse) Caption="工作報工" MinWidth="120">
+            <CellDisplayTemplate>
+                @if (!(bool)context.Value)
+                {
+                    <button class="dxbl-btn dxbl-btn-outline-success w-100" type="button" @onclick="@(() => GetResponse((WorkingList)context.DataItem))">
+                        <span>未報工</span>
+                    </button>
+                }
+                else
+                {
+                    <button class="dxbl-btn dxbl-btn-success w-100" type="button" @onclick="@(() => GetResponse((WorkingList)context.DataItem))">
+                        <span>已報工</span>
+                    </button>
+                }
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+
+        <DxGridDataColumn FieldName=@nameof(WorkingList.IsPause) Caption="工作暫停" MinWidth="120">
+            <CellDisplayTemplate>
+                @if (!(bool)context.Value)
+                {
+                    <button class="dxbl-btn dxbl-btn-outline-warning w-100" type="button" @onclick="@(() => GetPause((WorkingList)context.DataItem))">
+                        <span>@GetWorkingStatus((WorkingList)context.DataItem)</span>
+                    </button>
+                }
+                else
+                {
+                    <button class="dxbl-btn dxbl-btn-warning w-100" type="button" @onclick="@(() => GetPause((WorkingList)context.DataItem))">
+                        <span>已暫停</span>
+                    </button>
+                }
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+
+        <DxGridDataColumn FieldName=@nameof(WorkingList.WorkOrder) Caption="工單號碼" MinWidth="150" />
+        <DxGridDataColumn FieldName=@nameof(WorkingList.SeriaNumber) Caption="手臂序號" MinWidth="150" />
+    </Columns>
+    <EditFormTemplate Context="EditFormContext">
+        @{
+            var _WorkingList = (WorkingList)EditFormContext.EditModel;
+        }
+        <DxFormLayout>
+            @if (_WorkingList.AssignTime is null)
+            {
+                <DxFormLayoutItem Caption="工作日 :">
+                    <DxDateEdit @bind-Date=_WorkingList.WorkingTime />
+                </DxFormLayoutItem>
+            }
+            else
+            {
+                <DxFormLayoutItem Caption="工作日 :">
+                    <DxDateEdit @bind-Date=_WorkingList.WorkingTime ReadOnly="true" />
+                </DxFormLayoutItem>
+            }
+            @*            <DxFormLayoutItem Caption="作業序號 :">
+            <DxSpinEdit @bind-Value=_WorkingList.WorkingID />
+            </DxFormLayoutItem>*@
+            @*            <DxFormLayoutItem Caption="工作時段 :">
+            <DxTextBox @bind-Text=_WorkingList.WorkingPeriod />
+            </DxFormLayoutItem>*@
+
+            @*<DxFormLayoutItem Caption="工作時段:" ColSpanMd="6">
+            <DxComboBox Data="@_OperatorWorkTimes"
+            AllowUserInput="true"
+            NullText="工作時段..."
+            TextFieldName="@nameof(OperatorWorkTime.OperatorWorkTimeName)"
+            @bind-Text=_WorkingList.WorkingPeriod
+            @bind-Value="@OperatorWorkTimeValue">
+            </DxComboBox>
+            </DxFormLayoutItem>*@
+
+            @*            <DxFormLayoutItem Caption="作業程序 :">
+            <DxTextBox @bind-Text=_WorkingList.WorkingName />
+            </DxFormLayoutItem>*@
+
+            <DxFormLayoutItem Caption="作業程序:" ColSpanMd="6">
+                <DxComboBox Data="@_OperatorProcedures"
+                            AllowUserInput="true"
+                            NullText="作業程序..."
+                            TextFieldName="@nameof(OperatorProcedure.OperatorProcedureName)"
+                            @bind-Text=_WorkingList.WorkingName
+                            @bind-Value="@OperatorProcedureValue">
+                </DxComboBox>
+            </DxFormLayoutItem>
+
+            @*            <DxFormLayoutItem Caption="作業人員 :">
+            <DxTextBox @bind-Text=_WorkingList.OPNO />
+            </DxFormLayoutItem>*@
+
+            @if (_WorkingList.AssignTime is null)
+            {
+                <DxFormLayoutItem Caption="作業人員:" ColSpanMd="6">
+                    <DxComboBox Data="@_Operators"
+                                AllowUserInput="true"
+                                NullText="作業人員..."
+                                TextFieldName="@nameof(Operator.OperatorID)"
+                                @bind-Text=_WorkingList.OPNO
+                                @bind-Value="@OperatorValue">
+                    </DxComboBox>
+                </DxFormLayoutItem>
+            }
+            else
+            {
+                <DxFormLayoutItem Caption="作業人員 :">
+                    <DxTextBox @bind-Text=_WorkingList.OPNO ReadOnly="true" />
+                </DxFormLayoutItem>
+            }
+
+        </DxFormLayout>
+    </EditFormTemplate>
+</DxGrid>
+
+@*<DxPopup HeaderText="Header"
+         @bind-Visible="@PopupVisible"
+         BodyText="OperatorValue">
+</DxPopup>*@
+
+<DxPopup @bind-Visible="@PopupVisible"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         HeaderText="暫停工作"
+         BodyText="@_ErrorMsg">
+    <FooterContentTemplate Context="Context">
+        <DxComboBox CssClass="main_nav" Data="@_ReasonTypes"
+                    AllowUserInput="true"
+                    NullText="暫停工作原因..."
+                    TextFieldName="@nameof(ReasonType.ReasonName)"
+                    @bind-Value="@ReasonTypeValue">
+        </DxComboBox>
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="OK" Click="OkEulaClick" />
+        @*<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="Cancel" Click="CancelEulaClick" />*@
+    </FooterContentTemplate>
+</DxPopup>
+
+<DxPopup Width="100%" Height="100%" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center" @bind-Visible="@EsopPopupVisible"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         BodyText="@_ESOPMsg">
+    <HeaderContentTemplate>
+        <DxStackLayout>
+            <Items>
+                <DxStackLayoutItem>
+                    <Template>
+                        <div class="divstyle">ESOP</div>
+                    </Template>
+                </DxStackLayoutItem>
+                <DxStackLayoutItem Length="2.5fr">
+                    <Template>
+                        <DxComboBox Data="@_ESOPStationSelection"
+                                    TextFieldName="@nameof(ESOPStationSelection.StationName)"
+                                    NullText="請選擇作業站 ..."
+                                    ValueChanged="@((ESOPStationSelection eSOPStationSelection) => SelectedStationIDChanged(eSOPStationSelection))"
+                                    Value="@ESOPStationSelectionValue"
+                                    CssClass="cw-240 mt">
+                        </DxComboBox>
+                    </Template>
+                </DxStackLayoutItem>
+                <DxStackLayoutItem Length="2.5fr">
+                    <Template>
+                        <DxComboBox Data="@_ESOPProcedureSelection"
+                                    TextFieldName="@nameof(ESOPProcedureSelection.ProcedureName)"
+                                    NullText="請選擇作業 ..."
+                                    ValueChanged="@((ESOPProcedureSelection eSOPProcedureSelection) => SelectedProcedureIDChanged(eSOPProcedureSelection))"
+                                    Value="@ESOPProcedureSelectionValue"
+                                    CssClass="cw-240 mt">
+                        </DxComboBox>
+                    </Template>
+                </DxStackLayoutItem>
+                <DxStackLayoutItem Length="2.5fr">
+                    <Template>
+                        <DxComboBox Data="@_ESOPModelSelection"
+                                    TextFieldName="@nameof(ESOPModelSelection.ModelName)"
+                                    NullText="請選擇模組 ..."
+                                    ValueChanged="@((ESOPModelSelection eSOPModelSelection) => SelectedModelIDChanged(eSOPModelSelection))"
+                                    Value="@ESOPModelSelectionValue"
+                                    CssClass="cw-240 mt"
+                                    Enabled="@ESOPProcedureIsSelect">
+                        </DxComboBox>
+                    </Template>
+                </DxStackLayoutItem>
+            </Items>
+        </DxStackLayout>
+    </HeaderContentTemplate>
+    <BodyContentTemplate Context="PopupContext">
+        @*<img class="fit-width" src="images/Techman Robot.png" style="height: 24%; width: 24%; float:right" align="bottom" />*@
+        <div style="width:100%; height:100%;">
+            <object data="@_ESOPData" type="application/pdf" style="width:100%; height:100%;"></object>
+            @*<iframe src='../Uploads/S00/P00/M01/更新License.pdf' width="500" height="678"> </iframe>*@
+        </div>
+    </BodyContentTemplate>
+    <FooterContentTemplate Context="Context">
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="Close" Click="CloseEulaClick" />
+        @*<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="Cancel" Click="CancelEulaClick" />*@
+    </FooterContentTemplate>
+</DxPopup>
+
+<DxPopup @bind-Visible="@ErrorPopupVisible"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         HeaderText="錯誤提示"
+         BodyText="@_ErrorMsg">
+    <FooterContentTemplate Context="Context">
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="OK" Click="CloseErrorClick" />
+        @*<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="Cancel" Click="CancelEulaClick" />*@
+    </FooterContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter]
+    public string? OPID { get; set; }
+
+    private List<WorkingList>? _WorkingLists;
+    WorkingList WorkingListValue { get; set; }
+    DxGrid? MyGrid;
+
+    List<OperatorWorkTime>? _OperatorWorkTimes { get; set; }
+    string? OperatorWorkTimeValue { get; set; }
+
+    List<Operator>? _Operators { get; set; }
+    string? OperatorValue { get; set; }
+
+    List<OperatorProcedure>? _OperatorProcedures { get; set; }
+    string? OperatorProcedureValue { get; set; }
+
+    private List<ReasonType>? _ReasonTypes;
+    ReasonType ReasonTypeValue { get; set; }
+
+    WorkingList _EditModel;
+
+    bool PopupVisible { get; set; } = false;
+
+    bool EsopPopupVisible { get; set; } = false;
+
+    bool ErrorPopupVisible  { get; set; } = false;
+
+    string _ErrorMsg;
+
+    string _ESOPMsg;
+
+    string _ESOPData;
+
+    private List<ESOPStatus>? _ESOPStatus;
+    private List<ESOPStatus>? _SelectESOPStatus;
+
+    ESOPStatus ESOPStatusValue { get; set; }
+
+    private List<ProcedureSelection>? _ProcedureSelection;
+    private List<StationSelection>? _StationSelection;
+    private List<ModelSelection>? _ModelSelection;
+
+    private List<ESOPStationSelection>? _ESOPStationSelection;
+    private List<ESOPProcedureSelection>? _ESOPProcedureSelection;
+    private List<ESOPModelSelection>? _ESOPModelSelection;
+
+    ESOPStationSelection ESOPStationSelectionValue;
+    ESOPProcedureSelection ESOPProcedureSelectionValue;
+    ESOPModelSelection ESOPModelSelectionValue;
+
+    bool ESOPProcedureIsSelect;
+
+    string WorkingStationName;
+
+    private Tuple<List<DirectoryStatus>, List<FolderStatus>> _Tuple;
+    private List<DirectoryStatus>? _DirectoryStatus;
+
+    private List<WorkingTypeGroup>? _WorkingTypeGroups;
+    string ManufactureValue;
+
+    private List<StationStatus>? _StationStatus;
+
+    async Task CloseEulaClick()
+    {
+        EsopPopupVisible = false;
+    }
+
+    async Task CloseErrorClick()
+    {
+        ErrorPopupVisible = false;
+    }
+
+    async Task OkEulaClick()
+    {
+        if (ReasonTypeValue != null)
+        {
+            //if (await DataService.CheckPauseWork(item.OPNO) == false)
+            //{
+            if (WorkingListValue != null && WorkingListValue.IsReceive == true && WorkingListValue.IsResponse == false)
+            {
+                WorkingListValue.IsPause = true;
+                WorkingListValue.PauseTime = DateTime.Now;
+                WorkingListValue.IsReceive = false;
+                _WorkingLists = await DataService.ChangeWorkingListsAsync((WorkingList)WorkingListValue, false);
+                await DataService.ChangeWorkingPauseTimeListsAsync((WorkingList)WorkingListValue, "Pause", WorkingListValue.IsReceive, WorkingListValue.IsPause, WorkingListValue.IsResponse, ReasonTypeValue);
+                _WorkingLists = await DataService.GetWorkingListsAsync(OPID);
+                _WorkingLists = _WorkingLists.Where(x => x.IsResponse == false).ToList();
+                _WorkingLists = _WorkingLists.OrderBy(x => x.AssignTime).ToList();
+                _WorkingLists.Reverse();
+            }
+            PopupVisible = false;
+            ReasonTypeValue = _ReasonTypes.SingleOrDefault(x => x.ReasonCode == "ChangeWorkOrder");
+            //}
+        }
+    }
+
+    void CancelEulaClick()
+    {
+        PopupVisible = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _WorkingLists = await DataService.GetWorkingListsAsync(OPID);
+        _WorkingLists = _WorkingLists.Where(x => x.IsResponse == false).ToList();
+        _WorkingLists = _WorkingLists.OrderBy(x => x.AssignTime).ToList();
+        _WorkingLists.Reverse();
+        _OperatorWorkTimes = await DataService.GetOperatorWorkTimesAsync();
+        _Operators = await DataService.GetOperatorsAsync();
+        _OperatorProcedures = await DataService.GetOperatorProceduresAsync();
+        _ReasonTypes = await DataService.GetReasonTypesAsync();
+        _WorkingTypeGroups = await DataService.GetWorkingTypeGroupsAsync();
+        ReasonTypeValue = _ReasonTypes.SingleOrDefault(x => x.ReasonCode == "ChangeWorkOrder");
+        _ESOPStatus = await DataService.GetESOPStatusAsync();
+
+        if (OPID != "Detail")
+        {
+            if (_WorkingLists.Count == 0)
+            {
+                _ErrorMsg = "";
+                _ErrorMsg = "無此作業人員派工資料";
+                PopupVisible = true;
+            }
+        }
+        // _StationStatus = await DataService.GetStationStatusAsync();
+        // _StationSelection = await DataService.GetStationSelectionAsync();
+        // _Tuple = await DataService.GetESOPDirectoryStatusAsync();
+        // _DirectoryStatus = _Tuple.Item1;
+
+        _DirectoryStatus = DataService._DirectoryItem;
+    }
+    async Task OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (WorkingList)e.EditModel;
+        //editModel.UserName = "Test"; //Login User
+        //editModel.UpdateTime = DateTime.Now;
+        editModel.AssignTime = DateTime.Now;
+        _EditModel = editModel;
+        if (e.IsNew)
+        {
+            if (await DataService.CheckWorkingListsAsync((WorkingList)e.EditModel))
+            {
+                PopupVisible = true;
+            }
+            else
+            {
+                _WorkingLists = await DataService.ChangeWorkingListsAsync((WorkingList)e.EditModel, e.IsNew);
+            }
+        }
+        else
+        {
+            _WorkingLists = await DataService.ChangeWorkingListsAsync((WorkingList)e.EditModel, e.IsNew);
+        }
+    }
+    async Task Delete(WorkingList item)
+    {
+        if (item != null)
+        {
+            await DataService.Remove(item);
+        }
+    }
+    async Task GetReceive(WorkingList item)
+    {
+        if (await DataService.CheckReceiveWork(item.OPNO) == false)
+        {
+            if (item != null && item.IsReceive == false && item.IsResponse == false)
+            {
+                item.IsReceive = true;
+                item.ReceiveTime = DateTime.Now;
+                if (item.IsPause == true)
+                {
+                    item.IsPause = false;
+                    //item.PauseTime = null;
+                }
+                _WorkingLists = await DataService.ChangeWorkingListsAsync((WorkingList)item, false);
+                await DataService.ChangeWorkingPauseTimeListsAsync((WorkingList)item, "Receive", item.IsReceive, item.IsPause, item.IsResponse, null);
+                _WorkingLists = await DataService.GetWorkingListsAsync(OPID);
+                _WorkingLists = _WorkingLists.Where(x => x.IsResponse == false).ToList();
+                _WorkingLists = _WorkingLists.OrderBy(x => x.AssignTime).ToList();
+                _WorkingLists.Reverse();
+            }
+        }
+
+        WorkingStationName = item.WorkingName;
+        ESOPStatusValue = null;
+        ESOPProcedureSelectionValue = null;
+        ESOPModelSelectionValue = null;
+        _ESOPData = "";
+        ESOPProcedureIsSelect = false;
+        _ESOPStationSelection = null;
+        ESOPStationSelectionValue = null;
+        ESOPModelSelectionValue = null;
+        _ESOPProcedureSelection = null;
+
+        if (_ESOPStatus != null && _ESOPStatus.Count > 0)
+        {
+            ManufactureValue = _WorkingTypeGroups.SingleOrDefault(x => x.TypeGroup == item.WorkingName).ManufacturingProcess;
+            _StationStatus = await DataService.GetStationStatusAsync();
+            //_StationSelection = await DataService.GetStationSelectionAsync();
+            if (ManufactureValue != null && _StationStatus.Where(x => x.Manufacturing == ManufactureValue).Count() > 0)
+            {
+                _StationStatus = _StationStatus.Where(x => x.Manufacturing == ManufactureValue).ToList();
+            }
+            else
+            {
+                _StationStatus = await DataService.GetStationStatusAsync();
+            }
+            _ESOPStationSelection = new List<ESOPStationSelection>();
+            foreach (var items in _StationStatus)
+            {
+                _ESOPStationSelection.Add(new ESOPStationSelection
+                    {
+                        StationID = items.StationKey + items.StationID.ToString(),
+                        StationName = items.StationName,
+                        IsSelect = false
+                    });
+            }
+            EsopPopupVisible = true;
+        }
+        else
+        {
+            _ErrorMsg = "沒有任何ESOP文件";
+            ErrorPopupVisible = true;
+        }
+
+        // if (_ESOPStatus != null && _ESOPStatus.Count > 0)
+        // {
+        //     _ProcedureSelection = await DataService.GetProcedureSelectionAsync(ManufactureValue);
+        //     _SelectESOPStatus = new List<ESOPStatus>();
+        //     _ESOPProcedureSelection = new List<ESOPProcedureSelection>();
+
+        //     foreach (var items in _ESOPStatus.Where(x => x.StationID == "S" + item.WorkingName))
+        //     {
+        //         ESOPProcedureSelection _ESOPProcedureSelectionStatus = _ESOPProcedureSelection.FirstOrDefault(x => x.ProcedureID == _ProcedureSelection.SingleOrDefault(x => x.ProcedureID == items.ProcedureID).ProcedureName);
+
+        //         if (_ESOPProcedureSelectionStatus is null)
+        //         {
+        //             // _SelectESOPStatus.Add(new ESOPStatus
+        //             //     {
+        //             //         StationID = items.StationID,
+        //             //         ProcedureID = _ProcedureSelection.SingleOrDefault(x => x.ProcedureID == items.ProcedureID).ProcedureName,
+        //             //         ModelID = items.ModelID,
+        //             //         TypeGroup = items.TypeGroup,
+        //             //         ESOPCode = items.ESOPCode,
+        //             //         FileSite = items.FileSite
+        //             //     });
+        //             _ESOPProcedureSelection.Add(new ESOPProcedureSelection
+        //             {
+        //                 StationID = items.StationID,
+        //                 ProcedureID = _ProcedureSelection.SingleOrDefault(x => x.ProcedureID == items.ProcedureID).ProcedureName,
+        //                 IsSelect = false
+        //             });
+
+        //         }
+        //     }
+        // }
+
+        //_ESOPData = "../Uploads/S00/P00/M01/9TM999-411-R48(1) Standard Operation Procedure of IO Module(5.0x) assembly for TM5B,TMAB and TMBB.pdf";
+        EsopPopupVisible = true;
+    }
+    async Task GetResponse(WorkingList item)
+    {
+        if (item != null && item.IsReceive == true && item.IsPause == false && item.IsResponse == false)
+        {
+            item.IsResponse = true;
+            item.ResponseTime = DateTime.Now;
+            _WorkingLists = await DataService.ChangeWorkingListsAsync((WorkingList)item, false);
+            await DataService.ChangeWorkingPauseTimeListsAsync((WorkingList)item, "Response", item.IsReceive, item.IsPause, item.IsResponse, null);
+            _WorkingLists = await DataService.GetWorkingListsAsync(OPID);
+            _WorkingLists = _WorkingLists.Where(x => x.IsResponse == false).ToList();
+            _WorkingLists = _WorkingLists.OrderBy(x => x.AssignTime).ToList();
+            _WorkingLists.Reverse();
+        }
+    }
+
+    async Task GetPause(WorkingList item)
+    {
+        if (item != null && item.IsReceive == true && item.IsResponse == false && item.IsPause == false)
+        {
+            PopupVisible = true;
+            WorkingListValue = item;
+        }
+        //if (ReasonTypeValue != null)
+        //{
+        //    //if (await DataService.CheckPauseWork(item.OPNO) == false)
+        //    //{
+        //    if (item != null && item.IsReceive == true && item.IsResponse == false)
+        //    {
+        //        item.IsPause = true;
+        //        item.PauseTime = DateTime.Now;
+        //        item.IsReceive = false;
+        //        _WorkingLists = await DataService.ChangeWorkingListsAsync((WorkingList)item, false);
+        //        await DataService.ChangeWorkingPauseTimeListsAsync((WorkingList)item, "Pause", item.IsReceive, item.IsPause, item.IsResponse, ReasonTypeValue);
+        //        _WorkingLists = await DataService.GetWorkingListsAsync(OPID);
+        //        _WorkingLists = _WorkingLists.Where(x => x.IsResponse == false).ToList();
+        //        _WorkingLists = _WorkingLists.OrderBy(x => x.AssignTime).ToList();
+        //        _WorkingLists.Reverse();
+        //    }
+        //    //}
+        //}
+    }
+
+    string? GetWorkingStatus(WorkingList item)
+    {
+        string _Results = "未作業";
+        if (item != null && item.IsReceive == true && item.IsResponse == false && item.IsPause == false)
+        {
+            _Results = "作業中";
+        }
+        if (item != null && item.IsReceive == false && item.IsResponse == false && item.IsPause == false)
+        {
+            _Results = "未作業";
+        }
+        if (item != null && item.IsReceive == false && item.IsResponse == false && item.IsPause == true)
+        {
+            _Results = "已暫停";
+        }
+        if (item != null && item.IsReceive == false && item.IsResponse == true && item.IsPause == false)
+        {
+            _Results = "已完工";
+        }
+        return _Results;
+    }
+
+    // async Task SelectedProcedureIDChanged(ESOPStatus item)
+    // {
+    //     ESOPStatusValue = item;
+    //     _ESOPData = "../esop/" + item.ModelID + "/" + item.FileSite;
+    // }
+
+    async Task SelectedStationIDChanged(ESOPStationSelection item)
+    {
+        ESOPStationSelectionValue = item;
+        if (_ESOPStatus != null && _ESOPStatus.Count > 0)
+        {
+            _ProcedureSelection = await DataService.GetProcedureSelectionAsync(item.StationID);
+            _ESOPProcedureSelection = new List<ESOPProcedureSelection>();
+
+            foreach (var items in _ProcedureSelection)
+            {
+                _ESOPProcedureSelection.Add(new ESOPProcedureSelection
+                {
+                    StationID = items.StationID,
+                    ProcedureID = items.ProcedureID,
+                    ProcedureName = _ProcedureSelection.SingleOrDefault(x => x.ProcedureID == items.ProcedureID).ProcedureName,
+                    IsSelect = false
+                });
+            }
+            // foreach (var items in _ESOPStatus.Where(x => x.StationID == "S" + WorkingStationName && x.ProcedureID == _ProcedureSelection.SingleOrDefault(x => x.ProcedureName == item.ProcedureID).ProcedureID))
+            // {
+            //     _ESOPModelSelection.Add(new ESOPModelSelection
+            //         {
+            //             ProcedureID = item.ProcedureID,
+            //             ModelName = items.ModelID,
+            //             IsSelect = false
+            //         });
+            // }
+
+            //ESOPProcedureIsSelect = true;
+        }
+    }
+
+    async Task SelectedProcedureIDChanged(ESOPProcedureSelection item)
+    {
+        ESOPProcedureSelectionValue = item;
+        if (_ESOPStatus != null && _ESOPStatus.Count > 0)
+        {
+            _ModelSelection = await DataService.GetModelSelectionAsync();
+            _ESOPModelSelection = new List<ESOPModelSelection>();
+
+            foreach (var items in _ESOPStatus.Where(x => x.StationID == ESOPProcedureSelectionValue.StationID && x.ProcedureID == ESOPProcedureSelectionValue.ProcedureID))
+            {
+                _ESOPModelSelection.Add(new ESOPModelSelection
+                    {
+                        ModelID = items.ModelID,
+                        ModelName = _ModelSelection.SingleOrDefault(x => x.ModelKey + x.ModelID.ToString() == items.ModelID).ModelName,
+                        IsSelect = false
+                    });
+            }
+
+            // foreach (var items in _ModelSelection)
+            // {
+            //     _ESOPModelSelection.Add(new ESOPModelSelection
+            //     {
+            //         ModelID = items.ModelKey + items.ModelID.ToString(),
+            //         ModelName = items.ModelName,
+            //         IsSelect = false
+            //     });
+            // }
+            // foreach (var items in _ESOPStatus.Where(x => x.StationID == "S" + WorkingStationName && x.ProcedureID == _ProcedureSelection.SingleOrDefault(x => x.ProcedureName == item.ProcedureID).ProcedureID))
+            // {
+            //     _ESOPModelSelection.Add(new ESOPModelSelection
+            //     {
+            //         ProcedureID = item.ProcedureID,
+            //         ModelName = items.ModelID,
+            //         IsSelect = false
+            //     });
+            // }
+
+            ESOPProcedureIsSelect = true;
+        }
+    }
+
+    async Task SelectedModelIDChanged(ESOPModelSelection item)
+    {
+        ESOPModelSelectionValue = item;
+        //var ModelName = _ESOPStatus.SingleOrDefault(x => x.ProcedureID == _ProcedureSelection.SingleOrDefault(x => x.ProcedureName == ESOPProcedureSelectionValue.ProcedureID).ProcedureID && x.ModelID == ESOPModelSelectionValue.ModelName);
+        var ModelName = _ESOPStatus.SingleOrDefault(x => x.StationID == ESOPStationSelectionValue.StationID && x.ProcedureID == ESOPProcedureSelectionValue.ProcedureID && x.ModelID == ESOPModelSelectionValue.ModelID);
+        if (ModelName != null)
+        {
+            _ESOPData = "../esop/" + ModelName.ESOPCode + "/" + _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == ModelName.ESOPCode).DirectoryMax + "/" + _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == ModelName.ESOPCode).FileName;
+        }
+        else
+        {
+            _ErrorMsg = "沒有任何ESOP文件";
+            ErrorPopupVisible = true;
+        }
+        //ESOPProcedureIsSelect = false;
+    }
+}
+

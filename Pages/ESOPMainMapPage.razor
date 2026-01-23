@@ -1,0 +1,140 @@
+﻿@page "/ESOPMainMap"
+@using DxBlazorApplication7.Data
+@inject DataService DataService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<style>
+
+    .img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -45%);
+        width: 1920px;
+        height: 840px;
+        object-fit: scale-down;
+    }
+
+    .imgitem {
+        position: absolute;
+        top: 100px;
+        left: 50px;
+        width: 12px;
+        height: 120px;
+    }
+
+</style>
+
+<h3>ESOP Map</h3>
+
+<img class="img" src="../images/map/main-map.png">
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 360px; left: 1404px; width: 12px; height: 60px;">
+    <span>備料</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 570px; left: 1058px; width: 12px; height: 60px;">
+    <span>塗油</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 636px; left: 1058px; width: 12px; height: 60px;">
+    <span>塗膠</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 780px; left: 1188px; width: 150px; height: 33px;">
+    <span>拉力黏著力確認</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 741px; left: 1188px; width: 120px; height: 33px;">
+    <span>短路高壓確認</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 570px; left: 1114px; width: 12px; height: 99px;">
+    <span>法蘭預組</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 570px; left: 1157px; width: 12px; height: 135px;">
+    <span>H D 外殼結合</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 570px; left: 1197px; width: 12px; height: 135px;">
+    <span>煞車件預組</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 774px; left: 1410px; width: 165px; height: 33px;">
+    <span>組裝煞車件(第一段)</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 810px; left: 1410px; width: 165px; height: 33px;">
+    <span>組裝電路板(第二段)</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 729px; left: 1062px; width: 108px; height: 33px;">
+    <span>R0-R8測試</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 765px; left: 1062px; width: 108px; height: 33px;">
+    <span>磨合Fri測試</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 570px; left: 1239px; width: 12px; height: 99px;">
+    <span>組磁邊器</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 807px; left: 1035px; width: 135px; height: 33px;">
+    <span>G-Sensor Test</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 570px; left: 1281px; width: 12px; height: 135px;">
+    <span>I O 模組組裝</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 570px; left: 1321px; width: 12px; height: 135px;">
+    <span>電控箱組裝</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 570px; left: 1362px; width: 12px; height: 210px;">
+    <span>電控箱I m a g e 安裝</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 570px; left: 1404px; width: 12px; height: 180px;">
+    <span>電控箱烤漆件組裝</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 201px; left: 1080px; width: 12px; height: 180px;">
+    <span>手臂組裝</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 201px; left: 1119px; width: 12px; height: 255px;">
+    <span>J o i n t C o v e r 組裝</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 240px; left: 600px; width: 300px; height: 33px;">
+    <span>TM手臂測試</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 600px; left: 540px; width: 240px; height: 33px;">
+    <span>包裝、出貨</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 240px; left: 1443px; width: 12px; height: 180px;">
+    <span>支援倉庫收發料</span>
+</button>
+<button class="dxbl-btn dxbl-btn-info" type="button" @onclick="@(() => GetESOP("S18_P18-1_9TM5A0-411-R02"))" style="position: absolute; top: 390px; left: 600px; width: 300px; height: 33px;">
+    <span>支援QA、工程或其他</span>
+</button>
+
+<DxPopup Width="1800px" Height="900px" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center" @bind-Visible="@EsopPopupVisible"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         HeaderText="ESOP"
+         BodyText="@_ESOPMsg">
+    <BodyContentTemplate Context="PopupContext">
+        @*<img class="fit-width" src="images/Techman Robot.png" style="height: 24%; width: 24%; float:right" align="bottom" />*@
+        <div>
+            <object data="@_ESOPData" type="application/pdf" width="1770" height="780"></object>
+            @*<iframe src='../Uploads/S00/P00/M01/更新License.pdf' width="500" height="678"> </iframe>*@
+        </div>
+    </BodyContentTemplate>
+    <FooterContentTemplate Context="Context">
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="Close" Click="CloseEulaClick" />
+        @*<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="Cancel" Click="CancelEulaClick" />*@
+    </FooterContentTemplate>
+</DxPopup>
+
+@code {
+    bool EsopPopupVisible { get; set; } = false;
+
+    string _ESOPMsg;
+    string _ESOPData;
+
+    async Task GetESOP(string item)
+    {
+        _ESOPData = "../Uploads/S00/P00/M01/9TM999-411-R48(1) Standard Operation Procedure of IO Module(5.0x) assembly for TM5B,TMAB and TMBB.pdf";
+        EsopPopupVisible = true;
+    }
+
+    async Task CloseEulaClick()
+    {
+        EsopPopupVisible = false;
+    }
+}

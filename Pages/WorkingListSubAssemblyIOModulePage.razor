@@ -1,0 +1,737 @@
+﻿@page "/-WorkingListSubAssemblyIOModule-"
+@using DxBlazorApplication7.Data
+@inject DataService DataService
+@inject DataLogService DataLogService
+@using System.Globalization
+
+<br />
+<h3>產線人員派工作業 (IOModule)</h3>
+<br />
+
+<DxLoadingPanel @bind-Visible="PanelVisible"
+                IsContentBlocked="true"
+                ApplyBackgroundShading="true"
+                IndicatorAreaVisible="false"
+                Text="Fetching Data...">
+
+<DxGrid Data="_WorkingLists"
+        @ref="MyGrid"
+        PageSize="24"
+        EditModelSaving="OnEditModelSaving"
+        CustomizeEditModel="Grid_CustomizeEditModel">
+    <Columns>
+        <DxGridCommandColumn Width="90">
+            <HeaderTemplate>
+                <a class="oi oi-plus" @onclick="@(() => MyGrid.StartEditNewRowAsync())" style="text-decoration: none;" href="javascript:void(0);"></a>
+            </HeaderTemplate>
+            <CellDisplayTemplate>
+                @*<a class="oi oi-pencil" @onclick="@(() => MyGrid.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>*@
+                <a class="oi oi-x" @onclick="@(() => Delete((WorkingList)context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+            </CellDisplayTemplate>
+        </DxGridCommandColumn>
+        <DxGridDataColumn FieldName=@nameof(WorkingList.WorkingTime) Caption="工作日" MinWidth="90" />
+        @*<DxGridDataColumn FieldName=@nameof(WorkingList.WorkingID) Caption="作業序號" MinWidth="90" />*@
+        @*<DxGridDataColumn FieldName=@nameof(WorkingList.WorkingPeriod) Caption="工作時段" MinWidth="90" />*@
+        @*<DxGridDataColumn FieldName=@nameof(WorkingList.WorkingName) Caption="作業工站" MinWidth="150" />*@
+        <DxGridDataColumn FieldName=@nameof(WorkingList.WorkingDescription) Caption="作業工站" MinWidth="150" />
+        @*<DxGridDataColumn FieldName=@nameof(WorkingList.ProcessName) Caption="作業程序" MinWidth="150" />*@
+        <DxGridDataColumn FieldName=@nameof(WorkingList.ProcessDescription) Caption="作業程序" MinWidth="150" />
+        <DxGridDataColumn FieldName=@nameof(WorkingList.WorkOrder) Caption="工單號碼" MinWidth="300" />
+        <DxGridDataColumn FieldName=@nameof(WorkingList.OPName) Caption="作業人員" MinWidth="150" />
+        <DxGridDataColumn FieldName=@nameof(WorkingList.SeriaNumber) Caption="手臂序號" MinWidth="300" />
+        @*<DxGridDataColumn FieldName=@nameof(WorkingList.QTY) Caption="數量" MinWidth="90" />*@
+    </Columns>
+    <EditFormTemplate Context="EditFormContext">
+        @{
+            var _WorkingList = (WorkingList)EditFormContext.EditModel;
+        }
+
+        <DxFormLayout>
+            @if (_WorkingList.AssignTime is null)
+            {
+                @*<DxFormLayoutItem Caption="工作日 :">
+            <DxDateEdit @bind-Date=_WorkingList.WorkingTime />
+            </DxFormLayoutItem>*@
+
+                <DxFormLayoutItem Caption="作業日期 :" ColSpanMd="12">
+                    <div class="d-flex flex-row flex-wrap">
+                        @foreach (var item in _TimeDays)
+                        {
+                            <div class="me-2 mb-2">
+                                @if (item.IsSelect == false)
+                                {
+                                    <button class="dxbl-btn dxbl-btn-outline-info w-10" type="button" @onclick="@(() => SetDayStep(item.TimeDayType.ToString()))">
+                                        <span>@item.Description</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="dxbl-btn dxbl-btn-info w-10" type="button" @onclick="@(() => SetDayStep(item.TimeDayType.ToString()))">
+                                        <span>@item.Description</span>
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
+                </DxFormLayoutItem>
+            }
+            else
+            {
+                <DxFormLayoutItem Caption="工作日 :">
+                    <DxDateEdit @bind-Date=_WorkingList.WorkingTime ReadOnly="true" />
+                </DxFormLayoutItem>
+            }
+            @*            <DxFormLayoutItem Caption="作業序號 :">
+            <DxSpinEdit @bind-Value=_WorkingList.WorkingID />
+            </DxFormLayoutItem>*@
+            @*            <DxFormLayoutItem Caption="工作時段 :">
+            <DxTextBox @bind-Text=_WorkingList.WorkingPeriod />
+            </DxFormLayoutItem>*@
+
+            @*<DxFormLayoutItem Caption="工作時段 :" ColSpanMd="6">
+            <DxComboBox Data="@_OperatorWorkTimes"
+            AllowUserInput="true"
+            NullText="工作時段..."
+            TextFieldName="@nameof(OperatorWorkTime.OperatorWorkTimeName)"
+            @bind-Text=_WorkingList.WorkingPeriod
+            @bind-Value="@OperatorWorkTimeValue">
+            </DxComboBox>
+            </DxFormLayoutItem>*@
+
+            @*            <DxFormLayoutItem Caption="作業程序 :">
+            <DxTextBox @bind-Text=_WorkingList.WorkingName />
+            </DxFormLayoutItem>*@
+
+            <DxFormLayoutItem Caption="作業工站 :" ColSpanMd="6">
+                <DxComboBox Data="@_OperatorProcedures"
+                            AllowUserInput="false"
+                            NullText="作業工站..."
+                            TextFieldName="@nameof(OperatorProcedure.OperatorProcedureName)"
+                            @bind-Text=_WorkingList.WorkingName
+                            @bind-Value="@OperatorProcedureValue"
+                            SelectedItemChanged="@((OperatorProcedure item) => SelectedItemChanged(item))"
+                            ReadOnly="true"
+                            Enabled="false">
+                </DxComboBox>
+            </DxFormLayoutItem>
+
+            @if (_WorkingTypeDetail is not null)
+            {
+                <DxFormLayoutItem Caption="作業程序 :" ColSpanLg="12">
+                    <div class="d-flex flex-row flex-wrap">
+                        @foreach (var item in _WorkingTypeDetail)
+                        {
+                            <div class="me-2 mb-2">
+                                @if (item.IsSelect == false)
+                                {
+                                    <button class="dxbl-btn dxbl-btn-outline-info w-10" type="button" @onclick="@(() => SetWorkProcess(@item.TypeName.ToString()))" disabled>
+                                        <span>@item.TypeName</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="dxbl-btn dxbl-btn-info w-10" type="button" @onclick="@(() => SetWorkProcess(@item.TypeName.ToString()))" disabled>
+                                        <span>@item.TypeName</span>
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
+                </DxFormLayoutItem>
+            }
+            else
+            {
+                <DxFormLayoutItem Caption="作業程序 :" ColSpanMd="6">
+                    <DxTextBox @bind-Text=_WorkingList.ProcessName />
+                </DxFormLayoutItem>
+            }
+
+            @if (_WorkOrderSelections is not null)
+            {
+                <DxFormLayoutItem Caption="工單號碼 :" ColSpanLg="12">
+                    <div class="d-flex flex-row flex-wrap">
+                        @foreach (var item in _WorkOrderSelections)
+                        {
+                            <div class="me-2 mb-2">
+                                @if (item.IsSelect == false)
+                                {
+                                    <button class="dxbl-btn dxbl-btn-outline-info w-10" type="button" @onclick="@(() => SetWorkOrder(@item.WorkOrder.ToString()))">
+                                        <span>@item.WorkOrder</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="dxbl-btn dxbl-btn-info w-10" type="button" @onclick="@(() => SetWorkOrder(@item.WorkOrder.ToString()))">
+                                        <span>@item.WorkOrder</span>
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
+                </DxFormLayoutItem>
+            }
+
+            @*            <DxFormLayoutItem Caption="工單號碼 :" ColSpanMd="6">
+            <DxTextBox @bind-Text=_WorkingList.WorkOrder />
+            </DxFormLayoutItem>*@
+
+            @if (_WorkOrderSelections is not null)
+            {
+                <DxFormLayoutItem Caption="" ColSpanMd="6">
+                </DxFormLayoutItem>
+            }
+            @*            <DxFormLayoutItem Caption="作業人員 :">
+            <DxTextBox @bind-Text=_WorkingList.OPNO />
+            </DxFormLayoutItem>*@
+
+            @if (_SerialNumberSelections is not null)
+            {
+                <DxFormLayoutItem Caption="手臂序號 :" ColSpanLg="12">
+                    <div class="d-flex flex-row flex-wrap">
+                        @foreach (var item in _SerialNumberSelections)
+                        {
+                            <div class="me-2 mb-2">
+                                @if (item.IsWorkOrderSelect == true)
+                                {
+                                    @if (item.IsSerialNumberSelect == false)
+                                    {
+                                        <button class="dxbl-btn dxbl-btn-outline-success w-10" type="button" @onclick="@(() => SetSerialNumber(@item.SerialNumber.ToString()))">
+                                            <span>@item.SerialNumber</span>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="dxbl-btn dxbl-btn-success w-10" type="button" @onclick="@(() => SetSerialNumber(@item.SerialNumber.ToString()))">
+                                            <span>@item.SerialNumber</span>
+                                        </button>
+                                    }
+                                }
+                            </div>
+                        }
+                    </div>
+                </DxFormLayoutItem>
+            }
+
+            @*            @if (_WorkOrderSelections is not null)
+            {
+            <DxFormLayoutItem Caption="" ColSpanMd="6">
+            </DxFormLayoutItem>
+            }*@
+
+            @*            <DxFormLayoutItem Caption="手臂序號 :" ColSpanMd="6">
+            <DxTextBox @bind-Text=_WorkingList.SeriaNumber />
+            </DxFormLayoutItem>*@
+
+            @if (_WorkOrderSelections is not null)
+            {
+                <DxFormLayoutItem Caption="" ColSpanMd="6">
+                </DxFormLayoutItem>
+            }
+
+            @if (_WorkingList.AssignTime is null)
+            {
+                @*                <DxFormLayoutItem Caption="作業人員:" ColSpanMd="6">
+            <DxComboBox Data="@_Operators"
+            AllowUserInput="true"
+            NullText="作業人員..."
+            TextFieldName="@nameof(Operator.OperatorID)"
+            @bind-Text=_WorkingList.OPNO
+            @bind-Value="@OperatorValue">
+            </DxComboBox>
+            </DxFormLayoutItem>*@
+                @if (_WorkOrderSelections is not null)
+                {
+                    <DxFormLayoutItem Caption="作業人員 :" ColSpanMd="12">
+                        <div class="d-flex flex-row flex-wrap">
+                            @foreach (var item in _Operators)
+                            {
+                                <div class="me-2 mb-2">
+                                    @if (item.IsSelect == false)
+                                    {
+                                        <button class="dxbl-btn dxbl-btn-outline-info w-10" type="button" @onclick="@(() => SetManufacturingProcess(item.OperatorID.ToString()))">
+                                            <span>@item.OperatorName</span>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="dxbl-btn dxbl-btn-info w-10" type="button" @onclick="@(() => SetManufacturingProcess(item.OperatorID.ToString()))">
+                                            <span>@item.OperatorName</span>
+                                        </button>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </DxFormLayoutItem>
+                }
+                else
+                {
+                    <DxFormLayoutItem Caption="作業人員 :" ColSpanMd="6">
+                        <DxComboBox Data="@_Operators"
+                            AllowUserInput="true"
+                            NullText="作業人員..."
+                            TextFieldName="@nameof(Operator.OperatorID)"
+                            @bind-Text=_WorkingList.OPNO
+                            @bind-Value="@OperatorValue">
+                        </DxComboBox>
+                    </DxFormLayoutItem>
+                }
+            }
+            else
+            {
+                <DxFormLayoutItem Caption="作業人員 :">
+                    <DxTextBox @bind-Text=_WorkingList.OPNO ReadOnly="true" />
+                </DxFormLayoutItem>
+            }
+
+            @*            <DxFormLayoutItem Caption="數量 :" ColSpanMd="6">
+            <DxSpinEdit @bind-Value=_WorkingList.QTY />
+            </DxFormLayoutItem>*@
+
+        </DxFormLayout>
+
+        <br />
+    </EditFormTemplate>
+</DxGrid>
+
+</DxLoadingPanel>
+
+@*<DxPopup HeaderText="Header"
+         @bind-Visible="@PopupVisible"
+         BodyText="OperatorValue">
+</DxPopup>*@
+
+<DxPopup @bind-Visible="@PopupVisible"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         HeaderText="派工作業通知"
+         BodyText="@_ErrorMsg"
+         Width="315">
+    <FooterContentTemplate Context="Context">
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="OK" Click="OkEulaClick" />
+        @*<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="Cancel" Click="CancelEulaClick" />*@
+    </FooterContentTemplate>
+</DxPopup>
+
+@code {
+    DxGrid? MyGrid;
+    //List<WorkOrderSelection> _WorkOrderSelections = new List<WorkOrderSelection>();
+
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    _WorkOrderSelections = await DataService.GetERPWorkOrderList();
+    //}
+    private List<WorkingList>? _WorkingLists;
+
+    List<OperatorWorkTime>? _OperatorWorkTimes { get; set; }
+    string? OperatorWorkTimeValue { get; set; }
+
+    List<Operator>? _Operators { get; set; }
+    string? OperatorValue { get; set; }
+
+    List<OperatorProcedure>? _OperatorProcedures { get; set; }
+    OperatorProcedure OperatorProcedureValue;
+
+    private List<WorkOrderSelection>? _WorkOrderSelections;
+
+    private List<SerialNumberSelection>? _SerialNumberSelections;
+
+    private List<WorkingTypeDetail> _WorkingTypeDetail;
+
+    private List<TimeDay>? _TimeDays;
+
+    WorkingList _EditModel;
+
+    bool PopupVisible { get; set; } = false;
+    bool PanelVisible  { get; set; } = false;
+
+    string _ErrorMsg;
+
+    int WorkDayCount = 0;
+    int WorkOrderCount = 0;
+    int SerialNumberCount = 0;
+    int OPCount = 0;
+
+    string WN = "";
+
+    float? WorkOrderCounts { get; set; }
+
+    async Task OkEulaClick()
+    {
+        //_WorkingLists = await DataService.ChangeWorkingListsAsync(_EditModel, true);
+        PopupVisible = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _WorkingLists = await DataService.GetWorkingListsAsync("Detail");
+        _WorkingLists = _WorkingLists.Where(x => x.IsResponse == false && x.WorkingName == "14").ToList();
+        _WorkingLists = _WorkingLists.OrderBy(x => x.AssignTime).ToList();
+        _WorkingLists.Reverse();
+        _OperatorWorkTimes = await DataService.GetOperatorWorkTimesAsync();
+        _Operators = await DataService.GetOperatorsAsync();
+        _OperatorProcedures = await DataService.GetOperatorProceduresAsync();
+        _TimeDays = await DataService.GetTimeDaysAsync();
+        //OperatorProcedureValue = _OperatorProcedures.Where(x => x.OperatorProcedureSFC == "RobotAssembly").FirstOrDefault();
+        //_WorkOrderSelections = await DataService.GetWorkOrderSelectionAsync("RobotAssembly");
+        //_SerialNumberSelections = await DataService.GetSerialNumberSelectionAsync("RobotAssembly");
+    }
+    async Task OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (WorkingList)e.EditModel;
+        //editModel.UserName = "Test"; //Login User
+        //editModel.UpdateTime = DateTime.Now;
+        editModel.AssignTime = DateTime.Now;
+        //_EditModel = editModel;
+        _ErrorMsg = "";
+
+        if (e.IsNew)
+        {
+            if (WorkDayCount > 0 && WorkOrderCount > 0 && OPCount > 0)
+            {
+                DateTime _Time = DateTime.Parse(_TimeDays.Single(x => x.IsSelect == true).Description);
+                string _WorkName = OperatorProcedureValue.OperatorProcedureID;
+                string _WorkDescription = OperatorProcedureValue.OperatorProcedureName;
+                string _ProcessName = _WorkingTypeDetail[0].TypeID;
+                string _ProcessDescription = _WorkingTypeDetail[0].TypeName;
+                string _SeriaNumber = "";
+                int Index = await DataService.GetWorkingListsCountAsync() + 1;
+
+                List<WorkingList>? _NewWorkingLists = new List<WorkingList>();
+                List<WorkingList>? _DuplicateWorkingLists = new List<WorkingList>();
+
+                foreach (var orderitem in _WorkOrderSelections.Where(x => x.IsSelect == true))
+                {
+                    //foreach (var serialitem in _SerialNumberSelections.Where(x => x.IsSerialNumberSelect == true))
+                    //{
+                    //if (serialitem.WorkOrder != orderitem.WorkOrder)
+                    //{
+                    //    _SeriaNumber = "";
+                    //}
+                    //else
+                    //{
+                    //    _SeriaNumber = serialitem.SerialNumber;
+                    //}
+                    foreach (var opitem in _Operators.Where(x => x.IsSelect == true))
+                    {
+                        //var orginalForecast = _WorkingLists.FirstOrDefault(i => i.WorkingTime == _Time &&
+                        //                                                        i.WorkingID == Index &&
+                        //                                                        i.WorkingName == _WorkName &&
+                        //                                                        i.ProcessName == _ProcessName &&
+                        //                                                        i.WorkOrder == orderitem.WorkOrder &&
+                        //                                                        i.SeriaNumber == _SeriaNumber &&
+                        //                                                        i.OPNO == opitem.OperatorID);
+
+                        var orginalForecast = _WorkingLists.FirstOrDefault(i => i.WorkingTime == _Time &&
+                                                                                i.WorkingName == _WorkName &&
+                                                                                i.ProcessName == _ProcessName &&
+                                                                                i.WorkOrder == orderitem.WorkOrder &&
+                                                                                i.SeriaNumber == _SeriaNumber &&
+                                                                                i.OPNO == opitem.OperatorID &&
+                                                                                DateTime.Equals(Convert.ToDateTime(i.AssignTime.ToString()).Date, Convert.ToDateTime(editModel.AssignTime).Date) &&
+                                                                                //i.AssignTime == editModel.AssignTime &&
+                                                                                i.IsDel == false);
+
+                        string _IsNull = "Job not exist";
+                        if (orginalForecast is not null) { _IsNull = "Job is exist"; }
+
+                        DataLogService.WriteEventLog("Motion", "Add WorkingList" + "|" + _IsNull + "|" + _Time + "|" + Index + "|" + opitem.OperatorID + "|" + orderitem.WorkOrder + "|" + _SeriaNumber + "|" + "Add :" + DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff"));
+
+                        if (orginalForecast == null)
+                        {
+                            _NewWorkingLists.Add(new WorkingList
+                                    {
+                                        WorkingTime = _Time,
+                                        WorkingID = Index,
+                                        WorkingPeriod = "",
+                                        WorkingName = _WorkName,
+                                        WorkingDescription = _WorkDescription,
+                                        ProcessName = _ProcessName,
+                                        ProcessDescription = _ProcessDescription,
+                                        WorkOrder = orderitem.WorkOrder,
+                                        PartNo = orderitem.PartNo,
+                                        PartName = orderitem.PartName,
+                                        SeriaNumber = _SeriaNumber,
+                                        WorkOrderCount = orderitem.WorkOrderCount,
+                                        OPNO = opitem.OperatorID,
+                                        OPName = opitem.OperatorName,
+                                        AssignTime = DateTime.Now,
+                                        IsDel = false,
+                                        IsAssign = true,
+                                        IsReceive = false,
+                                        IsPause = false,
+                                        IsResponse = false
+                                    });
+                        }
+                        else
+                        {
+                            _ErrorMsg = _ErrorMsg + "," + opitem.OperatorID + ", " + orderitem.WorkOrder + ", " + _SeriaNumber + " \r\n";
+                            //_DuplicateWorkingLists.Add(new WorkingList
+                            //{
+                            //    WorkingTime = _Time,
+                            //    WorkingID = 1,
+                            //    WorkingName = _WorkName,
+                            //    WorkingDescription = _WorkDescription,
+                            //    ProcessName = _ProcessName,
+                            //    ProcessDescription = _ProcessDescription,
+                            //    WorkOrder = orderitem.WorkOrder,
+                            //    SeriaNumber = serialitem.SerialNumber,
+                            //    OPNO = opitem.OperatorID,
+                            //    AssignTime = DateTime.Now,
+                            //    IsDel = false,
+                            //    IsAssign = true,
+                            //    IsReceive = false,
+                            //    IsPause = false,
+                            //    IsResponse = false
+                            //});
+                        }
+
+                        Index++;
+                    }
+                    //}
+                }
+
+                if (!string.IsNullOrEmpty(_ErrorMsg))
+                {
+                    _ErrorMsg = _ErrorMsg.Substring(1);
+                    _ErrorMsg = _ErrorMsg + "於同時段已經有相同作業";
+                    PopupVisible = true;
+                }
+
+                _WorkingLists = await DataService.ChangeWorkingListsAsync(_NewWorkingLists);
+                _WorkingLists = await DataService.GetWorkingListsAsync("Detail");
+                _WorkingLists = _WorkingLists.Where(x => x.IsResponse == false && x.WorkingName == "14").ToList();
+                _WorkingLists = _WorkingLists.OrderBy(x => x.AssignTime).ToList();
+                _WorkingLists.Reverse();
+            }
+            else
+            {
+                if (WorkDayCount == 0)
+                {
+                    _ErrorMsg = _ErrorMsg + " 請選擇作業日期 (至少選擇其中一個項目) \r\n";
+                }
+                if (WorkOrderCount == 0)
+                {
+                    _ErrorMsg = _ErrorMsg + " 請選擇工單號碼 (至少選擇其中一個項目) \r\n";
+                }
+                if (SerialNumberCount < 1)
+                {
+                    _ErrorMsg = _ErrorMsg + " 請選擇手臂序號 (至少選擇其中一個項目) \r\n";
+                }
+                if (OPCount < 1)
+                {
+                    _ErrorMsg = _ErrorMsg + " 請選擇作業人員 (至少選擇其中一個項目) \r\n";
+                }
+
+                if (!string.IsNullOrEmpty(_ErrorMsg))
+                {
+                    _ErrorMsg = _ErrorMsg.Substring(1);
+                    PopupVisible = true;
+                }
+            }
+            //if (await DataService.CheckWorkingListsAsync((WorkingList)e.EditModel))
+            //{
+            //    PopupVisible = true;
+            //}
+            //else
+            //{
+            //    _WorkingLists = await DataService.ChangeWorkingListsAsync((WorkingList)e.EditModel, e.IsNew);
+            //}
+        }
+        else
+        {
+            //_WorkingLists = await DataService.ChangeWorkingListsAsync((WorkingList)e.EditModel, e.IsNew);
+        }
+    }
+    async Task Delete(WorkingList item)
+    {
+        if (item != null)
+        {
+            await DataService.Remove(item);
+        }
+        _WorkingLists = await DataService.GetWorkingListsAsync("Detail");
+        _WorkingLists = _WorkingLists.Where(x => x.IsResponse == false && x.WorkingName == "14").ToList();
+        _WorkingLists = _WorkingLists.OrderBy(x => x.AssignTime).ToList();
+        _WorkingLists.Reverse();
+    }
+    async Task SetWorkOrder(string item)
+    {
+        WorkOrderCount = 0;
+        if (_WorkOrderSelections.Single(x => x.WorkOrder == item).IsSelect == false)
+        {
+            DataLogService.WriteEventLog("Motion", "WorkOrder Select" + "|" + item + "|" + DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff"));
+            foreach (var _item in _WorkOrderSelections)
+            {
+                _item.IsSelect = false;
+            }
+            //foreach (var _item in _SerialNumberSelections)
+            //{
+            //    _item.IsSerialNumberSelect = false;
+            //    _item.IsWorkOrderSelect = false;
+            //}
+
+            _WorkOrderSelections.Single(x => x.WorkOrder == item).IsSelect = true;
+            WorkOrderCounts = _WorkOrderSelections.Single(x => x.WorkOrder == item).WorkOrderCount;
+            WorkOrderCount++;
+            //foreach (var items in _SerialNumberSelections.Where(x => x.WorkOrder == item))
+            //{
+            //    WN = item;
+            //    items.IsWorkOrderSelect = true;
+            //}
+        }
+        else
+        {
+            DataLogService.WriteEventLog("Motion", "WorkOrder Deselect" + "|" + item + "|" + DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff"));
+            foreach (var _item in _WorkOrderSelections)
+            {
+                _item.IsSelect = false;
+            }
+            //foreach (var _item in _SerialNumberSelections)
+            //{
+            //    _item.IsSerialNumberSelect = false;
+            //    _item.IsWorkOrderSelect = false;
+            //}
+
+            _WorkOrderSelections.Single(x => x.WorkOrder == item).IsSelect = false;
+            WorkOrderCounts = 0;
+            //foreach (var items in _SerialNumberSelections.Where(x => x.WorkOrder == item))
+            //{
+            //    WN = "";
+            //    items.IsWorkOrderSelect = false;
+            //}
+        }
+    }
+    async Task SetSerialNumber(string item)
+    {
+        //var item1 = _SerialNumberSelections.Single(x => x.WorkOrder == WN && x.SerialNumber == item);
+        if (_SerialNumberSelections.Single(x => x.WorkOrder == WN && x.SerialNumber == item).IsSerialNumberSelect == false)
+        {
+            DataLogService.WriteEventLog("Motion", "SerialNumber Select" + "|" + item + "|" + DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff"));
+            _SerialNumberSelections.Single(x => x.WorkOrder == WN && x.SerialNumber == item).IsSerialNumberSelect = true;
+            SerialNumberCount++;
+        }
+        else
+        {
+            DataLogService.WriteEventLog("Motion", "SerialNumber Deselect" + "|" + item + "|" + DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff"));
+            _SerialNumberSelections.Single(x => x.WorkOrder == WN && x.SerialNumber == item).IsSerialNumberSelect = false;
+            SerialNumberCount--;
+        }
+    }
+
+    async Task SetWorkProcess(string item)
+    {
+        if (_WorkingTypeDetail.Single(x => x.TypeName == item).IsSelect == false)
+        {
+            _WorkingTypeDetail.Single(x => x.TypeName == item).IsSelect = true;
+        }
+        else
+        {
+            _WorkingTypeDetail.Single(x => x.TypeName == item).IsSelect = false;
+        }
+    }
+
+    async Task SetDayStep(string item)
+    {
+        WorkDayCount = 0;
+        foreach (var _item in _TimeDays)
+        {
+            _item.IsSelect = false;
+        }
+        if (_TimeDays.Single(x => x.TimeDayType == item).IsSelect == false)
+        {
+            DataLogService.WriteEventLog("Motion", "WorkDay Select" + "|" + item + "|" + DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff"));
+            _TimeDays.Single(x => x.TimeDayType == item).IsSelect = true;
+            WorkDayCount++;
+        }
+        else
+        {
+            DataLogService.WriteEventLog("Motion", "WorkDay Select" + "|" + item + "|" + DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff"));
+            _TimeDays.Single(x => x.TimeDayType == item).IsSelect = false;
+        }
+    }
+
+    async Task SelectedItemChanged(OperatorProcedure item)
+    {
+        if (item is not null)
+        {
+            if (!string.IsNullOrEmpty(item.OperatorProcedureSFC))
+            {
+                _WorkOrderSelections = null;
+                _SerialNumberSelections = null;
+                _WorkingTypeDetail = null;
+                _Operators = null;
+                _WorkOrderSelections = await DataService.GetWorkOrderSelectionAsync(item.OperatorProcedureSFC);
+                _SerialNumberSelections = await DataService.GetSerialNumberSelectionAsync(item.OperatorProcedureSFC);
+                //_SerialNumberSelections.Sort();
+                _WorkingTypeDetail = await DataService.GetWorkingTypeDetailAsync(item.OperatorProcedureID);
+                _Operators = await DataService.GetOperatorsAsync(item.OperatorProcedureID);
+            }
+        }
+        else
+        {
+            _WorkOrderSelections = null;
+            _SerialNumberSelections = null;
+            _Operators = await DataService.GetOperatorsAsync();
+        }
+    }
+
+    async Task SetManufacturingProcess(string item)
+    {
+        //foreach (var items in _Operators)
+        //{
+        //    items.IsSelect = false;
+        //}
+        if (_Operators.Single(x => x.OperatorID == item).IsSelect == false)
+        {
+            _Operators.Single(x => x.OperatorID == item).IsSelect = true;
+            OPCount++;
+        }
+        else
+        {
+            _Operators.Single(x => x.OperatorID == item).IsSelect = false;
+            OPCount--;
+        }
+    }
+
+    async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+        if (e.IsNew)
+        {
+            DataLogService.WriteEventLog("Motion", "New Job Select" + "|" + "Start Create" + "|" + DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff"));
+            var editModel = (WorkingList)e.EditModel;
+            _WorkOrderSelections = null;
+            _SerialNumberSelections = null;
+            _WorkingTypeDetail = null;
+            OperatorProcedureValue = _OperatorProcedures[14];
+            WorkDayCount = 0;
+            WorkOrderCount = 0;
+            SerialNumberCount = 0;
+            OPCount = 0;
+
+            PanelVisible = true;
+            await Task.Run(() =>
+            {
+                OnTextChanged();
+                PanelVisible = false;
+            });
+
+            DataLogService.WriteEventLog("Motion", "New Job Select" + "|" + "Finish Create" + "|" + DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff"));
+        }
+    }
+
+    async Task OnTextChanged()
+    {
+        _WorkOrderSelections = null;
+        _SerialNumberSelections = null;
+        _WorkingTypeDetail = null;
+        _Operators = null;
+        _TimeDays = null;
+        _WorkOrderSelections = await DataService.GetERPWorkOrderList();
+        //_SerialNumberSelections = await DataService.GetSerialNumberSelectionAsync("RobotAssembly");
+        //_SerialNumberSelections.Sort();
+        _WorkingTypeDetail = await DataService.GetWorkingTypeDetailAsync("14");
+        _WorkingTypeDetail[0].IsSelect = true;
+        _Operators = await DataService.GetOperatorsAsync("14");
+        _TimeDays = await DataService.GetTimeDaysAsync();
+    }
+}

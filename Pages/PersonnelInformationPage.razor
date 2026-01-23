@@ -1,0 +1,151 @@
+﻿@page "/OperatorInformationPage"
+@using DxBlazorApplication7.Data
+@inject AuthenticationStateProvider authenticationStateProvider
+@inherits AuthComponentBase
+@inject DataService DataService
+
+<br />
+<h3>產線人員資本資料</h3>
+<br />
+
+<DxGrid Data="_OperatorInformations"
+        @ref="MyGrid"
+        PageSize="24"
+        EditModelSaving="OnEditModelSaving"
+        @bind-SelectedDataItems="SelectedDataItems">
+    <Columns>
+        @if (customAuth.user.role != Role.Guest && customAuth.user.department == "Manager")
+        {
+            <DxGridCommandColumn Width="90">
+                <HeaderTemplate>
+                    <a class="oi oi-plus" @onclick="@(() => MyGrid.StartEditNewRowAsync())" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </HeaderTemplate>
+                <CellDisplayTemplate>
+                    <a class="oi oi-pencil" @onclick="@(() => MyGrid.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                    <a class="oi oi-x" @onclick="@(() => Delete((OperatorInformation)context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </CellDisplayTemplate>
+            </DxGridCommandColumn>
+        }
+        <DxGridDataColumn FieldName=@nameof(OperatorInformation.Department) Caption="部門" MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(OperatorInformation.OperatorName) Caption="姓名" MinWidth="90" />
+@*         <DxGridDataColumn FieldName=@nameof(OperatorInformation.OperatorEnName) Caption="英文姓名" MinWidth="90" /> *@
+@*         <DxGridDataColumn FieldName=@nameof(OperatorInformation.Mail) Caption="郵件" MinWidth="300" /> *@
+@*         <DxGridDataColumn FieldName=@nameof(OperatorInformation.Phone) Caption="連絡電話" MinWidth="150" /> *@
+        <DxGridDataColumn FieldName=@nameof(OperatorInformation.OPNO) Caption="工號" MinWidth="120" />
+@*        <DxGridDataColumn FieldName=@nameof(OperatorInformation.CARDNO) Caption="卡號" MinWidth="180" />*@
+@*        <DxGridDataColumn FieldName=@nameof(OperatorInformation.IsDel) Caption="是否被刪除" MinWidth="210" />*@
+@*        <DxGridDataColumn FieldName=@nameof(OperatorInformation.IsSPDGroup) Caption="SPD" MinWidth="60" />*@
+@*         <DxGridDataColumn FieldName=@nameof(OperatorInformation.IsSPDGroup) Caption="SPD" Width="10%" MinWidth="90">
+            <CellDisplayTemplate>
+                @if ((bool)context.Value)
+                {
+                    <span class="grid-icon grid-icon-check"></span>
+                }
+            </CellDisplayTemplate>
+        </DxGridDataColumn> *@
+@*        <DxGridDataColumn FieldName=@nameof(OperatorInformation.CreateTime) Caption="建立時間" DisplayFormat="G" MinWidth="210" />*@
+@*        <DxGridDataColumn FieldName=@nameof(OperatorInformation.UpdateTime) Caption="更新時間" MinWidth="135" />*@
+    </Columns>
+    <EditFormTemplate Context="EditFormContext">
+        @{
+            var _OperatorInformation = (OperatorInformation)EditFormContext.EditModel;
+        }
+        <DxFormLayout>
+@*            <DxFormLayoutItem Caption="部門 :">
+                <DxTextBox @bind-Text=_OperatorInformation.Department />
+            </DxFormLayoutItem>*@
+            <DxFormLayoutItem Caption="部門:" ColSpanMd="6">
+                <DxComboBox Data="@_Departments"
+                            AllowUserInput="true"
+                            NullText="部門選擇..."
+                            TextFieldName="@nameof(Department.DepartmentName)"
+                            @bind-Text=_OperatorInformation.Department
+                            @bind-Value="@Value">
+                </DxComboBox>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="姓名 :">
+                <DxTextBox @bind-Text=_OperatorInformation.OperatorName />
+            </DxFormLayoutItem>
+@*             <DxFormLayoutItem Caption="英文姓名 :">
+                <DxTextBox @bind-Text=_OperatorInformation.OperatorEnName />
+            </DxFormLayoutItem> *@
+@*             <DxFormLayoutItem Caption="郵件 :">
+                <DxTextBox @bind-Text=_OperatorInformation.Mail />
+            </DxFormLayoutItem> *@
+@*             <DxFormLayoutItem Caption="連絡電話 :">
+                <DxTextBox @bind-Text=_OperatorInformation.Phone />
+            </DxFormLayoutItem> *@
+            <DxFormLayoutItem Caption="工號 :">
+                <DxTextBox @bind-Text=_OperatorInformation.OPNO />
+            </DxFormLayoutItem>
+@*            <DxFormLayoutItem Caption="卡號 :">
+                <DxTextBox @bind-Text=_OperatorInformation.CARDNO />
+            </DxFormLayoutItem>*@
+@*             <DxFormLayoutItem Caption="郵件 :">
+                <DxTextBox @bind-Text=_OperatorInformation.Mail />
+            </DxFormLayoutItem> *@
+@*            <DxFormLayoutItem Caption="是否被刪除 :">
+                <DxCheckBox @bind-Checked=_OperatorInformation.IsDel />
+            </DxFormLayoutItem>*@
+@*             <DxFormLayoutItem Caption="是否為SPD群組 :">
+                <DxCheckBox @bind-Checked=_OperatorInformation.IsSPDGroup />
+            </DxFormLayoutItem> *@
+@*            <DxFormLayoutItem Caption="建立時間 :">
+                <DxDateEdit @bind-Date=_OperatorInformation.CreateTime TimeSectionVisible="true" ReadOnly="true" />
+            </DxFormLayoutItem>*@
+@*            <DxFormLayoutItem Caption="更新時間 :">
+                <DxDateEdit @bind-Date=_OperatorInformation.UpdateTime TimeSectionVisible="true" ReadOnly="true" />
+            </DxFormLayoutItem>*@
+        </DxFormLayout>
+    </EditFormTemplate>
+</DxGrid>
+@code {
+    private List<OperatorInformation>? _OperatorInformations;
+    private List<UserDetails>? _UserDetails;
+    DxGrid? MyGrid;
+    IReadOnlyList<object>? SelectedDataItems { get; set; }
+    List<Department>? _Departments { get; set; }
+    string? Value { get; set; }
+    [Inject] public HttpClient Http { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _OperatorInformations = await DataService.GetOperatorInformationsAsync();
+        _Departments = await DataService.GetDepartmentsAsync();
+        //_UserDetails = await DataService.GetUserDetailsAsync();
+        _OperatorInformations = _OperatorInformations.Where(x => x.IsDel == false).ToList();
+        SelectedDataItems = _OperatorInformations.Where(x => x.IsSPDGroup == true).ToList();
+    }
+
+    async Task OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (OperatorInformation)e.EditModel;
+        //editModel.UserName = "Test"; //Login User
+        if (!string.IsNullOrEmpty(editModel.Department) && !string.IsNullOrEmpty(editModel.OperatorName) && !string.IsNullOrEmpty(editModel.OPNO))
+        {
+            editModel.OperatorEnName = "";
+            editModel.Mail = "";
+            editModel.Phone = "";
+            editModel.IsSPDGroup = false;
+            editModel.CARDNO = "";
+            editModel.Ability = "";
+            editModel.IsManager = false;
+            editModel.IsDel = false;
+            editModel.CreateUser = customAuth.user.userName;
+            editModel.UpdateTime = DateTime.Now;
+            editModel.CreateTime = DateTime.Now;
+            _OperatorInformations = await DataService.ChangeOperatorInformationsAsync((OperatorInformation)e.EditModel);
+        }
+        //Departments = await DataService.GetDepartmentsAsync();
+        //_OperatorInformations = _OperatorInformations.Where(x => x.IsDel == false).ToList();
+    }
+
+    async Task Delete(OperatorInformation item)
+    {
+        if (item != null)
+        {
+            await DataService.Remove(item);
+            _OperatorInformations = _OperatorInformations.Where(x => x.IsDel == false).ToList();
+        }
+    }
+}

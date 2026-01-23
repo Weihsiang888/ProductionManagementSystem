@@ -1,0 +1,209 @@
+﻿@using DxBlazorApplication7.Data
+@inject DataService DataService
+
+@foreach (var item in Param)
+{
+    <div class="bgcard" onclick="@(()=>{Nav(item);})">
+        <div class="block">
+            <DxGridLayout ColumnSpacing="0.1rem">
+                <Rows>
+                    <DxGridLayoutRow Height="6fr" />
+                    <DxGridLayoutRow Height="6fr" />
+                </Rows>
+                <Columns>
+                    <DxGridLayoutColumn Width="4fr" />
+                    <DxGridLayoutColumn Width="7fr" />
+                    <DxGridLayoutColumn Width="3fr" />
+                </Columns>
+                <Items>
+                    <DxGridLayoutItem Row="0" Column="0" RowSpan="2">
+                        <Template>
+                            <div class="cell">
+                                <div class="headerblock">
+                                    @GetStationProcedureVaule(item)
+                                    @* @item.ESOPCode *@
+                                    @* @GetSensorTableVaule(item) *@
+                                </div>
+                            </div>
+                        </Template>
+                    </DxGridLayoutItem>
+                    <DxGridLayoutItem Row="0" Column="1">
+                        <Template>
+                            <div class="label">
+                                @* @GetStationProcedureVaule(item) *@
+                                @GetModelVaule(item)
+                            </div>
+                        </Template>
+                    </DxGridLayoutItem>
+                    <DxGridLayoutItem Row="1" Column="1">
+                        <Template>
+                                @* @GetModelVaule(item) *@
+                                @item.ESOPCode
+                        </Template>
+                    </DxGridLayoutItem>
+                    <DxGridLayoutItem Row="0" Column="2" RowSpan="2">
+                        <Template>
+                            @* <DxButton Text="Success" RenderStyle="ButtonRenderStyle.Success" SizeMode="SizeMode.Medium"></DxButton> *@
+                            <div class="cell">
+                                <DxButton Text="開啟SOP" CssClass="w-100" RenderStyle="ButtonRenderStyle.Success" SizeMode="SizeMode.Large" Click="@(()=>{Nav(item);})"></DxButton>
+                            </div>
+                        </Template>
+                    </DxGridLayoutItem>
+                </Items>
+            </DxGridLayout>
+        </div>
+    </div>
+}
+
+<DxPopup Width="100%" Height="100%" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center" @bind-Visible="@EsopPopupVisible"
+         ShowHeader="false"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         BodyText="@_ESOPMsg">
+
+    <BodyContentTemplate Context="PopupContext">
+        @*<img class="fit-width" src="images/Techman Robot.png" style="height: 24%; width: 24%; float:right" align="bottom" />*@
+        @* <div style="width:100%; height:100%;">
+            <object data="@_ESOPData" type="application/pdf" style="width:100%; height:100%;"></object>
+            <iframe src='../Uploads/S00/P00/M01/更新License.pdf' width="500" height="678"> </iframe>
+        </div> *@
+        <div style="width:100%; height:100%;">
+            @if (!string.IsNullOrEmpty(_ESOPData))
+            {
+                @* <object data="@_ESOPData" type="application/pdf" style="width:100%; height:100%;" @key="_ESOPData"></object> *@
+                @* <iframe src="/pdfjs/web/viewer.html?file=@Uri.EscapeDataString(_ESOPData)"
+                        style="width:100%; height:100%; border:none;">
+                </iframe> *@
+                <iframe src="/pdfjs/web/viewer.html?file=@Uri.EscapeDataString(_ESOPData)#zoom=page-width"
+                        style="width:100%; height:100%; border:none;">
+                </iframe>
+
+            }
+        </div>
+    </BodyContentTemplate>
+    <FooterContentTemplate Context="Context">
+        <div class="d-flex align-items-center w-100">
+            <!-- 第一個靠左的按鈕 -->
+            <DxButton CssClass="popup-button my-1 me-2"
+                      RenderStyle="ButtonRenderStyle.Secondary"
+                      Text="繁體中文"
+                      Click="Selected_LanguageChanged" />
+
+            <!-- 第二個靠左的按鈕 -->
+            <DxButton CssClass="popup-button my-1 me-2"
+                      RenderStyle="ButtonRenderStyle.Secondary"
+                      Text="English"
+                      Click="Selected_LanguageChanged" />
+
+            <!-- 第三個靠最右的按鈕 -->
+            <DxButton CssClass="popup-button my-1 ms-auto"
+                      RenderStyle="ButtonRenderStyle.Primary"
+                      Text="Close"
+                      Click="CloseEulaClick" />
+        </div>
+        @* <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="Close" Click="CloseEulaClick" /> *@
+        @*<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="Cancel" Click="CancelEulaClick" />*@
+    </FooterContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter]
+    public List<ESOPStatus> Param { get; set; }
+
+    private List<StationStatus>? _StationStatus;
+    private List<ProcedureStatus>? _ProcedureStatus;
+    private List<ModelStatus>? _ModelStatus;
+
+    private Tuple<List<DirectoryStatus>, List<FolderStatus>> _Tuple;
+    private List<DirectoryStatus>? _DirectoryStatus;
+
+    bool EsopPopupVisible { get; set; } = false;
+    string _ESOPMsg;
+    string _ESOPData;
+
+    string _ESOPFolder;
+    string _ESOPFile;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _StationStatus = await DataService.GetStationStatusAsync();
+        _ProcedureStatus = await DataService.GetProcedureStatusAsync();
+        _ModelStatus = await DataService.GetModelStatusAsync();
+
+        // _Tuple = await DataService.GetESOPDirectoryStatusAsync();
+        // _DirectoryStatus = _Tuple.Item1;
+
+        _DirectoryStatus = DataService._DirectoryItem;
+    }
+
+    string? GetStationProcedureVaule(ESOPStatus item)
+    {
+        if (item.StationID != "" && item.ProcedureID != "")
+        {
+            string _StationName = "";
+            string _ProcedureName = "";
+            _StationName = _StationStatus.SingleOrDefault(x => x.StationKey + x.StationID.ToString() == item.StationID).StationName;
+            _ProcedureName = _ProcedureStatus.SingleOrDefault(x => x.ProcedureKey + x.ProcedureID.ToString() == item.ProcedureID).ProcedureName;
+            //return _StationName + " : " + _ProcedureName;
+            return _ProcedureName;
+        }
+        else
+        {
+            return "";
+        }
+    }
+
+    string? GetModelVaule(ESOPStatus item)
+    {
+        if (item.StationID != "" && item.ProcedureID != "")
+        {
+            string _ModelName = "";
+            _ModelName = _ModelStatus.SingleOrDefault(x => x.ModelKey + x.ModelID.ToString() == item.ModelID).ModelName;
+            return "模組 : " + _ModelName;
+        }
+        else
+        {
+            return "";
+        }
+    }
+
+    private void Nav(ESOPStatus item)
+    {
+        //nav.NavigateTo($"/TagDetails/{item.MachineSerialNumber.ToString()}/{item.MID.ToString()}");
+        EsopPopupVisible = true;
+        // _ESOPData = "../esop/" + item.ESOPCode + "/" + _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == item.ESOPCode).DirectoryMax + "/" + _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == item.ESOPCode).FileName;
+        //_ESOPData = "/esop/" + item.ESOPCode + "/" + _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == item.ESOPCode).DirectoryMax + "/" + _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == item.ESOPCode).FileName;
+        _ESOPFolder = "/esop/" + item.ESOPCode + "/" + _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == item.ESOPCode).DirectoryMax;
+        _ESOPFile = _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == item.ESOPCode).FileName;
+        _ESOPData = _ESOPFolder + "//" + _ESOPFile;
+    }
+
+    async Task Selected_LanguageChanged()
+    {
+        if (!string.IsNullOrEmpty(_ESOPData))
+        {
+            if (_ESOPFile.StartsWith("EN_"))
+            {
+                _ESOPData = _ESOPFolder + "//" + _ESOPFile.Replace("EN_", "");
+                _ESOPFile = _ESOPFile.Replace("EN_", "");
+            }
+            else
+            {
+                _ESOPData = _ESOPFolder + "//" + "EN_" + _ESOPFile;
+                _ESOPFile = "EN_" + _ESOPFile;
+            }
+        }
+        StateHasChanged();
+    }
+
+    async Task SOPEulaClick(ESOPStatus item)
+    {
+
+    }
+
+    async Task CloseEulaClick()
+    {
+        EsopPopupVisible = false;
+    }
+}

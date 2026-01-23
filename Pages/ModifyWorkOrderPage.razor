@@ -1,0 +1,174 @@
+﻿@page "/ModifyWorkerOrderPage"
+@using DxBlazorApplication7.Data
+@inject DataService DataService
+@using System.Globalization
+@using System.Collections.Generic
+
+<div class="UpdateWorkOrder">
+
+	<h3>更新工單</h3>
+	<p>注意 : 工單上輸入空格也會被視為1個號碼</p>
+
+	<DxGrid Data="_listWorkOrder"
+	KeyFieldName="ID"
+	ShowGroupPanel="false"
+	EditMode="GridEditMode.EditCell"
+	EditModelSaving="EditWorkOrderData"
+	PageSize="24">
+		<Columns>
+			@* <DxGridDataColumn FieldName=@nameof(WorkingOrderList.ID) Caption="索引" ReadOnly="true" Width="300" /> *@
+			<DxGridDataColumn FieldName=@nameof(WorkingOrderList.WorkOrder) Caption="工單(點擊修改)" ReadOnly="false" MinWidth="500" />
+		</Columns>
+	</DxGrid>
+
+	<br />
+	<button class="btn btn-info" @onclick="GetWorkOrderDataFromServiceAsync" disabled="@_isprocessing">獲取不是15碼的工單資料</button>
+	<button class="btn btn-danger" @onclick="UpdateWorkOrderDataToServiceAsync" disabled="@_isprocessing">更新工單</button>
+	<br />
+
+</div>
+
+<div class="UpdateWorkOrderCount">
+
+	<h3>更新工單數量</h3>
+
+	<br />
+	<DxToolbar>
+		<DxToolbarItem Context="itemCtx" BeginGroup="true" Alignment="ToolbarItemAlignment.Left">
+			<Template>
+				<DxTextBox @bind-Text="@_workOrderNumber"
+				NullText="輸入工單號碼"
+				CssClass="cw-320" />
+			</Template>
+		</DxToolbarItem>
+		<DxToolbarItem Text="搜尋" Click="SearchWorkOrderCountData" Alignment="ToolbarItemAlignment.Left" Enabled="@(!_isprocessing)" />
+	</DxToolbar>
+	<br />
+
+	<DxGrid Data="_listWorkOrderCount"
+	KeyFieldName="ID"
+	ShowGroupPanel="false"
+	EditMode="GridEditMode.EditCell"
+	EditModelSaving="EditWorkOrderCountData"
+	PageSize="24">
+		<Columns>
+			<DxGridDataColumn FieldName=@nameof(WorkingOrderList.StationName) Caption="站號" ReadOnly="true" MinWidth="500" />
+			<DxGridDataColumn FieldName=@nameof(WorkingOrderList.WorkOrder) Caption="工單" ReadOnly="true" MinWidth="500" />
+			<DxGridDataColumn FieldName=@nameof(WorkingOrderList.PassCount) Caption="良數量(點擊修改)" ReadOnly="false" MinWidth="250" />
+			<DxGridDataColumn FieldName=@nameof(WorkingOrderList.FailCount) Caption="不良數量(點擊修改)" ReadOnly="false" MinWidth="250" />
+		</Columns>
+	</DxGrid>
+
+	<br />
+	<button class="btn btn-danger" @onclick="UpdateWorkOrderCountDataToService" disabled="@_isprocessing">更新工單數量</button>
+	<br />
+
+</div>
+
+<style>
+
+	.UpdateWorkOrder {
+	border: 1px solid black;
+	padding: 20px;
+	margin-bottom: 20px;
+	}
+
+	.UpdateWorkOrderCount {
+	border: 1px solid black;
+	padding: 20px;
+	margin-bottom: 20px;
+	}
+
+	.cw-320 {
+	width: 300px;
+	}
+
+</style>
+
+
+@code {
+
+	bool _isprocessing { get; set; } = false;
+
+	#region WorkOrder
+
+	List<WorkingOrderList> _listWorkOrder = new List<WorkingOrderList>();
+
+	public async Task GetWorkOrderDataFromServiceAsync()
+	{
+		_isprocessing = true;
+		List<WorkingOrderList> data = await DataService.GetWorkingOrderListWrongLengthOfWorkOrderAsync();
+		_isprocessing = false;
+
+		_listWorkOrder.Clear();
+		_listWorkOrder = data;
+	}
+
+	public void EditWorkOrderData(GridEditModelSavingEventArgs e)
+	{
+		WorkingOrderList EditData = (WorkingOrderList)e.EditModel;
+
+		foreach (WorkingOrderList item in _listWorkOrder)
+		{
+			if (item.ID == EditData.ID)
+			{
+				item.WorkOrder = EditData.WorkOrder;
+			}
+		}
+	}
+
+	public async Task UpdateWorkOrderDataToServiceAsync()
+	{
+		if (_listWorkOrder.Count == 0)
+			return;
+
+		_isprocessing = true;
+		await DataService.UpdateWorkingOrderListAndStepListAsync(_listWorkOrder);
+		_isprocessing = false;
+	}
+
+	#endregion
+
+	#region WorkOrderCount
+
+	string _workOrderNumber { get; set; } = "";
+	List<WorkingOrderList> _listWorkOrderCount = new List<WorkingOrderList>();
+
+	public async Task SearchWorkOrderCountData()
+	{
+		_isprocessing = true;
+		List<WorkingOrderList> listData = await DataService.GetWorkingOrderListByWorkOrderAsync(_workOrderNumber);
+		_isprocessing = false;
+
+		_listWorkOrderCount.Clear();
+
+		if (listData != null)
+			_listWorkOrderCount = listData;
+	}
+
+	public void EditWorkOrderCountData(GridEditModelSavingEventArgs e)
+	{
+		WorkingOrderList EditData = (WorkingOrderList)e.EditModel;
+
+		foreach (WorkingOrderList item in _listWorkOrderCount)
+		{
+			if (item.ID == EditData.ID)
+			{
+				item.PassCount = EditData.PassCount;
+				item.FailCount = EditData.FailCount;
+			}
+		}
+	}
+
+	public async Task UpdateWorkOrderCountDataToService()
+	{
+		if (_listWorkOrderCount.Count != 0)
+		{
+			_isprocessing = true;
+			await DataService.UpdateWorkingOrderCountListAsync(_listWorkOrderCount);
+			_isprocessing = false;
+		}
+	}
+
+	#endregion
+}

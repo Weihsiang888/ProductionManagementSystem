@@ -1,0 +1,72 @@
+﻿@page "/-TimePeriod-"
+@using DxBlazorApplication7.Data
+@inject AuthenticationStateProvider authenticationStateProvider
+@inherits AuthComponentBase
+@inject DataService DataService
+
+<br />
+<h3>產線工作時段</h3>
+<br />
+
+<DxGrid Data="_TimePeriods"
+        @ref="MyGrid"
+        PageSize="24"
+        KeyFieldName="PeriodType"
+        EditModelSaving="OnEditModelSaving">
+    <Columns>
+        @if (customAuth.user.role != Role.Guest && customAuth.user.department == "Manager")
+        {
+            <DxGridCommandColumn Width="90">
+                <HeaderTemplate>
+                    <a class="oi oi-plus" @onclick="@(() => MyGrid.StartEditNewRowAsync())" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </HeaderTemplate>
+                <CellDisplayTemplate>
+                    <a class="oi oi-pencil" @onclick="@(() => MyGrid.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                    <a class="oi oi-x" @onclick="@(() => Delete((TimePeriod)context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </CellDisplayTemplate>
+            </DxGridCommandColumn>
+        }
+        <DxGridDataColumn FieldName=@nameof(TimePeriod.PeriodType) TextAlignment="GridTextAlignment.Left" Caption="編號" MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(TimePeriod.PeriodName) Caption="時段" MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(TimePeriod.Description) Caption="描述" MinWidth="90" />
+    </Columns>
+    <EditFormTemplate Context="EditFormContext">
+        @{
+            var _TimePeriod = (TimePeriod)EditFormContext.EditModel;
+        }
+        <DxFormLayout>
+            <DxFormLayoutItem Caption="編號 :">
+                <DxSpinEdit @bind-Value=_TimePeriod.PeriodType />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="時段 :">
+                <DxTextBox @bind-Text=_TimePeriod.PeriodName />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="描述 :">
+                <DxTextBox @bind-Text=_TimePeriod.Description />
+            </DxFormLayoutItem>
+        </DxFormLayout>
+    </EditFormTemplate>
+</DxGrid>
+@code {
+    private List<TimePeriod>? _TimePeriods;
+    DxGrid? MyGrid;
+    protected override async Task OnInitializedAsync()
+    {
+        _TimePeriods = await DataService.GetTimePeriodsAsync();
+    }
+    async Task OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (TimePeriod)e.EditModel;
+        //editModel.UserName = "Test"; //Login User
+        //editModel.UpdateTime = DateTime.Now;
+        //editModel.CreateTime = DateTime.Now;
+        _TimePeriods = await DataService.ChangeTimePeriodsAsync((TimePeriod)e.EditModel);
+    }
+    async Task Delete(TimePeriod item)
+    {
+        if (item != null)
+        {
+            await DataService.Remove(item);
+        }
+    }
+}

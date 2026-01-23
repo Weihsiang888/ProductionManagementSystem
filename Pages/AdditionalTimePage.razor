@@ -1,0 +1,418 @@
+﻿@page "/-AdditionalTimePage-"
+@using DxBlazorApplication7.Data
+@using System.Globalization
+@inject DataService DataService
+@using Microsoft.AspNetCore.Authentication.Cookies
+@*@attribute [Authorize(Roles = "Administrator")]*@
+
+<style>
+    .dx-form-layout-width {
+        max-width: 900px;
+        width: 100%;
+    }
+
+    .dx-editor-width {
+        max-width: 300px;
+        width: 100%;
+    }
+
+    .editor-icon {
+        width: 1rem;
+        height: 1rem;
+        background-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        background-position: center center;
+        background-color: currentColor;
+        opacity: 0.7;
+    }
+
+    .editor-icon-chevron-right-small {
+        -webkit-mask-image: url("../images/chevron-right-small.svg");
+        mask-image: url("../images/chevron-right-small.svg");
+    }
+
+    .editor-icon-chevron-left-small {
+        -webkit-mask-image: url("../images/chevron-left-small.svg");
+        mask-image: url("../images/chevron-left-small.svg");
+    }
+
+</style>
+
+<h3>工時調整</h3>
+
+<DxFormLayout>
+    <DxFormLayoutItem ColSpanMd="12" ColSpanLg="12">
+        <DxButton RenderStyle="ButtonRenderStyle.Success" Text="@CheckStatus" Click="SendStatus_Click" style="float:right" />
+    </DxFormLayoutItem>
+</DxFormLayout>
+<br />
+<DxGrid Data="_AdditionalTimes"
+        @ref="MyGrid"
+        PageSize="24"
+        EditModelSaving="OnEditModelSaving"
+        CustomizeEditModel="Grid_CustomizeEditModel">
+    <Columns>
+        @if (!IsLogIn)
+        {
+            <DxGridCommandColumn Width="90">
+                <HeaderTemplate>
+                <a class="oi oi-plus" @onclick="@(() => MyGrid.StartEditNewRowAsync())" style="text-decoration: none;" href="javascript:void(0);"></a>
+            </HeaderTemplate>
+            <CellDisplayTemplate>
+                @*<a class="oi oi-pencil" @onclick="@(() => MyGrid.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>*@
+                @if (GetIsApprove((AdditionalTime)context.DataItem))
+                {
+                    <a class="oi oi-x" @onclick="@(() => Delete((AdditionalTime)context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                }
+            </CellDisplayTemplate>
+            </DxGridCommandColumn>
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.AddTimeDate) Caption="調整日期" Width="180" />
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.ReasonType) Caption="調整原因" MinWidth="90" />
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.Description) Caption="敘述" MinWidth="300" />
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.OPNO) Caption="產線人員" Width="108" />
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.AddStartTime) Caption="開始時間" Width="180" >
+                <CellDisplayTemplate>
+                    <div class="d-flex flex-row flex-wrap">
+                        <span>@GetStartTimeVaule((AdditionalTime)context.DataItem)</span>
+                    </div>
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.AddEndTime) Caption="結束時間" Width="180" >
+                <CellDisplayTemplate>
+                    <div class="d-flex flex-row flex-wrap">
+                        <span>@GetEndTimeVaule((AdditionalTime)context.DataItem)</span>
+                    </div>
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+        }
+        else
+        {
+            <DxGridDataColumn Caption="" Width="45">
+                <CellDisplayTemplate>
+                    <DxCheckBox CheckedChanged="@((bool _Select) => CheckedChanged((AdditionalTime)context.DataItem, _Select))">
+                        </DxCheckBox>
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.AddTimeDate) Caption="調整日期" Width="180" />
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.ReasonType) Caption="調整原因" MinWidth="90" />
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.Description) Caption="敘述" MinWidth="300" />
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.OPNO) Caption="產線人員" Width="108" />
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.AddStartTime) Caption="開始時間" Width="180">
+                <CellDisplayTemplate>
+                    <div class="d-flex flex-row flex-wrap">
+                        <span>@GetStartTimeVaule((AdditionalTime)context.DataItem)</span>
+                    </div>
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.AddEndTime) Caption="結束時間" Width="180">
+                <CellDisplayTemplate>
+                    <div class="d-flex flex-row flex-wrap">
+                        <span>@GetEndTimeVaule((AdditionalTime)context.DataItem)</span>
+                    </div>
+                </CellDisplayTemplate>
+            </DxGridDataColumn>
+        }
+    </Columns>
+    <EditFormTemplate Context="EditFormContext">
+        @{
+            var _AdditionalTime = (AdditionalTime)EditFormContext.EditModel;
+        }
+        <DxFormLayout>
+            <DxFormLayoutItem Caption="作業人員 :" ColSpanMd="12">
+                <div class="d-flex flex-row flex-wrap">
+                    @foreach (var item in _Operators)
+                    {
+                        <div class="me-2 mb-2">
+                            @if (item.IsSelect == false)
+                            {
+                                <button class="dxbl-btn dxbl-btn-outline-info w-10" type="button" @onclick="@(() => SetManufacturingProcess(item.OperatorID.ToString()))">
+                                    <span>@item.OperatorName</span>
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="dxbl-btn dxbl-btn-info w-10" type="button" @onclick="@(() => SetManufacturingProcess(item.OperatorID.ToString()))">
+                                    <span>@item.OperatorName</span>
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
+            </DxFormLayoutItem>
+
+            <DxFormLayoutItem ColSpanMd="12" Caption="日期 :">
+                <DxDateEdit @bind-Date="@BeginDateTimeValue"
+                            @bind-DropDownVisible="@BeginCalendarVisible"
+                            CssClass="dx-editor-width"
+                            SizeMode="SizeMode.Large">
+                    <Buttons>
+                        <DxEditorButton IconCssClass="editor-icon editor-icon-chevron-left-small"
+                                        Tooltip="Previous Date"
+                                        Position="@EditorButtonPosition.Left"
+                                        Click="@(_ => OnChangeBeginDayButtonClick(false))" />
+                        <DxEditorButton IconCssClass="editor-icon editor-icon-chevron-right-small"
+                                        Tooltip="Next Date"
+                                        Position="@EditorButtonPosition.Right"
+                                        Click="@(_ => OnChangeBeginDayButtonClick(true))" />
+                    </Buttons>
+                </DxDateEdit>
+            </DxFormLayoutItem>
+
+            <DxFormLayoutItem ColSpanMd="12" Caption="開始日期 :">
+                <DxTimeEdit @bind-Time="@StartTimeValue"
+                            ScrollPickerFormat="HH mm"
+                            Format="HH mm"
+                            DisplayFormat="@DisplayFormat"
+                            NullText="作業開始時間..."
+                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                            CssClass="dx-editor-width" SizeMode="SizeMode.Large"/>
+
+            </DxFormLayoutItem>
+
+            <DxFormLayoutItem ColSpanMd="12" Caption="結束時間 :">
+                <DxTimeEdit @bind-Time="@EndTimeValue"
+                            ScrollPickerFormat="HH mm"
+                            Format="HH mm"
+                            DisplayFormat="@DisplayFormat"
+                            NullText="作業結束時間..."
+                            ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto"
+                            CssClass="dx-editor-width" SizeMode="SizeMode.Large" />
+
+            </DxFormLayoutItem>
+            <DxFormLayoutItem ColSpanMd="12" Caption="調整原因 :">
+                <DxComboBox Data="@_ReasonTypes"
+                            AllowUserInput="true"
+                            NullText="調整工時原因..."
+                            TextFieldName="@nameof(ReasonType.ReasonName)"
+                            @bind-Value="@ReasonTypeValue"
+                            CssClass="dx-editor-width" SizeMode="SizeMode.Large">
+                </DxComboBox>
+            </DxFormLayoutItem>
+        </DxFormLayout>
+    </EditFormTemplate>
+</DxGrid>
+
+<DxPopup Width="420px" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center" @bind-Visible="@PopupVisible"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false">
+    <HeaderContentTemplate>
+        <h3>Welcome</h3>
+    </HeaderContentTemplate>
+    <BodyContentTemplate Context="PopupContext">
+        <EditForm Model="@UserData" OnValidSubmit="@HandleValidSubmit" Context="EditFormContext">
+            <DataAnnotationsValidator />
+            @if (!IsLogIn)
+            {
+                <DxFormLayout>
+                    <DxFormLayoutItem ColSpanMd="12">
+                        <DxTextBox @bind-Text="@UserData.Username" NullText="Username" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                        <div class="text-danger"><ValidationMessage For="@(() => UserData.Username)" /></div>
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem ColSpanMd="12">
+                        <DxTextBox @bind-Text="@UserData.Password" NullText="Password" Password="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                        <div class="text-danger"><ValidationMessage For="@(() => UserData.Password)" /></div>
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem ColSpanMd="12">
+                        <DxButton CssClass="w-100" Text="Login" RenderStyle="ButtonRenderStyle.Primary" SubmitFormOnClick="true" />
+                    </DxFormLayoutItem>
+                </DxFormLayout>
+            }
+            else
+            {
+                <DxFormLayout>
+                    <DxFormLayoutItem ColSpanMd="12">
+                        <DxButton CssClass="w-100" Text="Logout" RenderStyle="ButtonRenderStyle.Primary" SubmitFormOnClick="true" />
+                    </DxFormLayoutItem>
+                </DxFormLayout>
+            }
+        </EditForm>
+    </BodyContentTemplate>
+</DxPopup>
+
+@code {
+    private List<AdditionalTime>? _AdditionalTimes;
+    List<Operator>? _Operators;
+    DateTime BeginDateTimeValue { get; set; } = DateTime.Today;
+    bool BeginCalendarVisible { get; set; }
+    DateTime StartTimeValue { get; set; } = DateTime.Now;
+    DateTime EndTimeValue { get; set; } = DateTime.Now;
+    string DisplayFormat { get; } = string.IsNullOrEmpty(CultureInfo.CurrentCulture.DateTimeFormat.AMDesignator) ? "HH:mm" : "HH:mm";
+    private List<ReasonType>? _ReasonTypes;
+    ReasonType ReasonTypeValue { get; set; }
+    DxGrid? MyGrid;
+
+    public bool PopupVisible { get; set; }
+    public bool IsLogIn { get; set; }
+    UserDataBase UserData { get; set; } = new UserDataBase();
+    string LogInValue = "Login";
+    string CheckStatus = "簽核";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _AdditionalTimes = await DataService.GetAdditionalTimesAsync();
+        _Operators = await DataService.GetOperatorsAsync("18");
+        _ReasonTypes = await DataService.GetReasonTypesAsync();
+        StartTimeValue = Convert.ToDateTime(DateTime.Now.ToString("yyyy/MM/dd") + " 08:30:00");
+        EndTimeValue = Convert.ToDateTime(DateTime.Now.ToString("yyyy/MM/dd") + " 17:30:00");
+    }
+
+    async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+        if (e.IsNew)
+        {
+            foreach (var _Operator in _Operators)
+            {
+                _Operator.IsSelect = false;
+            }
+            _AdditionalTimes = await DataService.GetAdditionalTimesAsync();
+            _Operators = await DataService.GetOperatorsAsync("18");
+            _ReasonTypes = await DataService.GetReasonTypesAsync();
+            BeginDateTimeValue = DateTime.Today;
+            StartTimeValue = Convert.ToDateTime(DateTime.Now.ToString("yyyy/MM/dd") + " 08:30:00");
+            EndTimeValue = Convert.ToDateTime(DateTime.Now.ToString("yyyy/MM/dd") + " 17:30:00");
+            ReasonTypeValue = null;
+        }
+    }
+
+    async Task OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (AdditionalTime)e.EditModel;
+        editModel.AddTimeDate = BeginDateTimeValue;
+        editModel.AddTimeType = "ADD";
+        foreach (var item in _Operators)
+        {
+            if (item.IsSelect == true)
+            {
+                editModel.OPNO = item.OperatorID;
+            }
+        }
+
+        editModel.AddStartTime = Convert.ToDateTime(BeginDateTimeValue.ToString("d") + " " + StartTimeValue.ToString("t"));
+        editModel.AddEndTime = Convert.ToDateTime(BeginDateTimeValue.ToString("d") + " " + EndTimeValue.ToString("t"));
+        TimeSpan ts = new TimeSpan(EndTimeValue.Ticks - StartTimeValue.Ticks);
+        editModel.AddTime = ts.TotalSeconds;
+        if (ReasonTypeValue != null)
+        {
+            editModel.ReasonType = ReasonTypeValue.ReasonCode;
+            editModel.Description = ReasonTypeValue.Description;
+        }
+        editModel.IsApprove = false;
+        editModel.IsDel = false;
+        _AdditionalTimes = await DataService.ChangeAdditionalTimeAsync(editModel);
+    }
+
+    async Task Delete(AdditionalTime item)
+    {
+        if (item != null)
+        {
+            await DataService.Remove(item);
+            _AdditionalTimes = await DataService.GetAdditionalTimesAsync();
+        }
+    }
+
+    async Task SetManufacturingProcess(string item)
+    {
+        foreach (var _Operator in _Operators)
+        {
+            _Operator.IsSelect = false;   
+        }
+        if (_Operators.Single(x => x.OperatorID == item).IsSelect == false)
+        {
+            _Operators.Single(x => x.OperatorID == item).IsSelect = true;
+        }
+        else
+        {
+            _Operators.Single(x => x.OperatorID == item).IsSelect = false;
+        }
+    }
+
+    void OnChangeBeginDayButtonClick(bool isAdd)
+    {
+        BeginCalendarVisible = false;
+        BeginDateTimeValue = BeginDateTimeValue.AddDays(isAdd ? 1 : -1);
+    }
+
+    async Task SendStatus_Click()
+    {
+        if (!IsLogIn)
+        {
+            PopupVisible = true;
+            //CheckStatus = "送出資料";
+        }
+        else
+        {
+            foreach (var item in _AdditionalTimes)
+            {
+                _AdditionalTimes = await DataService.ChangeAdditionalTimeAsync(item);
+            }
+            _AdditionalTimes = _AdditionalTimes.Where(x => x.IsApprove == false).ToList();
+        }
+    }
+
+    async Task HandleValidSubmit()
+    {
+        if (!IsLogIn)
+        {
+            if (UserData.Username == "JC.Wu" && UserData.Password == "PP5201")
+            {
+                PopupVisible = false;
+                IsLogIn = true;
+                LogInValue = "Logout";
+                CheckStatus = "送出資料";
+                _AdditionalTimes = await DataService.GetAdditionalTimesAsync();
+                _AdditionalTimes = _AdditionalTimes.Where(x => x.IsApprove == false && x.IsDel == false).ToList();
+            }
+            else
+            {
+                PopupVisible = false;
+                IsLogIn = false;
+                LogInValue = "Login";
+                UserData.Username = null;
+                UserData.Password = null;
+                UserData.Group = null;
+            }
+        }
+        else
+        {
+            PopupVisible = false;
+            IsLogIn = false;
+            LogInValue = "Login";
+            UserData.Username = null;
+            UserData.Password = null;
+            UserData.Group = null;
+        }
+    }
+
+    async Task CheckedChanged(AdditionalTime item, bool value)
+    {
+        if (item.IsApprove == false)
+        {
+            item.IsApprove = true;
+        }
+        else
+        {
+            item.IsApprove = false;
+        }
+    }
+
+    bool GetIsApprove(AdditionalTime item)
+    {
+        bool Result = false;
+        if (item.IsApprove == false)
+        {
+            Result = true;
+        }
+        return Result;
+    }
+
+    string GetStartTimeVaule(AdditionalTime item)
+    {
+        return item.AddStartTime.ToString("t");
+    }
+
+    string GetEndTimeVaule(AdditionalTime item)
+    {
+        return item.AddEndTime.ToString("t");
+    }
+}

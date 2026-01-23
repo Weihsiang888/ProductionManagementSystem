@@ -1,0 +1,90 @@
+﻿@page "/-WorkingType-"
+@using DxBlazorApplication7.Data
+@inject AuthenticationStateProvider authenticationStateProvider
+@inherits AuthComponentBase
+@inject DataService DataService
+
+<br />
+<h3>產線工站作業程序</h3>
+<br />
+
+<DxGrid Data="_WorkingTypes"
+        @ref="MyGrid"
+        PageSize="24"
+        KeyFieldName="TypeID"
+        EditModelSaving="OnEditModelSaving">
+    <Columns>
+        @if (customAuth.user.role != Role.Guest && customAuth.user.department == "Manager")
+        {
+            <DxGridCommandColumn Width="90">
+                <HeaderTemplate>
+                    <a class="oi oi-plus" @onclick="@(() => MyGrid.StartEditNewRowAsync())" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </HeaderTemplate>
+                <CellDisplayTemplate>
+                    <a class="oi oi-pencil" @onclick="@(() => MyGrid.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                    <a class="oi oi-x" @onclick="@(() => Delete((WorkingType)context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </CellDisplayTemplate>
+            </DxGridCommandColumn>
+        }
+        <DxGridDataColumn FieldName=@nameof(WorkingType.TypeID) TextAlignment="GridTextAlignment.Left" Caption="程序編號" MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(WorkingType.TypeName) Caption="作業程序" MinWidth="90" />
+        @*<DxGridDataColumn FieldName=@nameof(WorkingType.TypeGroup) Caption="工站" MinWidth="90" />*@
+        <DxGridDataColumn FieldName=@nameof(WorkingType.TypeGroup) Caption="工站" Width="30%" MinWidth="90">
+            <CellDisplayTemplate>
+                <span>@_Stations.Single(x => x.StationID == @context.Value.ToString()).StationName</span>
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+    </Columns>
+    <EditFormTemplate Context="EditFormContext">
+        @{
+            var _WorkingType = (WorkingType)EditFormContext.EditModel;
+        }
+        <DxFormLayout>
+            <DxFormLayoutItem Caption="程序編號 :">
+                <DxTextBox @bind-Text=_WorkingType.TypeID />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="作業程序 :">
+                <DxTextBox @bind-Text=_WorkingType.TypeName />
+            </DxFormLayoutItem>
+@*            <DxFormLayoutItem Caption="工站 :">
+                <DxTextBox @bind-Text=_WorkingType.TypeGroup />
+            </DxFormLayoutItem>*@
+            <DxFormLayoutItem Caption="工站:" ColSpanMd="6">
+                <DxComboBox Data="@_Stations"
+                            AllowUserInput="true"
+                            NullText="工站選擇..."
+                            TextFieldName="@nameof(Stations.StationName)"
+                            @bind-Text=_WorkingType.TypeGroup
+                            @bind-Value="@Value">
+                </DxComboBox>
+            </DxFormLayoutItem>
+        </DxFormLayout>
+    </EditFormTemplate>
+</DxGrid>
+@code {
+    private List<WorkingType>? _WorkingTypes;
+    DxGrid? MyGrid;
+    List<Stations>? _Stations { get; set; }
+    string? Value { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        _WorkingTypes = await DataService.GetWorkingTypesAsync();
+        _Stations = await DataService.GetStationsAsync();
+    }
+    async Task OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (WorkingType)e.EditModel;
+        editModel.TypeGroup = _Stations.Single(x => x.StationName == editModel.TypeGroup).StationID;
+        //editModel.UserName = "Test"; //Login User
+        //editModel.UpdateTime = DateTime.Now;
+        //editModel.CreateTime = DateTime.Now;
+        _WorkingTypes = await DataService.ChangeWorkingTypesAsync((WorkingType)e.EditModel);
+    }
+    async Task Delete(WorkingType item)
+    {
+        if (item != null)
+        {
+            await DataService.Remove(item);
+        }
+    }
+}

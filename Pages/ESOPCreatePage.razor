@@ -1,0 +1,105 @@
+﻿@using DxBlazorApplication7.Data
+@inject AuthenticationStateProvider authenticationStateProvider
+@inherits AuthComponentBase
+@inject DataService DataService
+
+<br />
+<h3 style="color:dodgerblue">ESOP清單建立</h3>
+<br />
+
+<DxGrid Data="_DirectoryReferenceTable"
+        @ref="MyGrid"
+        PageSize="24"
+        KeyFieldName="DirectoryIndex"
+        EditModelSaving="OnEditModelSaving"
+        CustomizeEditModel="Grid_CustomizeEditModel">
+    <Columns>
+        @if (!(customAuth.user.role != Role.Guest && customAuth.user.department == "Manager"))
+        {
+            <DxGridCommandColumn Width="90">
+                <HeaderTemplate>
+                    <a class="oi oi-plus" @onclick="@(() => MyGrid.StartEditNewRowAsync())" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </HeaderTemplate>
+                <CellDisplayTemplate>
+                    <a class="oi oi-pencil" @onclick="@(() => MyGrid.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                    <a class="oi oi-x" @onclick="@(() => Delete((DirectoryReferenceTable)context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </CellDisplayTemplate>
+            </DxGridCommandColumn>
+        }
+        <DxGridDataColumn FieldName=@nameof(DirectoryReferenceTable.DirectoryName) Caption="SOP目錄" MinWidth="120" />
+        <DxGridDataColumn FieldName=@nameof(DirectoryReferenceTable.DisplayName) Caption="顯示名稱" MinWidth="90" />
+    </Columns>
+    <EditFormTemplate Context="EditFormContext">
+        @{
+            var _DirectoryReferenceTable = (DirectoryReferenceTable)EditFormContext.EditModel;
+        }
+        <DxFormLayout>
+            <DxFormLayoutItem Caption="作業站編號:">
+                @if (IsEdit)
+                {
+                    <DxTextBox @bind-Text=_DirectoryReferenceTable.DirectoryName ReadOnly="@IsEdit" />
+                }
+                else
+                {
+                    <DxComboBox Data="@_ESOPFolder"
+                                AllowUserInput="false"
+                                NullText="程序名稱..."
+                                TextFieldName="@nameof(ESOPFolderItem.ESOPFolderName)"
+                                @bind-Text=_DirectoryReferenceTable.DirectoryName
+                                @bind-Value="@ESOPFolderName">
+                    </DxComboBox>
+                }
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="顯示名稱 :">
+                <DxTextBox @bind-Text=_DirectoryReferenceTable.DisplayName />
+            </DxFormLayoutItem>
+        </DxFormLayout>
+    </EditFormTemplate>
+</DxGrid>
+
+@code {
+    DxGrid? MyGrid;
+    private List<DirectoryReferenceTable> _DirectoryReferenceTable;
+    bool IsEdit = false;
+    List<ESOPFolderItem> _ESOPFolder = new List<ESOPFolderItem>();
+    ESOPFolderItem _ESOPFolderItem;
+    string ESOPFolderName;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _DirectoryReferenceTable = await DataService.GetDirectoryReferenceTablesAsync();
+        _DirectoryReferenceTable = _DirectoryReferenceTable.OrderBy(x => x.DirectoryName).ToList();
+        //_ESOPFolder = await DataService.GetESOPFolderStatusAsync(@"Z:\");
+    }
+
+    async Task OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (DirectoryReferenceTable)e.EditModel;
+
+        await DataService.SetDirectoryReferenceTablesAsync(editModel);
+        _DirectoryReferenceTable = await DataService.GetDirectoryReferenceTablesAsync();
+        _DirectoryReferenceTable = _DirectoryReferenceTable.OrderBy(x => x.DirectoryName).ToList();
+    }
+
+    async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+        var editModel = (DirectoryReferenceTable)e.EditModel;
+
+        if (e.IsNew)
+        {
+            IsEdit = false;
+            _ESOPFolder = await DataService.GetESOPFolderStatusAsync(@"\\172.25.210.8\01.product$\");
+        }
+        else
+        {
+            IsEdit = true;
+        }
+    }
+
+    async Task Delete(DirectoryReferenceTable item)
+    {
+        await DataService.Remove(item);
+        _DirectoryReferenceTable = await DataService.GetDirectoryReferenceTablesAsync();
+        _DirectoryReferenceTable = _DirectoryReferenceTable.OrderBy(x => x.DirectoryName).ToList();
+    }
+}

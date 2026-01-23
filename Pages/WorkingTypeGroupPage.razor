@@ -1,0 +1,181 @@
+﻿@page "/-WorkingTypeGroup-"
+@using DxBlazorApplication7.Data
+@inject AuthenticationStateProvider authenticationStateProvider
+@inherits AuthComponentBase
+@inject DataService DataService
+
+<br />
+<h3>產線工站</h3>
+<br />
+
+<DxGrid Data="_WorkingTypeGroups"
+        @ref="MyGrid"
+        PageSize="24"
+        KeyFieldName="TypeGroup"
+        EditModelSaving="OnEditModelSaving">
+    <Columns>
+        @if (customAuth.user.role != Role.Guest && customAuth.user.department == "Manager")
+        {
+            <DxGridCommandColumn Width="90">
+                <HeaderTemplate>
+                    <a class="oi oi-plus" @onclick="@(() => MyGrid.StartEditNewRowAsync())" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </HeaderTemplate>
+                <CellDisplayTemplate>
+                    <a class="oi oi-pencil" @onclick="@(() => MyGrid.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                    <a class="oi oi-x" @onclick="@(() => Delete((WorkingTypeGroup)context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </CellDisplayTemplate>
+            </DxGridCommandColumn>
+        }
+        <DxGridDataColumn FieldName=@nameof(WorkingTypeGroup.TypeGroup) TextAlignment="GridTextAlignment.Left" Caption="工站編號 / 資格編號" MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(WorkingTypeGroup.TypeGroupName) Caption="工站名稱" MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(WorkingTypeGroup.ManufacturingProcess) Caption="SFC製程名稱" MinWidth="90" />
+    </Columns>
+    <EditFormTemplate Context="EditFormContext">
+        @{
+            var _WorkingTypeGroup = (WorkingTypeGroup)EditFormContext.EditModel;
+        }
+        <DxFormLayout>
+            <DxFormLayoutItem Caption="工站編號 / 資格編號:">
+                <DxTextBox @bind-Text=_WorkingTypeGroup.TypeGroup />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="工站名稱 :">
+                <DxTextBox @bind-Text=_WorkingTypeGroup.TypeGroupName />
+            </DxFormLayoutItem>
+
+            <DxFormLayoutItem Caption="製程名稱 :" ColSpanLg="12">
+                <div class="d-flex flex-row flex-wrap">
+                    @if (_WorkingTypeGroup.TypeGroup != null && _WorkingTypeGroup.TypeGroup != "")
+                    {
+                        @foreach (var item in _WorkingTypeGroupBySFCs.Single(x => x.TypeGroup == _WorkingTypeGroup.TypeGroup).DetailList)
+                        {
+                            <div class="me-2 mb-2">
+                                @if (item.IsSelect == false)
+                                {
+                                    <button class="dxbl-btn dxbl-btn-outline-info w-10" type="button" @onclick="@(() => SetManufacturingProcess(_WorkingTypeGroup.TypeGroup, @item.ProcessName.ToString()))">
+                                        <span>@item.ProcessName</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="dxbl-btn dxbl-btn-info w-10" type="button" @onclick="@(() => SetManufacturingProcess(_WorkingTypeGroup.TypeGroup, @item.ProcessName.ToString()))">
+                                        <span>@item.ProcessName</span>
+                                    </button>
+                                }
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        @foreach (var item in _WorkingTypeGroupBySFCsList)
+                        {
+                            <div class="me-2 mb-2">
+                                @if (item.IsSelect == false)
+                                {
+                                    <button class="dxbl-btn dxbl-btn-outline-info w-10" type="button" @onclick="@(() => SetManufacturingProcessList(@item.ProcessName.ToString()))">
+                                        <span>@item.ProcessName</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="dxbl-btn dxbl-btn-info w-10" type="button" @onclick="@(() => SetManufacturingProcessList(@item.ProcessName.ToString()))">
+                                        <span>@item.ProcessName</span>
+                                    </button>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </DxFormLayoutItem>
+
+        </DxFormLayout>
+    </EditFormTemplate>
+</DxGrid>
+@code {
+    private List<WorkingTypeGroup>? _WorkingTypeGroups;
+    private List<WorkingTypeGroupBySFC>? _WorkingTypeGroupBySFCs;
+    private List<WorkingTypeGroupBySFCDetail>? _WorkingTypeGroupBySFCsList;
+
+    DxGrid? MyGrid;
+    protected override async Task OnInitializedAsync()
+    {
+        _WorkingTypeGroups = await DataService.GetWorkingTypeGroupsAsync();
+        _WorkingTypeGroupBySFCs = await DataService.GetWorkingTypeGroupBySFCAsync();
+        _WorkingTypeGroupBySFCsList = await DataService.GetWorkingTypeGroupBySFCListAsync();
+    }
+    async Task OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (WorkingTypeGroup)e.EditModel;
+        //editModel.UserName = "Test"; //Login User
+        //editModel.UpdateTime = DateTime.Now;
+        //editModel.CreateTime = DateTime.Now;
+        if (e.IsNew)
+        {
+            string _ProcessName = "";
+            foreach (var item in _WorkingTypeGroupBySFCsList)
+            {
+                if (item.IsSelect == true)
+                {
+                    _ProcessName = item.ProcessName;
+                }
+            }
+            if (!string.IsNullOrEmpty(_ProcessName))
+            {
+                _WorkingTypeGroups = await DataService.ChangeWorkingTypeGroupsAsync((WorkingTypeGroup)e.EditModel, _ProcessName);
+            }
+        }
+        else
+        {
+            string _ProcessName = "";
+            foreach (var item in _WorkingTypeGroupBySFCs.Single(x => x.TypeGroup == editModel.TypeGroup).DetailList)
+            {
+                if (item.IsSelect == true)
+                {
+                    _ProcessName = item.ProcessName;
+                }
+            }
+            if (!string.IsNullOrEmpty(_ProcessName))
+            {
+                _WorkingTypeGroups = await DataService.ChangeWorkingTypeGroupsAsync((WorkingTypeGroup)e.EditModel, _ProcessName);
+            }
+        }
+    }
+    async Task Delete(WorkingTypeGroup item)
+    {
+        if (item != null)
+        {
+            await DataService.Remove(item);
+        }
+    }
+
+    async Task SetManufacturingProcess(string item1, string item2)
+    {
+        foreach (var items in _WorkingTypeGroupBySFCs.Single(x => x.TypeGroup == item1).DetailList)
+        {
+            items.IsSelect = false;
+        }
+        if (_WorkingTypeGroupBySFCs.Single(x => x.TypeGroup == item1).DetailList.Single(x => x.ProcessName == item2).IsSelect == false)
+        {
+            _WorkingTypeGroupBySFCs.Single(x => x.TypeGroup == item1).DetailList.Single(x => x.ProcessName == item2).IsSelect = true;
+        }
+        else
+        {
+            _WorkingTypeGroupBySFCs.Single(x => x.TypeGroup == item1).DetailList.Single(x => x.ProcessName == item2).IsSelect = false;
+        }
+    }
+
+    async Task SetManufacturingProcessList(string item)
+    {
+        foreach (var items in _WorkingTypeGroupBySFCsList)
+        {
+            items.IsSelect = false;
+        }
+        if (_WorkingTypeGroupBySFCsList.Single(x => x.ProcessName == item).IsSelect == false)
+        {
+            _WorkingTypeGroupBySFCsList.Single(x => x.ProcessName == item).IsSelect = true;
+        }
+        else
+        {
+            _WorkingTypeGroupBySFCsList.Single(x => x.ProcessName == item).IsSelect = false;
+        }
+    }
+}

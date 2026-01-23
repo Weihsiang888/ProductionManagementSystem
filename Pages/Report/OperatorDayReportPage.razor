@@ -1,0 +1,173 @@
+﻿@page "/-OperatorDayReport-"
+@using DevExpress.Export
+@using DxBlazorApplication7.Data
+@inject DataService DataService
+
+<style>
+    .dx-form-layout-width {
+        max-width: 900px;
+        width: 100%;
+    }
+
+    .dx-editor-width {
+        max-width: 240px;
+        width: 100%;
+    }
+
+    .editor-icon {
+        width: 1rem;
+        height: 1rem;
+        background-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        background-position: center center;
+        background-color: currentColor;
+        opacity: 0.7;
+    }
+
+    .editor-icon-chevron-right-small {
+        -webkit-mask-image: url("../images/chevron-right-small.svg");
+        mask-image: url("../images/chevron-right-small.svg");
+    }
+
+    .editor-icon-chevron-left-small {
+        -webkit-mask-image: url("../images/chevron-left-small.svg");
+        mask-image: url("../images/chevron-left-small.svg");
+    }
+
+</style>
+
+<br />
+<h3>人員統計(工時)報表</h3>
+<br />
+
+<DxFormLayout>
+    <DxFormLayoutItem ColSpanMd="2" Caption="開始日期 :">
+        <DxDateEdit @bind-Date="@BeginDateTimeValue"
+                    @bind-DropDownVisible="@BeginCalendarVisible"
+                    CssClass="dx-editor-width">
+            <Buttons>
+                <DxEditorButton IconCssClass="editor-icon editor-icon-chevron-left-small"
+                                Tooltip="Previous Date"
+                                Position="@EditorButtonPosition.Left"
+                                Click="@(_ => OnChangeBeginDayButtonClick(false))" />
+                <DxEditorButton IconCssClass="editor-icon editor-icon-chevron-right-small"
+                                Tooltip="Next Date"
+                                Position="@EditorButtonPosition.Right"
+                                Click="@(_ => OnChangeBeginDayButtonClick(true))" />
+            </Buttons>
+        </DxDateEdit>
+    </DxFormLayoutItem>
+    <DxFormLayoutItem ColSpanMd="2" Caption="結束日期 :">
+        <DxDateEdit @bind-Date="@EndDateTimeValue"
+                    @bind-DropDownVisible="@EndCalendarVisible"
+                    CssClass="dx-editor-width">
+            <Buttons>
+                <DxEditorButton IconCssClass="editor-icon editor-icon-chevron-left-small"
+                                Tooltip="Previous Date"
+                                Position="@EditorButtonPosition.Left"
+                                Click="@(_ => OnChangeEndDayButtonClick(false))" />
+                <DxEditorButton IconCssClass="editor-icon editor-icon-chevron-right-small"
+                                Tooltip="Next Date"
+                                Position="@EditorButtonPosition.Right"
+                                Click="@(_ => OnChangeEndDayButtonClick(true))" />
+            </Buttons>
+        </DxDateEdit>
+    </DxFormLayoutItem>
+    <DxFormLayoutItem ColSpanMd="1">
+        <DxButton RenderStyle="ButtonRenderStyle.Info" Text="查詢" Click="Search_Click" style="float:left" />
+    </DxFormLayoutItem>
+    <DxFormLayoutItem ColSpanMd="2" ColSpanLg="7">
+        <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Export to XLSX" Click="ExportXlsx_Click" style="float:right" />
+    </DxFormLayoutItem>
+</DxFormLayout>
+
+@*<DxButton RenderStyle="ButtonRenderStyle.Success" Text="Export to XLSX" Click="ExportXlsx_Click" style="float:right" />*@
+<br />
+<DxGrid Data="_OP_Report_Days"
+        @ref="MyGrid"
+        PageSize="24"
+        EditModelSaving="OnEditModelSaving">
+    <Columns>
+        @*<DxGridCommandColumn Width="90">
+        <HeaderTemplate>
+        <a class="oi oi-plus" @onclick="@(() => MyGrid.StartEditNewRowAsync())" style="text-decoration: none;" href="javascript:void(0);"></a>
+        </HeaderTemplate>
+        <CellDisplayTemplate>
+        <a class="oi oi-pencil" @onclick="@(() => MyGrid.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
+        <a class="oi oi-x" @onclick="@(() => Delete((OP_Report)context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+        </CellDisplayTemplate>
+        </DxGridCommandColumn>*@
+        <DxGridDataColumn FieldName=@nameof(OP_Report_Day.DayTime) Caption="工作日" MinWidth="90" DisplayFormat="G" />
+        <DxGridDataColumn FieldName=@nameof(OP_Report_Day.OP1) Caption="鄭元德" MinWidth="75" />
+        <DxGridDataColumn FieldName=@nameof(OP_Report_Day.OP2) Caption="林重瑋" MinWidth="75" />
+        <DxGridDataColumn FieldName=@nameof(OP_Report_Day.OP3) Caption="黃政乾" MinWidth="75" />
+        <DxGridDataColumn FieldName=@nameof(OP_Report_Day.OP4) Caption="黃駿翊" MinWidth="75" />
+        <DxGridDataColumn FieldName=@nameof(OP_Report_Day.OP5) Caption="蔡勝恩" MinWidth="75" />
+        <DxGridDataColumn FieldName=@nameof(OP_Report_Day.OP6) Caption="陳家津" MinWidth="75" />
+        <DxGridDataColumn FieldName=@nameof(OP_Report_Day.OP7) Caption="張嘉祐" MinWidth="75" />
+        <DxGridDataColumn FieldName=@nameof(OP_Report_Day.TotalTimes) Caption="總工時" MinWidth="90" />
+    </Columns>
+    @*<EditFormTemplate Context="EditFormContext">
+    @{
+    var _OP_Report = (OP_Report)EditFormContext.EditModel;
+    }
+
+    </EditFormTemplate>*@
+</DxGrid>
+
+@code {
+    DxGrid? MyGrid;
+    private List<WorkingHoursStatistic>? _WorkingHoursStatistics;
+    private List<OP_Report_Day>? _OP_Report_Days;
+
+    DateTime BeginDateTimeValue { get; set; } = DateTime.Today;
+    DateTime EndDateTimeValue { get; set; } = DateTime.Today;
+    bool BeginCalendarVisible { get; set; }
+    bool EndCalendarVisible { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _WorkingHoursStatistics = await DataService.GetWorkingHoursStatisticsAsync();
+        BeginDateTimeValue = Convert.ToDateTime(_WorkingHoursStatistics.Where(x => x.ReceiveTime != null).OrderBy(x1 => x1.ReceiveTime).FirstOrDefault().ReceiveTime.ToString("yyyy/MM/dd") + " 00:00:00");
+        EndDateTimeValue = Convert.ToDateTime(_WorkingHoursStatistics.Where(x => x.ResponseTime != null).OrderByDescending(x1 => x1.ReceiveTime).FirstOrDefault().ResponseTime.ToString("yyyy/MM/dd") + " 23:59:59");
+        //_OP_Reports = await DataService.GetOP_ReportsAsync();
+        //_OP_Reports = _OP_Reports.OrderBy(x => x.ROWID).ToList();
+    }
+
+    async Task OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+
+    }
+
+    async Task Delete(WorkingData item)
+    {
+
+    }
+
+    async Task ExportXlsx_Click()
+    {
+        await MyGrid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
+        {
+
+        });
+    }
+
+    void OnChangeBeginDayButtonClick(bool isAdd)
+    {
+        BeginCalendarVisible = false;
+        BeginDateTimeValue = BeginDateTimeValue.AddDays(isAdd ? 1 : -1);
+    }
+
+    void OnChangeEndDayButtonClick(bool isAdd)
+    {
+        EndCalendarVisible = false;
+        EndDateTimeValue = EndDateTimeValue.AddDays(isAdd ? 1 : -1);
+    }
+
+    async Task Search_Click()
+    {
+        _OP_Report_Days = await DataService.GetOP_Report_DaysAsync(BeginDateTimeValue, EndDateTimeValue);
+        _OP_Report_Days = _OP_Report_Days.OrderBy(x => x.ROWID).ToList();
+    }
+}

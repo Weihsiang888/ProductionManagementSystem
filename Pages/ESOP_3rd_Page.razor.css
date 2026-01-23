@@ -1,0 +1,99 @@
+﻿.bgcard {
+    height: 6rem;
+    width: 36rem;
+    border: groove;
+    border-radius: 0.8rem;
+    border-width: 0.2rem;
+    border-color: #ffc107;
+    margin: 1rem;
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.bgcard-alarm {
+    height: 6rem;
+    width: 30rem;
+    border: groove;
+    border-radius: 0.8rem;
+    border-width: 0.2rem;
+    border-color: #fc781b;
+    margin: 1rem;
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.bgcard-error {
+    height: 6rem;
+    width: 30rem;
+    border: groove;
+    border-radius: 0.8rem;
+    border-width: 0.2rem;
+    border-color: #f31446;
+    margin: 1rem;
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.backsplitborder {
+    border-right: solid;
+    border-color: rgb(153, 153, 153);
+}
+
+.block {
+    height: 70%;
+    /*    border: solid;
+    border-width: 0.1rem;
+    border-color: white;*/
+    /*margin:0.5rem;*/
+}
+
+.cell {
+    height: 100%;
+    width: 100%;
+    /*    border: solid;
+    border-width: 0.1rem;
+    border-color: white;*/
+    border-radius: 0.8rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.headerblock {
+    height: 3.6rem;
+    width: 10rem;
+    border-radius: 0.8rem;
+    background-color: #4191eb;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.label {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    color: rgb(153, 153, 153);
+    font-size: 18px;
+}
+
+.content {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    font-size: 18px;
+}

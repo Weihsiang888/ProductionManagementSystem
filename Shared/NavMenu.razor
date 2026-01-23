@@ -1,0 +1,31 @@
+﻿<div class="sidebar @StateCssClass">
+    <DxTreeView AllowSelectNodes="true" CssClass="app-sidebar">
+    <Nodes>
+        <DxTreeViewNode NavigateUrl="./" Text="首頁"></DxTreeViewNode>
+        <DxTreeViewNode NavigateUrl="OperatorInformation" Text="產線人員資本資料"></DxTreeViewNode>
+        <DxTreeViewNode NavigateUrl="OperatorAbilityPage" Text="作業人員技能配置"></DxTreeViewNode>
+        <DxTreeViewNode NavigateUrl="TimePeriod" Text="產線工作時段"></DxTreeViewNode>
+        <DxTreeViewNode NavigateUrl="OvertimeSchedule" Text="產線加班時段"></DxTreeViewNode>
+        <DxTreeViewNode NavigateUrl="WorkingTypeGroup" Text="產線工站"></DxTreeViewNode>
+        <DxTreeViewNode NavigateUrl="WorkingType" Text="產線工站作業程序"></DxTreeViewNode>
+        @*<DxTreeViewNode NavigateUrl="WorkingList" Text="產線人員派工作業"></DxTreeViewNode>*@
+        <DxTreeViewNode NavigateUrl="WorkingListRobotAssembly">
+                <TextTemplate>
+                    <b>產線人員派工作業<br />RobotAssembly</b>
+                </TextTemplate>
+        </DxTreeViewNode>
+        <DxTreeViewNode NavigateUrl="WorkingResponsePage/Detail" Text="線上報工作業"></DxTreeViewNode>
+        <DxTreeViewNode NavigateUrl="WorkingReportPage">
+                <TextTemplate>
+                    <b>產線人員派工細節<br />Report</b>
+                </TextTemplate>
+        </DxTreeViewNode>
+        <DxTreeViewNode NavigateUrl="StatisticReport" Text="工單統計(工時)報表"></DxTreeViewNode>
+        <DxTreeViewNode NavigateUrl="OperatorReport" Text="人員統計(工時)報表"></DxTreeViewNode>
+    </Nodes>
+</DxTreeView>
+</div>
+
+@code {
+    [Parameter] public string? StateCssClass { get; set; }
+}

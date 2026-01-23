@@ -1,0 +1,175 @@
+﻿@page "/-OperatorAbilityPage-"
+@using DxBlazorApplication7.Data
+@inject AuthenticationStateProvider authenticationStateProvider
+@inherits AuthComponentBase
+@inject DataService DataService
+
+<br />
+<h3>產線人員技能配置</h3>
+
+<div class="me-2 mb-2" >
+    <div>
+    <button class="dxbl-btn dxbl-btn-outline-warning w-10" type="button" style="float:left; margin-right:9px">
+        <span>未選取</span>
+    </button>
+    </div>
+
+    <div>
+    <button class="dxbl-btn dxbl-btn-info w-10" type="button" style="float:left; margin-right:9px">
+        <span>已選取</span>
+    </button>
+    </div>
+</div>
+
+<div class="me-2 mb-2">
+    @if (customAuth.user.role != Role.Guest && customAuth.user.department == "Manager")
+    {
+        <button class="dxbl-btn dxbl-btn-success w-10" type="button" style="float:right" @onclick="@(() => SaveAbility(_OperatorAbilitys))">
+            <span>儲存技能配置</span>
+        </button>
+    }
+    @*<DxFormLayout>
+        <DxFormLayoutItem ColSpanMd="2" ColSpanLg="2" Context="fl_context">
+            <DxButton CssClass="w-100"
+                      Enabled="!isSending"
+                      Click="Send" style="float:right"
+                      RenderStyle="ButtonRenderStyle.Primary">
+                <div class="d-flex">
+                    <DxWaitIndicator Visible="isSending" />
+                    <span class="mx-2">@Message</span>
+                </div>
+            </DxButton>
+        </DxFormLayoutItem>
+    </DxFormLayout>*@
+</div>
+<br />
+<br />
+
+<DxLoadingPanel @bind-Visible="PanelVisible"
+                IsContentBlocked="true"
+                ApplyBackgroundShading="true"
+                IndicatorAreaVisible="false"
+                Text="Fetching Data...">
+
+                <DxGrid Data="_OperatorInformations"
+                        @ref="MyGrid"
+                        PageSize="24"
+                        KeyFieldName="OperatorName">
+                    <Columns>
+                        <DxGridDataColumn FieldName=@nameof(OperatorInformation.OperatorName) Caption="姓名" Width="120" />
+                        <DxGridDataColumn FieldName=@nameof(OperatorInformation.OPNO) Caption="全選" Width="45">
+                            <CellDisplayTemplate>
+                                <DxCheckBox CheckedChanged="@((bool _Select) => CheckedChanged(context.Value.ToString(), _Select))">
+                                    </DxCheckBox>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                        <DxGridDataColumn FieldName=@nameof(OperatorInformation.OPNO) Caption="技能配置" MinWidth="120">
+                            <CellDisplayTemplate>
+                                <div class="d-flex flex-row flex-wrap">
+                                    @foreach (var item in _OperatorAbilitys.Single(x => x.OperatorID == context.Value.ToString()).OperatorList)
+                                    {
+                                        <div class="me-2 mb-2">
+                                            @if (item.IsSelect == false)
+                                            {
+                                                <button class="dxbl-btn dxbl-btn-outline-warning w-10" type="button" @onclick="@(() => SetAbility(context.Value.ToString(), @item.WorkNumber.ToString()))">
+                                                    <span>@item.WorkName</span>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button class="dxbl-btn dxbl-btn-info w-10" type="button" @onclick="@(() => SetAbility(context.Value.ToString(), @item.WorkNumber.ToString()))">
+                                                    <span>@item.WorkName</span>
+                                                </button>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </CellDisplayTemplate>
+                        </DxGridDataColumn>
+                    </Columns>
+                    <EditFormTemplate Context="EditFormContext">
+                        @{
+                            var _OperatorInformation = (OperatorInformation)EditFormContext.EditModel;
+                        }
+                        <DxFormLayout>
+
+                        </DxFormLayout>
+                    </EditFormTemplate>
+                </DxGrid>
+
+</DxLoadingPanel>
+
+@code {
+    private List<OperatorInformation>? _OperatorInformations;
+    private List<OperatorAbility>? _OperatorAbilitys;
+    DxGrid? MyGrid;
+
+    bool PanelVisible { get; set; } = false;
+
+    bool isSending = false;
+    string feedbackText = "Your components are great!";
+    string formSubmitResult = "";
+    DateTime refreshedDate = DateTime.Now;
+    string Message => isSending ? "Sending..." : "Send";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _OperatorInformations = await DataService.GetOperatorInformationsAsync();
+        _OperatorAbilitys = await DataService.GetOperatorAbilityAsync();
+    }
+
+    async Task SetAbility(string id, string item)
+    {
+        await Task.Run(()=> {
+            if (_OperatorAbilitys is not null)
+            {
+                if (_OperatorAbilitys.Single(x => x.OperatorID == id).OperatorList.Single(x => x.WorkNumber == item).IsSelect == false)
+                {
+                    _OperatorAbilitys.Single(x => x.OperatorID == id).OperatorList.Single(x => x.WorkNumber == item).IsSelect = true;
+                }
+                else
+                {
+                    _OperatorAbilitys.Single(x => x.OperatorID == id).OperatorList.Single(x => x.WorkNumber == item).IsSelect = false;
+                }
+            }
+        });
+    }
+
+    async Task SaveAbility(List<OperatorAbility> abilities)
+    {
+        PanelVisible = true;
+        await Task.Run(()=> {
+            DataService.ChangeOperatorAbilityAsync(abilities);
+            PanelVisible = false;
+        });
+        //PanelVisible = false;
+        //await Task.Run(()=> {
+        //    DataService.ChangeOperatorAbilityAsync(abilities);
+        //    PanelVisible = false;
+        //});
+        _OperatorInformations = await DataService.GetOperatorInformationsAsync();
+        _OperatorAbilitys = await DataService.GetOperatorAbilityAsync();
+    }
+
+    async Task CheckedChanged(string id, bool value)
+    {
+        await Task.Run(()=> {
+            if (_OperatorAbilitys is not null)
+            {
+                foreach (var item in _OperatorAbilitys.Single(x => x.OperatorID == id).OperatorList)
+                {
+                    item.IsSelect = value;
+                }
+            }
+        });
+    }
+
+    async Task Send()
+    {
+        if (string.IsNullOrWhiteSpace(feedbackText)) return;
+        isSending = true;
+        await Task.Delay(3000);
+        formSubmitResult = "Thank you for completing the survey. " + refreshedDate.ToString("dd-MM-yyyy HH:mm:ss");
+        isSending = false;
+    }
+}

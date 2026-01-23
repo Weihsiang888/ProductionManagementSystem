@@ -1,0 +1,396 @@
+﻿@using DxBlazorApplication7.Data
+@inject AuthenticationStateProvider authenticationStateProvider
+@inherits AuthComponentBase
+@inject NavigationManager nav
+@inject DataService DataService
+
+@*<nav class="navbar header-navbar p-0">
+    <button class="navbar-toggler bg-primary d-block" @onclick="OnToggleClick">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="ms-3 fw-bold title pe-4">線上派工系統</div>
+</nav>*@
+
+<style>
+    .dxbl-menu-item-tmpl {
+        display: flex;
+        align-items: center;
+    }
+
+    .notoggle svg {
+        display: none;
+    }
+
+    .dxbl-menu-item .search {
+        min-width: 123px
+    }
+
+    .dxbl-menu-item-tmpl > .search {
+        position: relative;
+    }
+
+    .user-profile .logo-container {
+        margin-top: 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .user-profile .log-off-btn {
+        padding-top: 0.815rem;
+        padding-bottom: 0.815rem;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .menu-icon-user-profile {
+        opacity: 0.75;
+    }
+
+    .user-profile .menu-icon-user-profile {
+        opacity: 0.25;
+        margin-top: 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .user-name-container .tm-8 {
+        opacity: 0.8;
+    }
+
+    .menu-icon {
+        width: 1rem;
+        height: 1rem;
+        min-width: 1rem;
+        min-height: 1rem;
+        background-size: contain;
+        mask-repeat: no-repeat;
+        -webkit-mask-repeat: no-repeat;
+        background-position: center center;
+        background-color: currentColor;
+        opacity: 0.7;
+    }
+
+    .menu-icon-home {
+        mask-image: url("../images/home.svg");
+        -webkit-mask-image: url("../images/home.svg");
+    }
+
+    .menu-icon-support {
+        mask-image: url("../images/support.svg");
+        -webkit-mask-image: url("../images/support.svg");
+    }
+
+    .menu-icon-products {
+        mask-image: url("../images/products.svg");
+        -webkit-mask-image: url("../images/products.svg");
+    }
+
+    .menu-icon-setting {
+        mask-image: url("../images/settings.svg");
+        -webkit-mask-image: url("../images/settings.svg");
+    }
+
+    .menu-icon-add {
+        mask-image: url("../images/add.svg");
+        -webkit-mask-image: url("../images/add.svg");
+    }
+
+    .menu-icon-popup-position {
+        mask-image: url("../images/popup-position.svg");
+        -webkit-mask-image: url("../images/popup-position.svg");
+    }
+
+    .menu-icon-scheduler-navigator {
+        mask-image: url("../images/scheduler-navigator.svg");
+        -webkit-mask-image: url("../images/scheduler-navigator.svg");
+    }
+
+    .menu-icon-info {
+        mask-image: url("../images/info.svg");
+        -webkit-mask-image: url("../images/info.svg");
+    }
+
+    .icon-logo {
+        display: flex;
+        height: 24px;
+        width: 300px;
+        background-repeat: no-repeat;
+        background-image: url("../images/Techman-Robot-Logo.png");
+    }
+
+    .font-style {
+        color:dodgerblue;
+        font-weight: bold;
+        font-size: 1em;
+        text-align: center;
+    }
+
+    .menu-icon-user-profile {
+        mask-image: url("../images/user-profile.svg");
+        -webkit-mask-image: url("../images/user-profile.svg");
+    }
+
+    .menu-icon-large {
+        width: 5rem;
+        height: 5rem;
+        mask-size: 100%;
+        -webkit-mask-size: 100%;
+    }
+
+    .element-a {
+        display: none;
+    }
+
+    .element-b {
+        visibility: hidden;
+    }
+
+    .element-c {
+        opacity: 0;
+    }
+</style>
+
+<div class="card">
+    <div class="card-body p-0">
+        <DxMenu Title="產線 - 線上派工系統" ItemsPosition="ItemPosition.End" CollapseItemsToHamburgerMenu="true" ItemClick="@((args) => { 
+            if (args.ItemInfo.Name == "LogIn")
+            {
+                if(args.ItemInfo.Text == "Login")
+                { 
+                    PopupVisible = true;
+                } 
+                else 
+                { 
+                    PopupVisible = false;
+                    IsLogIn = false;
+                    LogInValue = "Login";
+                    UserData.Username = null;
+                    UserData.Password = null;
+                    UserData.Group = null;
+                } 
+            }})">
+       @* <DxMenu Title="產線 - 線上派工系統" ItemsPosition="ItemPosition.End" CollapseItemsToHamburgerMenu="true" >*@
+            <TitleTemplate>
+                @* <div class="icon-logo" role="img" aria-label="@context">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;產線 - 線上派工系統</div> *@
+                <div class="icon-logo font-style" role="img" aria-label="@context">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;產線 ( 報工 - ESOP ) 系統</div>
+            </TitleTemplate>
+            <Items>
+                <DxMenuItem IconCssClass="menu-icon-home menu-icon" NavigateUrl="./">
+                    <TextTemplate>
+                        <div class="font-style">首頁</div>
+                    </TextTemplate>
+                </DxMenuItem>
+                @* <DxMenuItem IconCssClass="menu-icon-products menu-icon">
+                    <TextTemplate>
+                        <div class="font-style">基本資料</div>
+                    </TextTemplate>
+                    <Items>
+                        <DxMenuItem CssClass="font-style" Text="產線人員資料" NavigateUrl="OperatorInformationPage" Position="ItemPosition.Start" />
+                        <DxMenuItem CssClass="font-style" Text="工站對照表" NavigateUrl="ComparisonPage" />
+                        <DxMenuItem CssClass="font-style" Text="工單修改" NavigateUrl="ModifyWorkerOrderPage" />
+                        @* <DxMenuItem CssClass="font-style" Text="技能配置" NavigateUrl="OperatorAbilityPage" /> 
+                        @* <DxMenuItem CssClass="font-style" Text="工作時段" NavigateUrl="TimePeriod" /> 
+                        @* <DxMenuItem CssClass="font-style" Text="調整原因" NavigateUrl="ReasonTypePage" /> 
+                        @* <DxMenuItem CssClass="font-style" Text="加班時段" NavigateUrl="OvertimeSchedule" /> 
+                        @* <DxMenuItem CssClass="font-style" Text="工時調整" NavigateUrl="AdditionalTimePage" /> 
+                    </Items>
+                </DxMenuItem> *@
+                @* <DxMenuItem IconCssClass="menu-icon-setting menu-icon">
+                    <TextTemplate>
+                        <div class="font-style">作業設定</div>
+                    </TextTemplate>
+                    <Items>
+                        <DxMenuItem CssClass="font-style" Text="產線工站" NavigateUrl="WorkingTypeGroup" />
+                        <DxMenuItem CssClass="font-style" Text="作業程序" NavigateUrl="WorkingType" />
+                    </Items>
+                </DxMenuItem> *@
+                @* <DxMenuItem IconCssClass="menu-icon-add menu-icon">
+                    <TextTemplate>
+                        <div class="font-style">派工作業</div>
+                    </TextTemplate>
+                    <Items>
+                        <DxMenuItem CssClass="font-style" Text="手臂組裝" NavigateUrl="WorkingListRobotAssembly" />
+                        <DxMenuItem CssClass="font-style" Text="IO模組" NavigateUrl="WorkingListSubAssemblyIOModule" />
+                    </Items>
+                </DxMenuItem> *@
+                @* <DxMenuItem IconCssClass="menu-icon-popup-position menu-icon" NavigateUrl="WorkingOrderResponsePage">
+                    <TextTemplate>
+                        <div class="font-style">報工作業</div>
+                    </TextTemplate>
+                    @* <Items>
+                        <DxMenuItem CssClass="font-style" Text="手臂組裝" NavigateUrl="WorkingResponsePage/Detail" />
+                    </Items> 
+                </DxMenuItem> *@
+                @* <DxMenuItem IconCssClass="menu-icon-scheduler-navigator menu-icon" NavigateUrl="WorkingReportPage">
+                    <TextTemplate>
+                        <div class="font-style">派工細節</div>
+                    </TextTemplate>
+                    <Items>
+                        <DxMenuItem CssClass="font-style" Text="手臂組裝" NavigateUrl="WorkingReportPage" />
+                    </Items>
+                </DxMenuItem> *@
+                @* <DxMenuItem IconCssClass="menu-icon-support menu-icon" NavigateUrl="ReportPage">
+                    <TextTemplate>
+                        <div class="font-style">報表</div>
+                    </TextTemplate>
+                    <Items>
+                        @* <DxMenuItem CssClass="font-style" Text="工單" NavigateUrl="StatisticReport" /> 
+                        @* <DxMenuItem CssClass="font-style" Text="人員" NavigateUrl="OperatorReport" /> 
+                        @* <DxMenuItem CssClass="font-style" Text="人員(天)" NavigateUrl="OperatorDayReport" /> 
+                    </Items>
+                </DxMenuItem> *@
+                @* @if (customAuth.user.role != Role.Guest)
+                {*@
+                    <DxMenuItem IconCssClass="menu-icon-info menu-icon" NavigateUrl="ESOPPage">
+                        <TextTemplate>
+                            <div class="font-style">ESOP</div>
+                        </TextTemplate>
+                        @* <Items>
+                            <DxMenuItem CssClass="font-style" Text="作業站別" NavigateUrl="StationStatus" />
+                            <DxMenuItem CssClass="font-style" Text="處理程序" NavigateUrl="ProcedureStatus" />
+                            <DxMenuItem CssClass="font-style" Text="機型" NavigateUrl="ModelStatus" />
+                            <DxMenuItem CssClass="font-style" Text="SOP綁定" NavigateUrl="ESOPStatus" />
+                            <DxMenuItem CssClass="font-style" Text="Main MAP" NavigateUrl="ESOPMainMap" />
+                            <DxMenuItem CssClass="font-style" Text="Process MAP" NavigateUrl="ESOPProcessMap" />
+                            <DxMenuItem CssClass="font-style" Text="SOP MAP" NavigateUrl="ESOPMap" />
+                        </Items> *@
+                    </DxMenuItem>
+                @* } *@
+                @if (customAuth.user.role != Role.Guest)
+                {
+                    <DxMenuItem title="Logout" Click="@NavToLogout" CssClass="notoggle font-style" IconCssClass="menu-icon-user-profile menu-icon" Name="Logout" Position="ItemPosition.End">
+                        <Template>
+                            <div style="padding:9px 27px; text-align:center;
+                                    color:dodgerblue">
+                                <span class="tab-title-bold">@GetLogInValue()</span>
+                            </div>
+                        </Template>
+                    </DxMenuItem>
+                }
+                else
+                {
+                    <DxMenuItem title="Login" Click="@NavToLogin" CssClass="notoggle font-style" IconCssClass="menu-icon-user-profile menu-icon" Name="Login" Position="ItemPosition.End">
+                        <Template>
+                            <div style="padding:9px 27px; text-align:center;
+                                    color:dodgerblue">
+                                <span class="tab-title-bold">@GetLogInValue()</span>
+                            </div>
+                        </Template>
+                    </DxMenuItem>
+                }
+                @*<DxMenuItem>
+                    <TextTemplate>
+                        <SigninView />
+                    </TextTemplate>
+                </DxMenuItem>*@
+            </Items>
+        </DxMenu>
+    </div>
+</div>
+
+@* <DxPopup Width="420px" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center" @bind-Visible="@PopupVisible"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false">
+    <HeaderContentTemplate>
+        <h3>Welcome</h3>
+    </HeaderContentTemplate>
+    <BodyContentTemplate Context="PopupContext">
+        <EditForm Model="@UserData" OnValidSubmit="@HandleValidSubmit" Context="EditFormContext">
+            <DataAnnotationsValidator />
+            @if (!IsLogIn)
+            {
+                <DxFormLayout>
+                    <DxFormLayoutItem ColSpanMd="12">
+                        <DxTextBox @bind-Text="@UserData.Username" NullText="Username" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                        <div class="text-danger"><ValidationMessage For="@(() => UserData.Username)" /></div>
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem ColSpanMd="12">
+                        <DxTextBox @bind-Text="@UserData.Password" NullText="Password" Password="true" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+                        <div class="text-danger"><ValidationMessage For="@(() => UserData.Password)" /></div>
+                    </DxFormLayoutItem>
+                    <DxFormLayoutItem ColSpanMd="12">
+                        <DxButton CssClass="w-100" Text="Login" RenderStyle="ButtonRenderStyle.Primary" SubmitFormOnClick="true" />
+                    </DxFormLayoutItem>
+                </DxFormLayout>
+            }
+            else
+            {
+                <DxFormLayout>
+                    <DxFormLayoutItem ColSpanMd="12">
+                        <DxButton CssClass="w-100" Text="Logout" RenderStyle="ButtonRenderStyle.Primary" SubmitFormOnClick="true" />
+                    </DxFormLayoutItem>
+                </DxFormLayout>
+            }
+        </EditForm>
+    </BodyContentTemplate>
+</DxPopup>
+ *@
+@code {
+    [Parameter] public bool ToggleOn { get; set; }
+    [Parameter] public EventCallback<bool> ToggleOnChanged { get; set; }
+    public bool PopupVisible { get; set; }
+    public bool IsLogIn { get; set; }
+    UserDataBase UserData { get; set; } = new UserDataBase();
+    string LogInValue = "Login";
+
+    bool IsManager = false;
+    private List<OperatorInformation>? _OperatorInformations;
+    async Task OnToggleClick() => await Toggle();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _OperatorInformations = await DataService.GetOperatorInformationsAsync();
+    }
+
+    async Task Toggle(bool? value = null) {
+        var newValue = value ?? !ToggleOn;
+        if(ToggleOn != newValue) {
+            ToggleOn = newValue;
+            await ToggleOnChanged.InvokeAsync(ToggleOn);
+        }
+    }
+    // void HandleValidSubmit()
+    // {
+    //     if (!IsLogIn)
+    //     {
+    //         PopupVisible = false;
+    //         if (UserData.Username == "admin")
+    //         {
+    //             IsManager = true;
+    //         }
+    //         IsLogIn = true;
+    //         LogInValue = "Logout";
+    //     }
+    // }
+    private void NavToLogin()
+    {
+        nav.NavigateTo("/LoginPage");
+    }
+    private void NavToLogout()
+    {
+        nav.NavigateTo("/LogoutPage");
+    }
+
+    string GetLogInValue()
+    {
+        string Result = "Login : Guest";
+        if (customAuth.user.role == Role.Guest)
+        {
+            Result = "Login : Guest";
+        }
+        else if (customAuth.user.role != Role.Guest)
+        {
+            var item = _OperatorInformations.SingleOrDefault(x => x.OPNO == customAuth.user.userName);
+            if (item != null)
+            {
+                Result = "Logout【 " + item.OperatorName + " 】";
+            }
+            else
+            {
+                Result = "Logout【 " + customAuth.user.userName + " 】";
+            }
+        }
+        else if (customAuth.user == null)
+        {
+            Result = "Login : Guest";
+        }
+        return Result;
+    }
+}

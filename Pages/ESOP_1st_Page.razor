@@ -1,0 +1,199 @@
+﻿@page "/ESOPPage"
+@using DxBlazorApplication7.Data
+@inject DataService DataService
+@inject AuthenticationStateProvider authenticationStateProvider
+@inherits AuthComponentBase
+
+<DxTabs CssClass="tabs" SizeMode="SizeMode.Large" RenderMode="TabsRenderMode.AllTabs">
+    <DxTabPage Text="ESOP">
+        <TabTemplate>
+            <div style="padding:9px 27px; text-align:center;
+                        color:dodgerblue">
+                <span class="tab-title-bold">ESOP</span>
+            </div>
+        </TabTemplate>
+        <ChildContent>
+            <br />
+            <h3 style="color:dodgerblue">
+                清單
+            </h3>
+            @foreach (var item in _StationSelection.Select(x => x.StationID).Distinct())
+            {
+                @* <div class="background-cards"> *@
+                    <ESOP_2nd_Page Param1="@item"></ESOP_2nd_Page>
+                @* </div> *@
+            }
+        </ChildContent>
+    </DxTabPage>
+
+    @if (_DirectoryReferenceTable != null)
+    {
+        foreach (var item in _DirectoryReferenceTable)
+        {
+            @* <DxTabPage>
+                <TabTemplate>
+                    <div class="d-flex pt-2 demo-employee-card">
+                        <span class="tab-title-bold">@item.DisplayName</span>
+                    </div>
+                </TabTemplate>
+            </DxTabPage> *@
+
+            @* <DxTabPage @key="item.DirectoryName">
+                <TabTemplate>
+                    <div style="padding:9px 27px; text-align:center; color:royalblue">
+                        <span class="tab-title-bold">@item.DisplayName</span>
+                    </div>
+                </TabTemplate>
+                <ChildContent>
+                    <ESOP_Folder_Page FolderNumber="@item.DirectoryName" @key="item.DirectoryName"></ESOP_Folder_Page>
+                </ChildContent>
+            </DxTabPage> *@
+
+            <DxTabPage @key="item.DirectoryName">
+                <TabTemplate>
+                        <div style="padding:9px 27px; text-align:center;
+                                    color:dodgerblue">
+                        <span class="tab-title-bold">@item.DisplayName</span>
+                    </div>
+                </TabTemplate>
+                <ChildContent>
+                    <br />
+                        <div><span class="tab-title-bold">@item.DirectoryName</span></div>
+                    <br />
+                        <ESOP_Folder_Page FolderNumber="@item.DirectoryName" @key="item.DirectoryName"></ESOP_Folder_Page>
+                    <br />
+                </ChildContent>
+            </DxTabPage>
+        }
+    }
+
+    <DxTabPage Text="手動選取SOP">
+        <TabTemplate>
+            <div style="padding:9px 27px; text-align:center;
+                        color:dodgerblue">
+                <span class="tab-title-bold">手動選取SOP</span>
+            </div>
+        </TabTemplate>
+        <ChildContent>
+            <ESOPSelectionPage></ESOPSelectionPage>
+        </ChildContent>
+    </DxTabPage>
+
+    @if ((customAuth.user.role != Role.Guest && customAuth.user.department == "Manager"))
+    {
+        <DxTabPage Text="修改ESOP清單">
+            <TabTemplate>
+                <div style="padding:9px 27px; text-align:center;
+                                color:dodgerblue">
+                    <span class="tab-title-bold">修改ESOP清單</span>
+                </div>
+            </TabTemplate>
+            <ChildContent>
+                <ESOPCreatePage></ESOPCreatePage>
+            </ChildContent>
+        </DxTabPage>
+
+        <DxTabPage Text="工作站別">
+            <TabTemplate>
+                <div style="padding:9px 27px; text-align:center;
+                                    color:dodgerblue">
+                    <span class="tab-title-bold">工作站別</span>
+                </div>
+            </TabTemplate>
+            <ChildContent>
+                <StationStatusPage></StationStatusPage>
+            </ChildContent>
+        </DxTabPage>
+        <DxTabPage Text="做業程序">
+            <TabTemplate>
+                <div style="padding:9px 27px; text-align:center;
+                                        color:dodgerblue">
+                    <span class="tab-title-bold">做業程序</span>
+                </div>
+            </TabTemplate>
+            <ChildContent>
+                <ProcedureStatusPage></ProcedureStatusPage>
+            </ChildContent>
+        </DxTabPage>
+        <DxTabPage Text="機型">
+            <TabTemplate>
+                <div style="padding:9px 27px; text-align:center;
+                                            color:dodgerblue">
+                    <span class="tab-title-bold">機型</span>
+                </div>
+            </TabTemplate>
+            <ChildContent>
+                <ModelStatusPage></ModelStatusPage>
+            </ChildContent>
+        </DxTabPage>
+        <DxTabPage Text="SOP綁定">
+            <TabTemplate>
+                <div style="padding:9px 27px; text-align:center;
+                                                color:dodgerblue">
+                    <span class="tab-title-bold">SOP綁定</span>
+                </div>
+            </TabTemplate>
+            <ChildContent>
+                <ESOPStatusPage></ESOPStatusPage>
+            </ChildContent>
+        </DxTabPage>
+    }
+</DxTabs>
+
+<DxPopup Width="1800px" Height="900px" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center" @bind-Visible="@EsopPopupVisible"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         BodyText="@_ESOPMsg">
+
+    <BodyContentTemplate Context="PopupContext">
+        @*<img class="fit-width" src="images/Techman Robot.png" style="height: 24%; width: 24%; float:right" align="bottom" />*@
+        <div>
+            <object data="@_ESOPData" type="application/pdf" width="1770" height="780"></object>
+            @*<iframe src='../Uploads/S00/P00/M01/更新License.pdf' width="500" height="678"> </iframe>*@
+        </div>
+    </BodyContentTemplate>
+    <FooterContentTemplate Context="Context">
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="Close" Click="CloseEulaClick" />
+        @*<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="Cancel" Click="CancelEulaClick" />*@
+    </FooterContentTemplate>
+</DxPopup>
+
+@code {
+    private List<StationStatus>? _StationStatus;
+    private List<StationSelection>? _StationSelection;
+    private List<ProcedureStatus>? _ProcedureStatus;
+    private List<ModelStatus>? _ModelStatus;
+    private List<ESOPStatus>? _ESOPStatus;
+    private Tuple<List<DirectoryStatus>, List<FolderStatus>> _Tuple;
+    private List<DirectoryStatus>? _DirectoryStatus;
+
+    private List<DirectoryReferenceTable> _DirectoryReferenceTable;
+
+    bool EsopPopupVisible { get; set; } = false;
+    string _ESOPMsg;
+    string _ESOPData;
+
+    public string StationName { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _StationStatus = await DataService.GetStationStatusAsync();
+        _StationSelection = await DataService.GetStationSelectionAsync();
+        _ProcedureStatus = await DataService.GetProcedureStatusAsync();
+        _ModelStatus = await DataService.GetModelStatusAsync();
+        _ESOPStatus = await DataService.GetESOPStatusAsync();
+        // _Tuple = await DataService.GetESOPDirectoryStatusAsync();
+        // _DirectoryStatus = _Tuple.Item1;
+
+        _DirectoryStatus = DataService._DirectoryItem;
+
+        _DirectoryReferenceTable = await DataService.GetDirectoryReferenceTablesAsync();
+        _DirectoryReferenceTable = _DirectoryReferenceTable.OrderBy(x => x.DirectoryName).ToList();
+    }
+
+    async Task CloseEulaClick()
+    {
+        EsopPopupVisible = false;
+    }
+}

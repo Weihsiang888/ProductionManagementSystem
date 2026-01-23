@@ -1,0 +1,576 @@
+﻿@page "/ESOPStatus"
+@using DxBlazorApplication7.Data
+@inject AuthenticationStateProvider authenticationStateProvider
+@inherits AuthComponentBase
+@inject DataService DataService
+@inject NavigationManager NavigationManager
+
+<br />
+<h3 style="color:dodgerblue">建立 ESOP</h3>
+<br />
+
+<DxGrid Data="_ESOPStatus"
+        @ref="MyGrid"
+        PageSize="24"
+        KeyFieldName="ModelID"
+        EditModelSaving="OnEditModelSaving"
+        CustomizeEditModel="Grid_CustomizeEditModel">
+    <Columns>
+        @if (customAuth.user.role != Role.Guest && customAuth.user.department == "Manager")
+        {
+            <DxGridCommandColumn Width="90">
+                <HeaderTemplate>
+                    <a class="oi oi-plus" @onclick="@(() => MyGrid.StartEditNewRowAsync())" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </HeaderTemplate>
+                <CellDisplayTemplate>
+                    @*<a class="oi oi-pencil" @onclick="@(() => MyGrid.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>*@
+                    <a class="oi oi-x" @onclick="@(() => Delete((ESOPStatus)context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </CellDisplayTemplate>
+            </DxGridCommandColumn>
+        }
+        <DxGridDataColumn FieldName=@nameof(ESOPStatus.StationID) TextAlignment="GridTextAlignment.Left" Caption="作業站名稱" Width="120" >
+            <CellDisplayTemplate>
+                <span>@GetStationName((ESOPStatus)context.DataItem)</span>
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+        <DxGridDataColumn FieldName=@nameof(ESOPStatus.ProcedureID) Caption="程序名稱" Width="180" >
+        <CellDisplayTemplate>
+                <span>@GetProcedureName((ESOPStatus)context.DataItem)</span>
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+        <DxGridDataColumn FieldName=@nameof(ESOPStatus.ModelID) Caption="機種/料號名稱" Width="210" >
+        <CellDisplayTemplate>
+                <span>@GetModelName((ESOPStatus)context.DataItem)</span>
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+        <DxGridDataColumn FieldName=@nameof(ESOPStatus.ESOPCode) Caption="ESOP" Width="165" />
+        <DxGridDataColumn FieldName=@nameof(ESOPStatus.FileSite) Caption="檔案位置" MinWidth="300" />
+    </Columns>
+    <EditFormTemplate Context="EditFormContext">
+        @{
+            var _ESOPStatus = (ESOPStatus)EditFormContext.EditModel;
+        }
+        <DxFormLayout>
+            <DxFormLayoutItem Caption="作業站名稱 :" ColSpanLg="12">
+                <div class="d-flex flex-row flex-wrap">
+                @foreach (var item in _StationSelection)
+                {
+                    <div class="me-2 mb-2">
+                        @if (item.IsSelect == false)
+                        {
+                            <button class="dxbl-btn dxbl-btn-outline-info w-10" type="button" @onclick="@(() => SetStationSelection(@item.StationID.ToString()))">
+                                <span>@item.StationName</span>
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="dxbl-btn dxbl-btn-info w-10" type="button" @onclick="@(() => SetStationSelection(@item.StationID.ToString()))">
+                                <span>@item.StationName</span>
+                            </button>
+                        }
+                    </div>
+                }
+                </div>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="作業名稱 :" ColSpanLg="12">
+                <div class="d-flex flex-row flex-wrap">
+                    @if (_ProcedureSelection is not null)
+                    {
+                        @foreach (var item in _ProcedureSelection)
+                        {
+                            <div class="me-2 mb-2">
+                                @if (item.IsSelect == false)
+                                {
+                                    <button class="dxbl-btn dxbl-btn-outline-info w-10" type="button" @onclick="@(() => SetProcedureSelection(@item.ProcedureID.ToString()))">
+                                        <span>@item.ProcedureName</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="dxbl-btn dxbl-btn-info w-10" type="button" @onclick="@(() => SetProcedureSelection(@item.ProcedureID.ToString()))">
+                                        <span>@item.ProcedureName</span>
+                                    </button>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="模組名稱 :" ColSpanLg="12">
+                <div class="d-flex flex-row flex-wrap">
+                    @if (_ModelSelection is not null)
+                    {
+                        @foreach (var item in _ModelSelection)
+                        {
+                            <div class="me-2 mb-2">
+                                @if (item.IsSelect == false)
+                                {
+                                    <button class="dxbl-btn dxbl-btn-outline-info w-10" type="button" @onclick="@(() => SetModelSelection(@item))">
+                                        <span>@item.Description</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="dxbl-btn dxbl-btn-info w-10" type="button" @onclick="@(() => SetModelSelection(@item))">
+                                        <span>@item.Description</span>
+                                    </button>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="料號1階 :" ColSpanLg="12">
+                <div class="d-flex flex-row flex-wrap">
+                    @if (_FolderStatus is not null)
+                    {
+                        @foreach (var item in _FolderStatus)
+                        {
+                            <div class="me-2 mb-2">
+                                @if (item.IsSelect == false)
+                                {
+                                    <button class="dxbl-btn dxbl-btn-outline-info w-10" type="button" @onclick="@(() => SetFolderStatus(@item.FolderName.ToString()))">
+                                        <span>@item.FolderName</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="dxbl-btn dxbl-btn-info w-10" type="button" @onclick="@(() => SetFolderStatus(@item.FolderName.ToString()))">
+                                        <span>@item.FolderName</span>
+                                    </button>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="料號2階 :" ColSpanLg="12">
+                <div class="d-flex flex-row flex-wrap">
+                    @if (_SubFolderStatus is not null)
+                    {
+                        @foreach (var item in _SubFolderStatus)
+                        {
+                            <div class="me-2 mb-2">
+                                @if (item.IsSelect == false)
+                                {
+                                    <button class="dxbl-btn dxbl-btn-outline-info w-10" type="button" @onclick="@(() => SetSubFolderStatus(@item.FolderName.ToString()))">
+                                        <span>@item.FolderName</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="dxbl-btn dxbl-btn-info w-10" type="button" @onclick="@(() => SetSubFolderStatus(@item.FolderName.ToString()))">
+                                        <span>@item.FolderName</span>
+                                    </button>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="料號3階 :" ColSpanLg="12">
+                <div class="d-flex flex-row flex-wrap">
+                    @if (_EndFolderStatus is not null)
+                    {
+                        @foreach (var item in _EndFolderStatus)
+                        {
+                            <div class="me-2 mb-2">
+                                @if (item.IsSelect == false)
+                                {
+                                    <button class="dxbl-btn dxbl-btn-outline-info w-10" type="button" @onclick="@(() => SetEndFolderStatus(@item.FolderName.ToString()))">
+                                        <span>@item.FolderName</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="dxbl-btn dxbl-btn-info w-10" type="button" @onclick="@(() => SetEndFolderStatus(@item.FolderName.ToString()))">
+                                        <span>@item.FolderName</span>
+                                    </button>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </DxFormLayoutItem>
+            @* <DxFormLayoutItem Caption="作業站名稱 :" ColSpanMd="6">
+                <DxComboBox Data="@_StationStatus"
+                            AllowUserInput="false"
+                            NullText="作業站名稱..."
+                            TextFieldName="@nameof(StationStatus.StationName)"
+                            @bind-Text=_ESOPStatus.StationID
+                            @bind-Value="@StationIDVaule">
+                </DxComboBox>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="程序名稱 :" ColSpanMd="6">
+                <DxComboBox Data="@_ProcedureStatus"
+                            AllowUserInput="false"
+                            NullText="程序名稱..."
+                            TextFieldName="@nameof(ProcedureStatus.ProcedureName)"
+                            @bind-Text=_ESOPStatus.ProcedureID
+                            @bind-Value="@ProcedureIDVaule">
+                </DxComboBox>
+            </DxFormLayoutItem> *@
+            @* <DxFormLayoutItem Caption="機種/料號名稱 :" ColSpanMd="6">
+                <DxComboBox Data="@_ModelStatus"
+                            AllowUserInput="false"
+                            NullText="機種/料號名稱..."
+                            TextFieldName="@nameof(ModelStatus.ModelName)"
+                            @bind-Text=_ESOPStatus.ModelID
+                            @bind-Value="@ModelIDVaule">
+                </DxComboBox>
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="上傳檔案 :" ColSpanMd="12">
+                <div class="upload-container">
+                    <div style="@(SelectedFilesCount > 0 ? "display: none" : string.Empty)">
+                        <span class="drop-file-icon mb-3"></span>
+                        <span class="mb-3">Click the Select Files button to select a file</span>
+                    </div>
+                    <DxUpload Name="MyFile" UploadUrl="@GetUploadUrl("api/Upload/UploadFile/?Folder=" + Folder)" SelectedFilesChanged="SelectedFilesChanged"
+                              AllowedFileExtensions="@(new List<string> { ".pdf", ".PDF" })" MaxFileSize="400000000"
+                              CssClass="@(SelectedFilesCount > 0 ? "w-100" : string.Empty)">
+                    </DxUpload>
+                </div>
+            </DxFormLayoutItem> *@
+        </DxFormLayout>
+    </EditFormTemplate>
+</DxGrid>
+
+<DxPopup @bind-Visible="@DelPopupVisible"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         HeaderText="是否確認要刪除"
+         BodyText="@_DelMsg">
+    <FooterContentTemplate Context="Context">
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="OK" Click="ConfirmEulaClick" />
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="Cancel" Click="CancelEulaClick" />
+    </FooterContentTemplate>
+</DxPopup>
+
+@code {
+    DxGrid? MyGrid;
+    private List<StationStatus>? _StationStatus;
+    private List<ProcedureStatus>? _ProcedureStatus;
+    private List<StationSelection>? _StationSelection;
+    private List<ProcedureSelection>? _ProcedureSelection;
+    private List<ModelSelection>? _ModelSelection;
+
+    private List<ModelStatus>? _ModelStatus;
+    private List<ESOPStatus>? _ESOPStatus;
+    //private List<ESOPFileStatus>? _ESOPFileStatus;
+    private List<DirectoryStatus>? _DirectoryStatus;
+    private List<FolderStatus>? _FolderStatus;
+    private List<FolderStatus>? _SubFolderStatus;
+    private List<FolderStatus>? _EndFolderStatus;
+    private Tuple<List<DirectoryStatus>, List<FolderStatus>> _Tuple;
+
+    bool IsEdit;
+    StationStatus StationIDVaule;
+    ProcedureStatus ProcedureIDVaule;
+    ModelStatus ModelIDVaule;
+    bool UploadVisible { get; set; } = false;
+    int SelectedFilesCount { get; set; }
+    string Folder  = "1St_2nd_3rd";
+    string FileName = "";
+
+    string StationID = "";
+    string ProcedureID = "";
+    string ModelName = "";
+    string ModelID = "";
+    string _FolderSelect = "";
+    string _SubFolderSelect = "";
+    string _EndFolderSelect = "";
+
+    IEnumerable<UploadFileInfo> UploadFiles;
+
+    string _DelMsg;
+    bool DelPopupVisible { get; set; } = false;
+    ESOPStatus ESOPStatusValue;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _StationStatus = await DataService.GetStationStatusAsync();
+        _ProcedureStatus = await DataService.GetProcedureStatusAsync();
+        _StationSelection = await DataService.GetStationSelectionAsync();
+        //_ProcedureSelection = await DataService.GetProcedureSelectionAsync();
+        _ProcedureSelection = null;
+        _ModelSelection = await DataService.GetModelSelectionAsync();
+        _ModelStatus = await DataService.GetModelStatusAsync();
+        _ESOPStatus = await DataService.GetESOPStatusAsync();
+        //_ESOPFileStatus = await DataService.GetESOPFileStatusAsync();
+        // _Tuple = await DataService.GetESOPDirectoryStatusAsync();
+        // _DirectoryStatus = _Tuple.Item1;
+        //_FolderStatus = _Tuple.Item2;
+
+        _DirectoryStatus = DataService._DirectoryItem;
+        _FolderStatus = DataService._FolderItem;
+    }
+    async Task OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        if (!string.IsNullOrEmpty(StationID) && !string.IsNullOrEmpty(ProcedureID) && !string.IsNullOrEmpty(_FolderSelect) && !string.IsNullOrEmpty(_SubFolderSelect) && !string.IsNullOrEmpty(_EndFolderSelect) && !string.IsNullOrEmpty(ModelName))
+        {
+            var editModel = (ESOPStatus)e.EditModel;
+            editModel.StationID = StationID;
+            editModel.ProcedureID = ProcedureID;
+            editModel.ModelID = ModelID;
+            //editModel.ModelID = _FolderSelect + "-" + _SubFolderSelect + "-" + _EndFolderSelect;
+            //editModel.TypeGroup = _FolderSelect + "-" + _SubFolderSelect + "-" + _EndFolderSelect;
+            editModel.TypeGroup = _StationSelection.SingleOrDefault(x => x.StationID == StationID).Manufacturing;
+            editModel.ESOPCode = _FolderSelect + "-" + _SubFolderSelect + "-" + _EndFolderSelect;
+            //editModel.ESOPCode = StationID + "_" + ProcedureID + "_" + editModel.ModelID;
+            //editModel.FileSite = _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == editModel.ModelID).DirectoryMax + "/" + _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == editModel.ModelID).FileName;
+            editModel.FileSite = _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == editModel.ESOPCode).FileName;
+            editModel.IsDel = false;
+            _ESOPStatus = await DataService.ChangeESOPStatusAsync(editModel);
+        }
+    }
+    async Task Delete(ESOPStatus item)
+    {
+        ESOPStatusValue = item;
+        _DelMsg = "是否要刪除ESOP綁定, " + item.FileSite;
+        DelPopupVisible = true;
+
+        // if (item != null)
+        // {
+        //     await DataService.Remove(item);
+        // }
+    }
+    async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+        if (e.IsNew)
+        {
+            foreach (var item in _StationSelection)
+            {
+                item.IsSelect = false;
+                _FolderStatus = null;
+            }
+            foreach (var item in _ModelSelection)
+            {
+                item.IsSelect = false;
+                //_FolderStatus = null;
+            }
+            _FolderSelect = "";
+            _SubFolderSelect = "";
+            _EndFolderSelect = "";
+            _ProcedureSelection = null;
+            _FolderStatus = null;
+            _SubFolderStatus = null;
+            _EndFolderStatus = null;
+            IsEdit = false;
+        }
+        else
+        {
+            IsEdit = true;
+        }
+        StationIDVaule = null;
+        ProcedureIDVaule = null;
+        ModelIDVaule = null;
+    }
+    protected void SelectedFilesChanged(IEnumerable<UploadFileInfo> files)
+    {
+        SelectedFilesCount = files.ToList().Count;
+        FileName = files.Last().Name;
+        InvokeAsync(StateHasChanged);
+    }
+    protected string GetUploadUrl(string url)
+    {
+        if (StationIDVaule != null && ProcedureIDVaule != null && ModelIDVaule != null)
+        {
+            Folder = StationIDVaule.StationID + "_" + ProcedureIDVaule.ProcedureID + "_" + ModelIDVaule.ModelID;
+            url = "api/Upload/UploadFile/?Folder=" + Folder;
+            return NavigationManager.ToAbsoluteUri(url).AbsoluteUri;
+        }
+        else
+        {
+            return "";
+        }
+    }
+    async Task SetStationSelection(string id)
+    {
+        foreach (var item in _StationSelection)
+        {
+            item.IsSelect = false;
+        }
+        _FolderSelect = "";
+        _SubFolderSelect = "";
+        _EndFolderSelect = "";
+        _FolderStatus = null;
+        _SubFolderStatus = null;
+        _EndFolderStatus = null;
+
+        foreach (var item in _Tuple.Item2)
+        {
+            item.IsSelect = false;
+        }
+
+        if (_StationSelection.Single(x => x.StationID == id).IsSelect == false)
+        {
+            _StationSelection.Single(x => x.StationID == id).IsSelect = true;
+            StationID = id;
+            _ProcedureSelection = await DataService.GetProcedureSelectionAsync(id);
+            _FolderStatus = _Tuple.Item2;
+        }
+        else
+        {
+            _StationSelection.Single(x => x.StationID == id).IsSelect = false;
+            StationID = "";
+            _ProcedureSelection = null;
+            _FolderStatus = null;
+        }
+    }
+    async Task SetProcedureSelection(string id)
+    {
+        foreach (var item in _ProcedureSelection)
+        {
+            item.IsSelect = false;
+            //_FolderStatus = null;
+        }
+        if (_ProcedureSelection.Single(x => x.ProcedureID == id).IsSelect == false)
+        {
+            _ProcedureSelection.Single(x => x.ProcedureID == id).IsSelect = true;
+            ProcedureID = id;
+            //_FolderStatus = _Tuple.Item2;
+        }
+        else
+        {
+            _ProcedureSelection.Single(x => x.ProcedureID == id).IsSelect = false;
+            ProcedureID = "";
+            //_FolderStatus = null;
+        }
+    }
+    async Task SetModelSelection(ModelSelection _Model)
+    {
+        foreach (var item in _ModelSelection)
+        {
+            item.IsSelect = false;
+            //_FolderStatus = null;
+        }
+        if (_ModelSelection.Single(x => x.ModelName == _Model.ModelName).IsSelect == false)
+        {
+            _ModelSelection.Single(x => x.ModelName == _Model.ModelName).IsSelect = true;
+            ModelID = _Model.ModelKey + _Model.ModelID.ToString();
+            ModelName = _Model.ModelName;
+            //_FolderStatus = _Tuple.Item2;
+        }
+        else
+        {
+            _ModelSelection.Single(x => x.ModelName == _Model.ModelName).IsSelect = false;
+            ModelID = "";
+            ModelName = "";
+            //ModelID = _Model.ModelKey + _Model.ModelID.ToString();
+            //ModelName = _Model.ModelName;
+            //_FolderStatus = null;
+        }
+    }
+    async Task SetFolderStatus(string id)
+    {
+        foreach (var item in _FolderStatus)
+        {
+            item.IsSelect = false;
+        }
+        if (_FolderStatus.Single(x => x.FolderName == id).IsSelect == false)
+        {
+            _FolderStatus.Single(x => x.FolderName == id).IsSelect = true;
+            _FolderSelect = id;
+            string _Sub = "";
+            _SubFolderStatus = new List<FolderStatus>();
+            foreach (var item in _DirectoryStatus.Where(x => x.DirectoryName.Contains(id)))
+            {
+                if (_Sub != item.DirectoryName.Split("-")[1])
+                {
+                    _SubFolderStatus.Add(new FolderStatus
+                        {
+                            FolderName = item.DirectoryName.Split("-")[1],
+                            IsSelect = false
+                        });
+                    _Sub = item.DirectoryName.Split("-")[1];
+                }
+            }
+            _EndFolderStatus = null;
+        }
+        else
+        {
+            _FolderStatus.Single(x => x.FolderName == id).IsSelect = false;
+            _FolderSelect = "";
+            _SubFolderSelect = "";
+            _EndFolderSelect = "";
+            _SubFolderStatus = null;
+            _EndFolderStatus = null;
+        }
+    }
+    async Task SetSubFolderStatus(string id)
+    {
+        foreach (var item in _SubFolderStatus)
+        {
+            item.IsSelect = false;
+        }
+        if (_SubFolderStatus.Single(x => x.FolderName == id).IsSelect == false)
+        {
+            _SubFolderStatus.Single(x => x.FolderName == id).IsSelect = true;
+            _SubFolderSelect = id;
+            string _Sub = "";
+            _EndFolderStatus = new List<FolderStatus>();
+            foreach (var item in _DirectoryStatus.Where(x => x.DirectoryName.Contains(_FolderSelect + "-" + id)))
+            {
+                if (_Sub != item.DirectoryName.Split("-")[2])
+                {
+                    _EndFolderStatus.Add(new FolderStatus
+                        {
+                            FolderName = item.DirectoryName.Split("-")[2],
+                            IsSelect = false
+                        });
+                    _Sub = item.DirectoryName.Split("-")[2];
+                }
+            }
+        }
+        else
+        {
+            _SubFolderStatus.Single(x => x.FolderName == id).IsSelect = false;
+            _SubFolderSelect = "";
+            _EndFolderSelect = "";
+            _EndFolderStatus = null;
+        }
+    }
+    async Task SetEndFolderStatus(string id)
+    {
+        foreach (var item in _EndFolderStatus)
+        {
+            item.IsSelect = false;
+        }
+        if (_EndFolderStatus.Single(x => x.FolderName == id).IsSelect == false)
+        {
+            _EndFolderStatus.Single(x => x.FolderName == id).IsSelect = true;
+            _EndFolderSelect = id;
+        }
+        else
+        {
+            _EndFolderStatus.Single(x => x.FolderName == id).IsSelect = false;
+            _EndFolderSelect = "";
+        }
+    }
+    string GetStationName(ESOPStatus item)
+    {
+        return _StationStatus.SingleOrDefault(x => x.StationKey + x.StationID == item.StationID).StationName;
+    }
+    string GetProcedureName(ESOPStatus item)
+    {
+        return _ProcedureStatus.SingleOrDefault(x => x.ProcedureKey + x.ProcedureID == item.ProcedureID).ProcedureName;
+    }
+    string GetModelName(ESOPStatus item)
+    {
+        return _ModelStatus.SingleOrDefault(x => x.ModelKey + x.ModelID == item.ModelID).ModelName;
+    }
+
+    async Task ConfirmEulaClick()
+    {
+        if (ESOPStatusValue != null)
+        {
+            await DataService.Remove(ESOPStatusValue);
+        }
+    }
+
+    async Task CancelEulaClick()
+    {
+        DelPopupVisible = false;
+    }
+}

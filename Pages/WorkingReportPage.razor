@@ -1,0 +1,280 @@
+﻿@page "/-WorkingReportPage-"
+@using DxBlazorApplication7.Data
+@inject DataService DataService
+
+<br />
+<h3>報工作業細節</h3>
+<br />
+
+<DxGrid Data="_WorkingLists"
+        @ref="MyGrid"
+        PageSize="24"
+        EditModelSaving="OnEditModelSaving">
+    <Columns>
+@*        <DxGridCommandColumn Width="90">
+        <HeaderTemplate>
+        <a class="oi oi-plus" @onclick="@(() => MyGrid.StartEditNewRowAsync())" style="text-decoration: none;" href="javascript:void(0);"></a>
+        </HeaderTemplate>
+        <CellDisplayTemplate>
+        <a class="oi oi-pencil" @onclick="@(() => MyGrid.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
+        <a class="oi oi-x" @onclick="@(() => Delete((WorkingList)context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+        </CellDisplayTemplate>
+        </DxGridCommandColumn>*@
+        <DxGridDataColumn FieldName=@nameof(WorkingList.WorkingTime) Caption="工作日" MinWidth="60" />
+        @*<DxGridDataColumn FieldName=@nameof(WorkingList.WorkingID) Caption="作業序號" MinWidth="90" />*@
+        @*<DxGridDataColumn FieldName=@nameof(WorkingList.WorkingPeriod) Caption="工作時段" MinWidth="90" />*@
+        @*<DxGridDataColumn FieldName=@nameof(WorkingList.WorkingName) Caption="作業程序" MinWidth="150" />*@
+        <DxGridDataColumn FieldName=@nameof(WorkingList.WorkingDescription) Caption="作業程序" MinWidth="150" />
+        <DxGridDataColumn FieldName=@nameof(WorkingList.OPName) Caption="作業人員" MinWidth="150" />
+
+        <DxGridDataColumn FieldName=@nameof(WorkingList.IsAssign) Caption="工作分配" MinWidth="120">
+            <CellDisplayTemplate>
+                @if (!(bool)context.Value)
+                {
+                    <button class="dxbl-btn dxbl-btn-outline-primary w-100" type="button">
+                        <span>未分配</span>
+                    </button>
+                }
+                else
+                {
+                    <button class="dxbl-btn dxbl-btn-primary w-100" type="button">
+                        <span>已分配</span>
+                    </button>
+                }
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+
+        <DxGridDataColumn FieldName=@nameof(WorkingList.IsReceive) Caption="工作接收" MinWidth="120">
+            <CellDisplayTemplate>
+                @if (!(bool)context.Value)
+                {
+                    <button class="dxbl-btn dxbl-btn-outline-info w-100" type="button">
+                        <span>未接收</span>
+                    </button>
+                }
+                else
+                {
+                    <button class="dxbl-btn dxbl-btn-info w-100" type="button">
+                        <span>已接收</span>
+                    </button>
+                }
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+
+        <DxGridDataColumn FieldName=@nameof(WorkingList.IsResponse) Caption="工作報工" MinWidth="120">
+            <CellDisplayTemplate>
+                @if (!(bool)context.Value)
+                {
+                    <button class="dxbl-btn dxbl-btn-outline-success w-100" type="button">
+                        <span>未報工</span>
+                    </button>
+                }
+                else
+                {
+                    <button class="dxbl-btn dxbl-btn-success w-100" type="button">
+                        <span>已報工</span>
+                    </button>
+                }
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+
+        <DxGridDataColumn FieldName=@nameof(WorkingList.IsPause) Caption="工作暫停" MinWidth="120">
+            <CellDisplayTemplate>
+                @if (!(bool)context.Value)
+                {
+                    <button class="dxbl-btn dxbl-btn-outline-warning w-100" type="button">
+                        <span>作業中</span>
+                    </button>
+                }
+                else
+                {
+                    <button class="dxbl-btn dxbl-btn-warning w-100" type="button">
+                        <span>已暫停</span>
+                    </button>
+                }
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+
+        <DxGridDataColumn FieldName=@nameof(WorkingList.WorkOrder) Caption="工單號碼" MinWidth="150" />
+        <DxGridDataColumn FieldName=@nameof(WorkingList.SeriaNumber) Caption="手臂序號" MinWidth="150" />
+    </Columns>
+    <EditFormTemplate Context="EditFormContext">
+        @{
+            var _WorkingList = (WorkingList)EditFormContext.EditModel;
+        }
+        <DxFormLayout>
+            @if (_WorkingList.AssignTime is null)
+            {
+                <DxFormLayoutItem Caption="工作日 :">
+                    <DxDateEdit @bind-Date=_WorkingList.WorkingTime />
+                </DxFormLayoutItem>
+            }
+            else
+            {
+                <DxFormLayoutItem Caption="工作日 :">
+                    <DxDateEdit @bind-Date=_WorkingList.WorkingTime ReadOnly="true" />
+                </DxFormLayoutItem>
+            }
+            @*            <DxFormLayoutItem Caption="作業序號 :">
+            <DxSpinEdit @bind-Value=_WorkingList.WorkingID />
+            </DxFormLayoutItem>*@
+            @*            <DxFormLayoutItem Caption="工作時段 :">
+            <DxTextBox @bind-Text=_WorkingList.WorkingPeriod />
+            </DxFormLayoutItem>*@
+
+            @*<DxFormLayoutItem Caption="工作時段:" ColSpanMd="6">
+                <DxComboBox Data="@_OperatorWorkTimes"
+                            AllowUserInput="true"
+                            NullText="工作時段..."
+                            TextFieldName="@nameof(OperatorWorkTime.OperatorWorkTimeName)"
+                            @bind-Text=_WorkingList.WorkingPeriod
+                            @bind-Value="@OperatorWorkTimeValue">
+                </DxComboBox>
+            </DxFormLayoutItem>*@
+
+            @*            <DxFormLayoutItem Caption="作業程序 :">
+            <DxTextBox @bind-Text=_WorkingList.WorkingName />
+            </DxFormLayoutItem>*@
+
+            <DxFormLayoutItem Caption="作業程序:" ColSpanMd="6">
+                <DxComboBox Data="@_OperatorProcedures"
+                            AllowUserInput="true"
+                            NullText="作業程序..."
+                            TextFieldName="@nameof(OperatorProcedure.OperatorProcedureName)"
+                            @bind-Text=_WorkingList.WorkingName
+                            @bind-Value="@OperatorProcedureValue">
+                </DxComboBox>
+            </DxFormLayoutItem>
+
+            @*            <DxFormLayoutItem Caption="作業人員 :">
+            <DxTextBox @bind-Text=_WorkingList.OPNO />
+            </DxFormLayoutItem>*@
+
+            @if (_WorkingList.AssignTime is null)
+            {
+                <DxFormLayoutItem Caption="作業人員:" ColSpanMd="6">
+                    <DxComboBox Data="@_Operators"
+                            AllowUserInput="true"
+                            NullText="作業人員..."
+                            TextFieldName="@nameof(Operator.OperatorID)"
+                            @bind-Text=_WorkingList.OPNO
+                            @bind-Value="@OperatorValue">
+                    </DxComboBox>
+                </DxFormLayoutItem>
+            }
+            else
+            {
+                <DxFormLayoutItem Caption="作業人員 :">
+                    <DxTextBox @bind-Text=_WorkingList.OPNO ReadOnly="true" />
+                </DxFormLayoutItem>
+            }
+
+        </DxFormLayout>
+    </EditFormTemplate>
+</DxGrid>
+
+@*<DxPopup HeaderText="Header"
+         @bind-Visible="@PopupVisible"
+         BodyText="OperatorValue">
+</DxPopup>*@
+
+<DxPopup @bind-Visible="@PopupVisible"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         HeaderText="派工作業通知"
+         BodyText="此作業人員於同時段已經被安排其他作業">
+    <FooterContentTemplate Context="Context">
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="OK" Click="OkEulaClick" />
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="Cancel" Click="CancelEulaClick" />
+    </FooterContentTemplate>
+</DxPopup>
+
+
+@code {
+    private List<WorkingList>? _WorkingLists;
+    DxGrid? MyGrid;
+
+    List<OperatorWorkTime>? _OperatorWorkTimes { get; set; }
+    string? OperatorWorkTimeValue { get; set; }
+
+    List<Operator>? _Operators { get; set; }
+    string? OperatorValue { get; set; }
+
+    List<OperatorProcedure>? _OperatorProcedures { get; set; }
+    string? OperatorProcedureValue { get; set; }
+
+    WorkingList _EditModel;
+
+    bool PopupVisible { get; set; } = false;
+
+    async Task OkEulaClick()
+    {
+        _WorkingLists = await DataService.ChangeWorkingListsAsync(_EditModel, true);
+        PopupVisible = false;
+    }
+
+    void CancelEulaClick()
+    {
+        PopupVisible = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _WorkingLists = await DataService.GetWorkingListsAsync("Detail");
+        _WorkingLists = _WorkingLists.OrderBy(x => x.AssignTime).ToList();
+        _WorkingLists.Reverse();
+        _OperatorWorkTimes = await DataService.GetOperatorWorkTimesAsync();
+        _Operators = await DataService.GetOperatorsAsync();
+        _OperatorProcedures = await DataService.GetOperatorProceduresAsync();
+    }
+    async Task OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (WorkingList)e.EditModel;
+        //editModel.UserName = "Test"; //Login User
+        //editModel.UpdateTime = DateTime.Now;
+        editModel.AssignTime = DateTime.Now;
+        _EditModel = editModel;
+        if (e.IsNew)
+        {
+            if (await DataService.CheckWorkingListsAsync((WorkingList)e.EditModel))
+            {
+                PopupVisible = true;
+            }
+            else
+            {
+                _WorkingLists = await DataService.ChangeWorkingListsAsync((WorkingList)e.EditModel, e.IsNew);
+            }
+        }
+        else
+        {
+            _WorkingLists = await DataService.ChangeWorkingListsAsync((WorkingList)e.EditModel, e.IsNew);
+        }
+    }
+    async Task Delete(WorkingList item)
+    {
+        if (item != null)
+        {
+            await DataService.Remove(item);
+        }
+    }
+    //async Task GetReceive(WorkingList item)
+    //{
+    //    if (item != null && item.IsReceive == false)
+    //    {
+    //        item.IsReceive = true;
+    //        item.ReceiveTime = DateTime.Now;
+    //        _WorkingLists = await DataService.ChangeWorkingListsAsync((WorkingList)item, false);
+    //    }
+    //}
+    //async Task GetResponse(WorkingList item)
+    //{
+    //    if (item != null && item.IsResponse == false)
+    //    {
+    //        item.IsResponse = true;
+    //        item.ResponseTime = DateTime.Now;
+    //        _WorkingLists = await DataService.ChangeWorkingListsAsync((WorkingList)item, false);
+    //    }
+    //}
+}
+

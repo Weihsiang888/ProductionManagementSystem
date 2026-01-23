@@ -1,0 +1,229 @@
+﻿@using DevExpress.Export
+@using DxBlazorApplication7.Data
+@using Microsoft.Build.Framework
+@inject DataService DataService
+
+<DxGrid Data="_DetailTimeList"
+        @ref="DetailGrid"
+        PageSize="36"
+        ShowGroupPanel="false"
+        SizeMode="SizeMode.Large">
+    <Columns>
+        <DxGridDataColumn FieldName=@nameof(DetailTimeList.WorkOrder) Caption="工單" GroupIndex="0" MinWidth="300" />
+        <DxGridDataColumn FieldName=@nameof(DetailTimeList.StationName) Caption="作業站" MinWidth="150" />
+        <DxGridDataColumn FieldName=@nameof(DetailTimeList.WorkTimes) Caption="工時" MinWidth="150" />
+        <DxGridDataColumn FieldName=@nameof(DetailTimeList.OPNO) Caption="作業人員" MinWidth="150" />
+        <DxGridDataColumn FieldName=@nameof(DetailTimeList.WorkOrderCount) Caption="數量" MinWidth="150" />
+    </Columns>
+    <ToolbarTemplate>
+        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+            <DxToolbarItem CssClass="fontstyle" Text="工時統計【工站】" BeginGroup="true" />
+            <DxToolbarItem Text="Export to XLSX" BeginGroup="true" Click="ExportDetailXlsx_Click" Alignment="ToolbarItemAlignment.Right" />
+        </DxToolbar>
+    </ToolbarTemplate>
+    <EditFormTemplate Context="EditFormContext">
+        @{
+            var _WorkingOrderList = (DetailTimeList)EditFormContext.EditModel;
+        }
+        <DxFormLayout>
+
+        </DxFormLayout>
+    </EditFormTemplate>
+</DxGrid>
+
+@code {
+    DxGrid? StationGrid;
+    DxGrid? OrderGrid;
+    DxGrid? DetailGrid;
+
+    List<WorkingOrderList> _WorkingOrderLists = new List<WorkingOrderList>();
+    List<WorkingOrderStepList> _WorkingOrderStepLists = new List<WorkingOrderStepList>();
+    List<OrderTimeList> _WorkingOrderTime;
+    List<StationTimeList> _WorkingOrderTimeList;
+    List<DetailTimeList> _DetailTimeList;
+
+    public class OrderTimeList
+    {
+        public string WorkOrder { get; set; } = "";
+
+        public string OPNO { get; set; } = "";
+
+        public DateTime StartStep { get; set; }
+
+        public DateTime EndStep { get; set; }
+
+        public string WorkTimes { get; set; } = "";
+
+        public int WorkTime { get; set; } = 0;
+
+        public int WorkOrderCount { get; set; } = 0;
+    }
+
+    public class StationTimeList
+    {
+        public string WorkOrder { get; set; } = "";
+
+        public string StationName { get; set; } = "";
+
+        public string OPNO { get; set; } = "";
+
+        public string WorkTimes { get; set; } = "";
+
+        public int WorkTime { get; set; } = 0;
+
+        public int WorkOrderCount { get; set; } = 0;
+    }
+
+    public class DetailTimeList
+    {
+        public string WorkOrder { get; set; } = "";
+
+        public string StationName { get; set; } = "";
+
+        public string OPNO { get; set; } = "";
+
+        public DateTime StartStep { get; set; }
+
+        public DateTime EndStep { get; set; }
+
+        public string WorkTimes { get; set; } = "";
+
+        public int WorkTime { get; set; } = 0;
+
+        public int WorkOrderCount { get; set; } = 0;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ReadPageData();
+    }
+
+    public async Task ReadPageData()
+    {
+        _WorkingOrderStepLists = await DataService.GetWorkingOrderStepListAsync();
+        _WorkingOrderLists = await DataService.GetWorkingOrderListAsync();
+        _WorkingOrderLists = _WorkingOrderLists.Where(x => x.IsResponse == true).ToList();
+        _WorkingOrderStepLists = _WorkingOrderStepLists.Where(x => x.WorkingStatus != "作業已新增").OrderBy(x => x.WorkOrder).ThenBy(x => x.WOID).ThenBy(x => x.OPNO).ThenBy(x => x.StatusTime).ToList();
+        var NewWorkingOrderStepLists = _WorkingOrderStepLists.Select((x, i) => new { Value = x, Index = i }).ToList();
+
+        _WorkingOrderTime = new List<OrderTimeList>();
+        _WorkingOrderTimeList = new List<StationTimeList>();
+        _DetailTimeList = new List<DetailTimeList>();
+        DateTime StartTime = new DateTime();
+        DateTime EndTime = new DateTime();
+        int StationWorkTime = 0;
+        int OrderWorkTime = 0;
+        string WorkTimeString = "";
+        int WorkOrderCounts = 0;
+        DateTime StartStepValue = new DateTime();
+        DateTime EndStepValue = new DateTime();
+
+        foreach (var item in NewWorkingOrderStepLists)
+        {
+            if (item.Value.WorkingStatus == "作業已接收")
+            {
+                int StartItemCount = _WorkingOrderTimeList.Where(x => x.WorkOrder == item.Value.WorkOrder).ToList().Count;
+                if (StartItemCount == 0)
+                {
+                    StartStepValue = DateTime.Parse(item.Value.StatusTime.ToString());
+                }
+                StartTime = DateTime.Parse(item.Value.StatusTime.ToString());
+                continue;
+            }
+            if (item.Value.WorkingStatus == "作業已暫停" || item.Value.WorkingStatus == "作業已結束")
+            {
+                EndTime = DateTime.Parse(item.Value.StatusTime.ToString()); ;
+                TimeSpan ts = new TimeSpan(EndTime.Ticks - StartTime.Ticks);
+                OrderWorkTime = OrderWorkTime + int.Parse(ts.TotalSeconds.ToString());
+                StationWorkTime = StationWorkTime + int.Parse(ts.TotalSeconds.ToString());
+
+                var NextItem = NewWorkingOrderStepLists.FirstOrDefault(x => x.Index == item.Index + 1);
+                if (NextItem != null)
+                {
+                    EndStepValue = DateTime.Parse(item.Value.StatusTime.ToString());
+                    ts = new TimeSpan(0, 0, StationWorkTime);
+                    WorkTimeString = string.Format("{0:00}", ts.Hours) + ":" + string.Format("{0:00}", ts.Minutes) + ":" + string.Format("{0:00}", ts.Seconds);
+                    _DetailTimeList.Add(new DetailTimeList
+                        {
+                            WorkOrder = item.Value.WorkOrder,
+                            StationName = item.Value.StationName,
+                            OPNO = item.Value.OPNO,
+                            StartStep = StartStepValue,
+                            EndStep = EndStepValue,
+                            WorkTimes = WorkTimeString,
+                            WorkTime = StationWorkTime,
+                            WorkOrderCount = WorkOrderCounts
+                        });
+
+                    if (item.Value.StationName != NextItem.Value.StationName)
+                    {
+                        ts = new TimeSpan(0, 0, StationWorkTime);
+                        WorkTimeString = string.Format("{0:00}", ts.Hours) + ":" + string.Format("{0:00}", ts.Minutes) + ":" + string.Format("{0:00}", ts.Seconds);
+                        if (_WorkingOrderLists.Where(x => x.WorkOrder == item.Value.WorkOrder && x.StationName == item.Value.StationName).ToList().Count > 0)
+                        {
+                            var ItemCount = _WorkingOrderLists.Where(x => x.WorkOrder == item.Value.WorkOrder && x.StationName == item.Value.StationName).ToList().Sum(x => x.WorkOrderCount);
+                            WorkOrderCounts = int.Parse(ItemCount.ToString());
+                        }
+                        _WorkingOrderTimeList.Add(new StationTimeList
+                            {
+                                WorkOrder = item.Value.WorkOrder,
+                                StationName = item.Value.StationName,
+                                //OPNO = item.Value.OPNO,
+                                WorkTimes = WorkTimeString,
+                                WorkTime = StationWorkTime,
+                                WorkOrderCount = WorkOrderCounts
+                            });
+                        StationWorkTime = 0;
+                    }
+                    if (item.Value.WorkOrder != NextItem.Value.WorkOrder)
+                    {
+                        EndStepValue = DateTime.Parse(item.Value.StatusTime.ToString());
+                        ts = new TimeSpan(0, 0, OrderWorkTime);
+                        WorkTimeString = string.Format("{0:00}", ts.Hours) + ":" + string.Format("{0:00}", ts.Minutes) + ":" + string.Format("{0:00}", ts.Seconds);
+                        if (_WorkingOrderLists.Where(x => x.WorkOrder == item.Value.WorkOrder && x.StationName == item.Value.StationName).ToList().Count > 0)
+                        {
+                            var ItemCount = _WorkingOrderLists.Where(x => x.WorkOrder == item.Value.WorkOrder).ToList().DistinctBy(x => x.StationName).Max(x => x.WorkOrderCount);
+                            WorkOrderCounts = int.Parse(ItemCount.ToString());
+                        }
+                        _WorkingOrderTime.Add(new OrderTimeList
+                            {
+                                WorkOrder = item.Value.WorkOrder,
+                                //OPNO = item.Value.OPNO,
+                                StartStep = StartStepValue,
+                                EndStep = EndStepValue,
+                                WorkTimes = WorkTimeString,
+                                WorkTime = OrderWorkTime,
+                                WorkOrderCount = WorkOrderCounts
+                            });
+
+                        OrderWorkTime = 0;
+                    }
+                }
+            }
+        }
+    }
+
+    async Task ExportStationXlsx_Click()
+    {
+        await StationGrid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
+        {
+
+        });
+    }
+
+    async Task ExportOrderXlsx_Click()
+    {
+        await OrderGrid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
+        {
+
+        });
+    }
+
+    async Task ExportDetailXlsx_Click()
+    {
+        await DetailGrid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
+        {
+
+        });
+    }
+}

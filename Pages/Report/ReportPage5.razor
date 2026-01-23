@@ -1,0 +1,873 @@
+﻿@using DevExpress.Export
+@using DxBlazorApplication7.Data
+@using Microsoft.Build.Framework
+@using System.Text.RegularExpressions
+@inject DataService DataService
+
+<style>
+    .highlighted-item-red > td {
+    background-color: rgba(245, 198, 198, 0.6);
+    }
+
+    .highlighted-item-green > td {
+    background-color: rgba(198, 245, 198, 0.6);
+    }
+
+    .dx-editor-width {
+    max-width: 450px;
+    width: 100%;
+    }
+
+    .editor-icon {
+    width: 1rem;
+    height: 1rem;
+    background-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    background-position: center center;
+    background-color: currentColor;
+    opacity: 0.7;
+    }
+
+    .editor-icon-chevron-right-small {
+    -webkit-mask-image: url("../images/chevron-right-small.svg");
+    mask-image: url("../images/chevron-right-small.svg");
+    }
+
+    .editor-icon-chevron-left-small {
+    -webkit-mask-image: url("../images/chevron-left-small.svg");
+    mask-image: url("../images/chevron-left-small.svg");
+    }
+
+</style>
+
+<DxGrid Data="_DetailTimeLists"
+@ref="DetailGrid"
+PageSize="36"
+ShowGroupPanel="false"
+CustomizeElement="Grid_CustomizeElement"
+SizeMode="SizeMode.Large">
+    <Columns>
+        <DxGridDataColumn FieldName=@nameof(DetailTimeList.Index) Caption="索引" Width="90" />
+        <DxGridDataColumn FieldName=@nameof(DetailTimeList.WorkOrder) Caption="工單" MinWidth="300" />
+        <DxGridDataColumn FieldName=@nameof(DetailTimeList.StationName) Caption="作業站" MinWidth="150" />
+        <DxGridDataColumn FieldName=@nameof(DetailTimeList.StartStep) Caption="開始時間" MinWidth="150" DisplayFormat="G" >
+            <CellDisplayTemplate>
+                @if (context.Value is DateTime dateTime && dateTime != default)
+                {
+                    @dateTime.ToString("G") <!-- 顯示格式化的日期 -->
+                }
+                else
+                {
+                    @("") <!-- 顯示空值 -->
+                }
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+
+        <DxGridDataColumn FieldName=@nameof(DetailTimeList.EndStep) Caption="結束時間" MinWidth="150" DisplayFormat="G" >
+            <CellDisplayTemplate>
+                @if (context.Value is DateTime dateTime && dateTime != default)
+                {
+                    @dateTime.ToString("G") <!-- 顯示格式化的日期 -->
+                }
+                else
+                {
+                    @("") <!-- 顯示空值 -->
+                }
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+        <DxGridDataColumn FieldName=@nameof(DetailTimeList.WorkTimes) Caption="工時" MinWidth="150" />
+        <DxGridDataColumn FieldName=@nameof(DetailTimeList.OPNO) Caption="作業人員" MinWidth="150" />
+        <DxGridDataColumn FieldName=@nameof(DetailTimeList.passCount) Caption="良數量" MinWidth="150" />
+        <DxGridDataColumn FieldName=@nameof(DetailTimeList.failCount) Caption="不良數量" MinWidth="150" />
+    </Columns>
+    <ToolbarTemplate>
+        <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Contained">
+            <DxToolbarItem Text="重新整理" BeginGroup="true" Click="Refresh" />
+            @* <DxToolbarItem CssClass="fontstyle" Text="工時統計【工單】" BeginGroup="true" /> *@
+            <DxToolbarItem Context="itemCtx" RenderStyle=" ButtonRenderStyle.Secondary" BeginGroup="true">
+                <DxDropDownButton CssClass="w-100" Text="@OpenTrim">
+                    <Items>
+                        <DxDropDownButtonItem Text="詳細報工" Click="Showdetailwo"/>
+                        <DxDropDownButtonItem Text="工單總覽" Click="Summarywo" />
+                    </Items>
+                </DxDropDownButton>
+            </DxToolbarItem>
+            <DxToolbarItem Context="itemCtx" BeginGroup="true">
+                <Template>
+                    <DxComboBox Data="@_ProcessNames"
+                    AllowUserInput="true"
+                    NullText="作業選擇..."
+                    TextFieldName="@nameof(ComparisonTable.ProcessName)"
+                    @bind-Value="@FilterValue">
+                    </DxComboBox>
+                </Template>
+            </DxToolbarItem>
+            <DxToolbarItem CssClass="fontstyle" Text="作業篩選" Click="Filter" />
+
+            <DxToolbarItem Text="開始時間" BeginGroup="true"/>
+            <DxToolbarItem Context="itemCtx">
+                <Template>
+                    <DxDateEdit @bind-Date="@BeginDateTimeValue"
+                    @bind-DropDownVisible="@BeginCalendarVisible"
+                    TimeSectionVisible="true"
+                    CssClass="dx-editor-width">
+                        <Buttons>
+                            <DxEditorButton IconCssClass="editor-icon editor-icon-chevron-left-small"
+                            Tooltip="Previous Date"
+                            Position="@EditorButtonPosition.Left"
+                            Click="@(_ => OnChangeBeginDayButtonClick(false))" />
+                            <DxEditorButton IconCssClass="editor-icon editor-icon-chevron-right-small"
+                            Tooltip="Next Date"
+                            Position="@EditorButtonPosition.Right"
+                            Click="@(_ => OnChangeBeginDayButtonClick(true))" />
+                        </Buttons>
+
+                    </DxDateEdit>
+                </Template>
+            </DxToolbarItem>
+            <DxToolbarItem Text="結束時間" />
+            <DxToolbarItem Context="itemCtx">
+                <Template>
+                    <DxDateEdit @bind-Date="@EndDateTimeValue"
+                    @bind-DropDownVisible="@EndCalendarVisible"
+                    TimeSectionVisible="true"
+                    CssClass="dx-editor-width">
+                        <Buttons>
+                            <DxEditorButton IconCssClass="editor-icon editor-icon-chevron-left-small"
+                            Tooltip="Previous Date"
+                            Position="@EditorButtonPosition.Left"
+                            Click="@(_ => OnChangeEndDayButtonClick(false))" />
+                            <DxEditorButton IconCssClass="editor-icon editor-icon-chevron-right-small"
+                            Tooltip="Next Date"
+                            Position="@EditorButtonPosition.Right"
+                            Click="@(_ => OnChangeEndDayButtonClick(true))" />
+                        </Buttons>
+                    </DxDateEdit>
+                </Template>
+            </DxToolbarItem>
+            <DxToolbarItem Text="查詢" Click="Search_Click" Alignment="ToolbarItemAlignment.Right" />
+
+            <DxToolbarItem Context="itemCtx" BeginGroup="true" Alignment="ToolbarItemAlignment.Right">
+                <Template>
+                    <DxTextBox @bind-Text="@TextValue"
+                    NullText="工單號碼"
+                    CssClass="cw-320" />
+                </Template>
+            </DxToolbarItem>
+            <DxToolbarItem Text="搜尋" Click="SearchGrid" Alignment="ToolbarItemAlignment.Right" />
+            <DxToolbarItem Text="轉存EXCEL" BeginGroup="true" Click="ExportDetailXlsx_Click" Alignment="ToolbarItemAlignment.Right" />
+        </DxToolbar>
+    </ToolbarTemplate>
+    <EditFormTemplate Context="EditFormContext">
+        @{
+            var _WorkingOrderList = (DetailTimeList)EditFormContext.EditModel;
+        }
+        <DxFormLayout>
+
+        </DxFormLayout>
+    </EditFormTemplate>
+</DxGrid>
+
+@code {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    DxGrid? StationGrid;
+    DxGrid? OrderGrid;
+    DxGrid? DetailGrid;
+
+    List<WorkingOrderList> _WorkingOrderLists = new List<WorkingOrderList>();
+    List<WorkingOrderStepList> _WorkingOrderStepLists = new List<WorkingOrderStepList>();
+    List<OrderTimeList> _WorkingOrderTime;
+    List<StationTimeList> _WorkingOrderTimeList;
+    List<DetailTimeList> _DetailTimeList;
+    List<DetailTimeList> _DetailTimeLists;
+    List<DetailTimeList> _DetailTimeListSummary;
+    List<JointModuleTables> listJointModuleTables;
+    List<JointModuleTables> listFilterJointModuleTables;
+    List<string>? _ProcessNames { get; set; }
+    string? FilterValue { get; set; }
+    string TextValue;
+
+    string? OpenTrim = "詳細報工";
+    DateTime BeginDateTimeValue { get; set; } = DateTime.Today;
+    DateTime EndDateTimeValue { get; set; } = DateTime.Today.AddDays(1).AddTicks(-1);
+    bool BeginCalendarVisible { get; set; }
+    bool EndCalendarVisible { get; set; }
+
+
+
+    public class OrderTimeList
+    {
+        public string WorkOrder { get; set; } = "";
+
+        public string OPNO { get; set; } = "";
+
+        public DateTime StartStep { get; set; }
+
+        public DateTime EndStep { get; set; }
+
+        public string WorkTimes { get; set; } = "";
+
+        public int WorkTime { get; set; } = 0;
+
+        public int WorkOrderCount { get; set; }
+    }
+
+    public class StationTimeList
+    {
+        public string WorkOrder { get; set; } = "";
+
+        public string StationName { get; set; } = "";
+
+        public string OPNO { get; set; } = "";
+
+        public string WorkTimes { get; set; } = "";
+
+        public int WorkTime { get; set; } = 0;
+
+        public int WorkOrderCount { get; set; } = 0;
+    }
+
+    public class DetailTimeList
+    {
+        public string Index { get; set; } = "";
+
+        public string WorkOrder { get; set; } = "";
+
+        public string StationName { get; set; } = "";
+
+        public string OPNO { get; set; } = "";
+
+        public DateTime StartStep { get; set; }
+
+        public DateTime EndStep { get; set; }
+
+        public string WorkTimes { get; set; } = "";
+
+        public int WorkTime { get; set; } = 0;
+
+        public int? passCount { get; set; }
+
+        public int? failCount { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ReadPageData();
+    }
+
+    List<WorkingOrderStepList> getWorkingOrderStepFilterLists()
+    {
+        List<WorkingOrderStepList> listFilter = new List<WorkingOrderStepList>();
+
+        foreach (string workOrder in _WorkingOrderStepLists.Select(x => x.WorkOrder).ToList())
+        {
+            List<WorkingOrderStepList> listSameWorkOrder = _WorkingOrderStepLists.Where(x => x.WorkOrder == workOrder).ToList();
+
+            foreach (int woId in listSameWorkOrder.Select(x => x.WOID).ToList())
+            {
+                List<WorkingOrderStepList> listSameWoId = listSameWorkOrder.Where(x => x.WOID == woId).OrderBy(x => x.StatusTime).ToList();
+
+                for (int i = 0; i < listSameWoId.Count; i++)
+                {
+                    if (listSameWoId[i].WorkingStatus == "作業已接收")
+                    {
+                        bool delete = true;
+
+                        for (int j = i + 1; j < listSameWoId.Count; j++)
+                        {
+                            if (listSameWoId[j].WorkingStatus == "作業已暫停" || listSameWoId[j].WorkingStatus == "作業已結束")
+                            {
+                                delete = false;
+                            }
+                        }
+
+                        if (delete)
+                        {
+                            listFilter.Add(listSameWoId[i]);
+                        }
+                    }
+
+
+                    if (listSameWoId[i].WorkingStatus == "作業已暫停" || listSameWoId[i].WorkingStatus == "作業已結束")
+                    {
+                        bool delete = true;
+
+                        for (int j = i + 1; j < listSameWoId.Count; j++)
+                        {
+                            if (listSameWoId[j].WorkingStatus == "作業已暫停" || listSameWoId[j].WorkingStatus == "作業已結束")
+                            {
+                                delete = false;
+                            }
+                        }
+
+                        if (delete)
+                        {
+                            for (int j = i + 1; j < listSameWoId.Count; j++)
+                            {
+                                listFilter.Add(listSameWoId[j]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return listFilter.Distinct().ToList();
+    }
+
+    public async Task ReadPageData()
+    {
+        //StartTimeValue = Convert.ToDateTime(DateTime.Now.ToString("yyyy/MM/dd") + " 08:30:00");
+        //EndDateTimeValue = Convert.ToDateTime(DateTime.Now.ToString("yyyy/MM/dd") + " 17:30:00");
+        listJointModuleTables = await DataService.GetJointModuleTablesList();
+        _ProcessNames = listJointModuleTables.Select(x => x.Process).Distinct().ToList();
+
+        _WorkingOrderStepLists = await DataService.GetWorkingOrderStepListAsync();
+        _WorkingOrderLists = await DataService.GetWorkingOrderListAsync();
+        _WorkingOrderLists = _WorkingOrderLists.Where(x => x.IsResponse == true).ToList();
+
+        _WorkingOrderStepLists = _WorkingOrderStepLists.Where(x => x.WorkingTime >= BeginDateTimeValue && x.WorkingTime <= EndDateTimeValue).ToList();
+
+
+
+        // var groupedWorkOrders1 = _WorkingOrderStepLists.GroupBy(x => x.WorkOrder);
+
+        // foreach (var item in groupedWorkOrders1)
+        // {
+        //     var targetGroup = groupedWorkOrders1.FirstOrDefault(g => g.Key == "GMO0-2505000114");
+
+        //     if (targetGroup != null)
+        //     {
+        //         // 這裡可以處理 targetGroup，例如遍歷內容
+        //         foreach (var item1 in targetGroup)
+        //         {
+        //             // 處理每個 WorkingOrderStepList
+        //         }
+        //     }
+        // }
+
+
+        if (!string.IsNullOrEmpty(FilterValue))
+        {
+            listFilterJointModuleTables = listJointModuleTables.Where(x => x.Process == FilterValue).ToList();
+            _WorkingOrderStepLists = _WorkingOrderStepLists.Where(x => IsExist(x.StationName)).ToList();
+        }
+
+        //_WorkingOrderStepLists = _WorkingOrderStepLists.Where(x => x.WorkingStatus != "作業已新增").OrderBy(x => x.WorkOrder).ThenBy(x => x.WOID).ThenBy(x => x.OPNO).ThenBy(x => x.StatusTime).ToList();
+        _WorkingOrderStepLists = _WorkingOrderStepLists.Where(x => x.WorkingStatus != "作業已新增").OrderBy(x => x.WorkOrder).ThenBy(x => x.OPNO).ThenBy(x => x.WOID).ThenBy(x => x.StatusTime).ToList();
+
+        foreach (WorkingOrderStepList filter in getWorkingOrderStepFilterLists())
+        {
+            _WorkingOrderStepLists.Remove(filter);
+        }
+
+        //_WorkingOrderStepLists = _WorkingOrderStepLists.Where(x => x.WorkingTime >= BeginDateTimeValue && x.WorkingTime <= EndDateTimeValue).ToList();
+
+        // if (!string.IsNullOrEmpty(FilterValue))
+        // {
+        //     _ComparisonTableVlaue = _ComparisonTables.Where(x => x.ProcessName == FilterValue).ToList();
+        //     _WorkingOrderStepLists = _WorkingOrderStepLists.Where(x => IsExist(x.StationName)).ToList();
+        // }
+        var NewWorkingOrderStepLists = _WorkingOrderStepLists.Select((x, i) => new { Value = x, Index = i }).ToList();
+        // _ComparisonTables = await DataService.GetComparisonTableAsync();
+        // _ProcessNames = _ComparisonTables.Select(x => x.ProcessName).Distinct().ToList();
+
+
+        _WorkingOrderTime = new List<OrderTimeList>();
+        _WorkingOrderTimeList = new List<StationTimeList>();
+        _DetailTimeList = new List<DetailTimeList>();
+        _DetailTimeLists = new List<DetailTimeList>();
+        DateTime StartTime = new DateTime();
+        DateTime EndTime = new DateTime();
+        int StationWorkTime = 0;
+        int OrderWorkTime = 0;
+        string WorkTimeString = "";
+        int WorkOrderCounts = 0;
+        int? passCounts = 0;
+        int? failCounts = 0;
+        DateTime FirstStepValue = new DateTime();
+        DateTime StartStepValue = new DateTime();
+        DateTime EndStepValue = new DateTime();
+        string IndexStatus = "";
+
+        string workingOrderTotalNum = "";
+
+
+
+        // foreach (var item in NewWorkingOrderStepLists)
+        // {
+        //     if (item.Value.WorkingStatus == "作業已接收")
+        //     {
+        //         int StartItemCount = _DetailTimeList.Where(x => x.WorkOrder == item.Value.WorkOrder).ToList().Count;
+        //         if (StartItemCount == 0)
+        //         {
+        //             var filteredList = NewWorkingOrderStepLists.Where(x => x.Value.WorkOrder == item.Value.WorkOrder).ToList();
+        //             FirstStepValue = DateTime.Parse(filteredList.Min(x => x.Value.StatusTime.ToString()));
+
+        //             //FirstStepValue = DateTime.Parse(item.Value.StatusTime.ToString());
+        //         }
+
+        //         StartStepValue = DateTime.Parse(item.Value.StatusTime.ToString());
+        //         StartTime = DateTime.Parse(item.Value.StatusTime.ToString());
+        //         continue;
+        //     }
+        //     if (item.Value.WorkingStatus == "作業已暫停" || item.Value.WorkingStatus == "作業已結束")
+        //     {
+        //         EndTime = DateTime.Parse(item.Value.StatusTime.ToString()); ;
+        //         TimeSpan ts = new TimeSpan(EndTime.Ticks - StartTime.Ticks);
+        //         OrderWorkTime = int.Parse(ts.TotalSeconds.ToString());
+        //         StationWorkTime = int.Parse(ts.TotalSeconds.ToString());
+
+
+        //         QuantityByWorkOrder_ERP quantity = await DataService.GetQuantityByWorkerOrder(item.Value.WorkOrder);
+
+        //         //  var yyyy = _WorkingOrderLists.Where(x => x.WorkOrder == item.Value.WorkOrder);
+
+        //         workingOrderTotalNum = "總量:" + quantity.Quantity.ToString(); 
+        //         var NextItem = NewWorkingOrderStepLists.FirstOrDefault(x => x.Index == item.Index + 1);
+        //         if (NextItem != null)
+        //         {
+        //             EndStepValue = DateTime.Parse(item.Value.StatusTime.ToString());
+        //             //ts = new TimeSpan(0, 0, StationWorkTime);
+        //             WorkTimeString = string.Format("{0:00}", (int)ts.TotalHours) + ":" + string.Format("{0:00}", ts.Minutes) + ":" + string.Format("{0:00}", ts.Seconds);
+
+        //             if (_WorkingOrderLists.Where(x => x.WorkOrder == item.Value.WorkOrder && x.StationName == item.Value.StationName && x.ID == item.Value.WOID).ToList().Count > 0)
+        //             {
+        //                 var pass = _WorkingOrderLists.FirstOrDefault(x => x.WorkOrder == item.Value.WorkOrder && x.StationName == item.Value.StationName && x.ID == item.Value.WOID).PassCount;
+        //                 var fail = _WorkingOrderLists.FirstOrDefault(x => x.WorkOrder == item.Value.WorkOrder && x.StationName == item.Value.StationName && x.ID == item.Value.WOID).FailCount;
+        //                 passCounts = int.Parse(pass.ToString());
+        //                 failCounts = int.Parse(fail.ToString());
+        //             }
+
+        //             if (item.Value.WorkingStatus == "作業已暫停")
+        //             {
+        //                 passCounts = null;
+        //                 failCounts = null;
+        //                 IndexStatus = "暫停";
+        //             }
+        //             else
+        //             {
+        //                 IndexStatus = "結束";
+        //             }
+
+        //             _DetailTimeList.Add(new DetailTimeList
+        //                 {
+        //                     Index = IndexStatus,
+        //                     WorkOrder = item.Value.WorkOrder,
+        //                     StationName = item.Value.StationName,
+        //                     OPNO = item.Value.OPNO,
+        //                     StartStep = StartStepValue,
+        //                     EndStep = EndStepValue,
+        //                     WorkTimes = WorkTimeString,
+        //                     WorkTime = StationWorkTime,
+        //                     passCount = passCounts,
+        //                     failCount = failCounts
+        //                 });
+
+
+        //             if (item.Value.WorkOrder != NextItem.Value.WorkOrder)
+        //             {
+        //                 EndStepValue = DateTime.Parse(item.Value.StatusTime.ToString());
+
+        //                 if (_WorkingOrderLists.Where(x => x.WorkOrder == item.Value.WorkOrder && x.StationName == item.Value.StationName).ToList().Count > 0)
+        //                 {
+        //                     var ItemCount = _WorkingOrderLists.Where(x => x.WorkOrder == item.Value.WorkOrder).ToList().DistinctBy(x => x.StationName).Max(x => x.WorkOrderCount);
+        //                     WorkOrderCounts = int.Parse(ItemCount.ToString());
+        //                 }
+
+        //                 OrderWorkTime = _DetailTimeList.Where(x => x.WorkOrder == item.Value.WorkOrder).Sum(x => x.WorkTime);
+        //                 ts = new TimeSpan(0, 0, OrderWorkTime);
+        //                 WorkTimeString = string.Format("{0:00}", (int)ts.TotalHours) + ":" + string.Format("{0:00}", ts.Minutes) + ":" + string.Format("{0:00}", ts.Seconds);
+
+
+        //                 // _WorkingOrderTime.Add(new OrderTimeList
+        //                 //     {
+        //                 //         WorkOrder = item.Value.WorkOrder,
+        //                 //         //OPNO = item.Value.OPNO,
+        //                 //         StartStep = FirstStepValue,
+        //                 //         EndStep = EndStepValue,
+        //                 //         WorkTimes = WorkTimeString,
+        //                 //         WorkTime = OrderWorkTime,
+        //                 //         WorkOrderCount = WorkOrderCounts
+        //                 //     });
+
+        //                 _DetailTimeList.Add(new DetailTimeList
+        //                     {
+        //                         Index = "總工時",
+        //                         WorkOrder = item.Value.WorkOrder + "("+workingOrderTotalNum+")",
+        //                         StationName = "",
+        //                         OPNO = "",
+        //                         StartStep = FirstStepValue,
+        //                         EndStep = DateTime.Parse(NewWorkingOrderStepLists.Where(x => x.Value.WorkOrder == item.Value.WorkOrder).ToList().Max(x => x.Value.StatusTime.ToString())),
+        //                         WorkTimes = WorkTimeString,
+        //                         WorkTime = StationWorkTime,
+        //                         passCount = null,
+        //                         failCount = null
+        //                     });
+
+        //                 OrderWorkTime = 0;
+        //             }
+        //         }
+        //         else
+        //         {
+        //             EndStepValue = DateTime.Parse(item.Value.StatusTime.ToString());
+        //             //ts = new TimeSpan(0, 0, StationWorkTime);
+        //             WorkTimeString = string.Format("{0:00}", (int)ts.TotalHours) + ":" + string.Format("{0:00}", ts.Minutes) + ":" + string.Format("{0:00}", ts.Seconds);
+
+        //             if (_WorkingOrderLists.Where(x => x.WorkOrder == item.Value.WorkOrder && x.StationName == item.Value.StationName && x.ID == item.Value.WOID).ToList().Count > 0)
+        //             {
+        //                 var pass = _WorkingOrderLists.FirstOrDefault(x => x.WorkOrder == item.Value.WorkOrder && x.StationName == item.Value.StationName && x.ID == item.Value.WOID).PassCount;
+        //                 var fail = _WorkingOrderLists.FirstOrDefault(x => x.WorkOrder == item.Value.WorkOrder && x.StationName == item.Value.StationName && x.ID == item.Value.WOID).FailCount;
+        //                 passCounts = int.Parse(pass.ToString());
+        //                 failCounts = int.Parse(fail.ToString());
+        //             }
+
+        //             if (item.Value.WorkingStatus == "作業已暫停")
+        //             {
+        //                 passCounts = null;
+        //                 failCounts = null;
+        //                 IndexStatus = "暫停";
+        //             }
+        //             else
+        //             {
+        //                 IndexStatus = "結束";
+        //             }
+
+        //             _DetailTimeList.Add(new DetailTimeList
+        //                 {
+        //                     Index = IndexStatus,
+        //                     WorkOrder = item.Value.WorkOrder,
+        //                     StationName = item.Value.StationName,
+        //                     OPNO = item.Value.OPNO,
+        //                     StartStep = StartStepValue,
+        //                     EndStep = EndStepValue,
+        //                     WorkTimes = WorkTimeString,
+        //                     WorkTime = StationWorkTime,
+        //                     passCount = passCounts,
+        //                     failCount = failCounts
+        //                 });
+
+        //             // if (_WorkingOrderLists.Where(x => x.WorkOrder == item.Value.WorkOrder && x.StationName == item.Value.StationName).ToList().Count > 0)
+        //             // {
+        //             //     var ItemCount = _WorkingOrderLists.Where(x => x.WorkOrder == item.Value.WorkOrder).ToList().DistinctBy(x => x.StationName).Max(x => x.WorkOrderCount);
+        //             //     WorkOrderCounts = int.Parse(ItemCount.ToString());
+        //             // }
+
+        //             OrderWorkTime = _DetailTimeList.Where(x => x.WorkOrder == item.Value.WorkOrder).Sum(x => x.WorkTime);
+        //             ts = new TimeSpan(0, 0, OrderWorkTime);
+        //             WorkTimeString = string.Format("{0:00}", (int)ts.TotalHours) + ":" + string.Format("{0:00}", ts.Minutes) + ":" + string.Format("{0:00}", ts.Seconds);
+
+        //             // _WorkingOrderTime.Add(new OrderTimeList
+        //             //     {
+        //             //         WorkOrder = item.Value.WorkOrder,
+        //             //         //OPNO = item.Value.OPNO,
+        //             //         StartStep = FirstStepValue,
+        //             //         EndStep = EndStepValue,
+        //             //         WorkTimes = WorkTimeString,
+        //             //         WorkTime = OrderWorkTime,
+        //             //         WorkOrderCount = WorkOrderCounts
+        //             //     });
+
+        //             _DetailTimeList.Add(new DetailTimeList
+        //                 {
+        //                     Index = "總工時",
+        //                     WorkOrder = item.Value.WorkOrder + "(" + workingOrderTotalNum + ")",
+        //                     StationName = "",
+        //                     OPNO = "",
+        //                     StartStep = FirstStepValue,
+        //                     EndStep = DateTime.Parse(NewWorkingOrderStepLists.Where(x => x.Value.WorkOrder == item.Value.WorkOrder).ToList().Max(x => x.Value.StatusTime.ToString())),
+        //                     WorkTimes = WorkTimeString,
+        //                     WorkTime = StationWorkTime,
+        //                     passCount = null,
+        //                     failCount = null
+        //                 });
+
+        //             StationWorkTime = 0;
+        //             OrderWorkTime = 0;
+        //         }
+        //     }
+        // }
+
+
+        var groupedWorkOrders = NewWorkingOrderStepLists.GroupBy(x => x.Value.WorkOrder);
+
+        foreach (var group in groupedWorkOrders)
+        {
+            var workOrder = group.Key;
+            var steps = group.ToList();
+
+            // 獲取最早和最晚的時間
+            var firstStepTime = steps.Min(x => x.Value.StatusTime);
+            var lastStepTime = steps.Max(x => x.Value.StatusTime);
+
+            foreach (var item in steps)
+            {
+                if (item.Value.WorkingStatus == "作業已接收")
+                {
+                    if (!_DetailTimeList.Any(x => x.WorkOrder == workOrder))
+                    {
+                        FirstStepValue = firstStepTime ?? DateTime.MinValue;
+                    }
+
+                    StartStepValue = item.Value.StatusTime ?? DateTime.MinValue;
+                    StartTime = item.Value.StatusTime ?? DateTime.MinValue;
+                    continue;
+                }
+
+                if (item.Value.WorkingStatus == "作業已暫停" || item.Value.WorkingStatus == "作業已結束")
+                {
+                    EndTime = item.Value.StatusTime ?? DateTime.MinValue;
+                    TimeSpan ts = EndTime - StartTime;
+                    OrderWorkTime = (int)ts.TotalSeconds;
+                    StationWorkTime = OrderWorkTime;
+
+                    QuantityByWorkOrder_ERP quantity = await DataService.GetQuantityByWorkerOrder(workOrder);
+                    workingOrderTotalNum = "總量:" + quantity.Quantity;
+
+                    var nextItem = steps.FirstOrDefault(x => x.Index == item.Index + 1);
+                    EndStepValue = item.Value.StatusTime ?? DateTime.MinValue;
+
+                    WorkTimeString = string.Format("{0:00}:{1:00}:{2:00}", ts.Hours, ts.Minutes, ts.Seconds);
+
+                    if (_WorkingOrderLists.Any(x => x.WorkOrder == workOrder && x.StationName == item.Value.StationName && x.ID == item.Value.WOID))
+                    {
+                        var matchingOrder = _WorkingOrderLists.First(x => x.WorkOrder == workOrder && x.StationName == item.Value.StationName && x.ID == item.Value.WOID);
+                        passCounts = (int?)matchingOrder.PassCount;
+                        failCounts = (int?)matchingOrder.FailCount;
+                    }
+
+                    IndexStatus = item.Value.WorkingStatus == "作業已暫停" ? "暫停" : "結束";
+
+                    _DetailTimeList.Add(new DetailTimeList
+                        {
+                            Index = IndexStatus,
+                            WorkOrder = workOrder,
+                            StationName = item.Value.StationName,
+                            OPNO = item.Value.OPNO,
+                            StartStep = StartStepValue,
+                            EndStep = EndStepValue,
+                            WorkTimes = WorkTimeString,
+                            WorkTime = StationWorkTime,
+                            passCount = IndexStatus == "暫停" ? null : passCounts,
+                            failCount = IndexStatus == "暫停" ? null : failCounts
+                        });
+
+                    if (nextItem == null || nextItem.Value.WorkOrder != workOrder)
+                    {
+                        OrderWorkTime = _DetailTimeList.Where(x => x.WorkOrder == workOrder).Sum(x => x.WorkTime);
+                        ts = TimeSpan.FromSeconds(OrderWorkTime);
+                        WorkTimeString = string.Format("{0:00}:{1:00}:{2:00}", ts.Hours, ts.Minutes, ts.Seconds);
+
+                        _DetailTimeList.Add(new DetailTimeList
+                            {
+                                Index = "總工時",
+                                WorkOrder = workOrder + "(" + workingOrderTotalNum + ")",
+                                StationName = "",
+                                OPNO = "",
+                                StartStep = firstStepTime ?? DateTime.MinValue,
+                                EndStep = lastStepTime ?? DateTime.MinValue,
+                                WorkTimes = WorkTimeString,
+                                WorkTime = StationWorkTime,
+                                passCount = null,
+                                failCount = null
+                            });
+
+                        StationWorkTime = 0;
+                        OrderWorkTime = 0;
+                    }
+                }
+            }
+        }
+
+        // _DetailTimeLists = _DetailTimeList.OrderBy(x => x.WorkOrder).ThenByDescending(x => x.Index.Length).ToList();
+        _DetailTimeLists = _DetailTimeList.OrderBy(x => x.WorkOrder).ThenBy(x => x.OPNO).ToList();
+
+
+
+        //     _DetailTimeLists = _DetailTimeList
+        // .GroupBy(x => new { x.WorkOrder, x.StationName })
+        // .Select(g => new DetailTimeList
+        //     {
+        //         WorkOrder = g.Key.WorkOrder,
+        //         StationName = g.Key.StationName,
+        //         StartStep = g.Min(x => x.StartStep),
+        //         EndStep = g.Max(x => x.EndStep),
+        //         WorkTimes = g.Aggregate(TimeSpan.Zero, (sum, next) => sum.Add(TimeSpan.Parse(next.WorkTimes))).ToString(@"hh\:mm\:ss"),
+        //         WorkTime = 0,
+        //         passCount = g.Sum(x => x.passCount),
+        //         failCount = g.Sum(x => x.failCount)
+        //     })
+        // .OrderBy(x => x.WorkOrder)
+        // .ThenBy(x => x.StationName)
+        // .ToList();
+
+    }
+
+    async Task ExportStationXlsx_Click()
+    {
+        await StationGrid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
+        {
+
+        });
+    }
+
+    async Task ExportOrderXlsx_Click()
+    {
+        await OrderGrid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
+        {
+
+        });
+    }
+
+    async Task ExportDetailXlsx_Click()
+    {
+        await DetailGrid.ExportToXlsxAsync("ExportResult", new GridXlExportOptions()
+        {
+
+        });
+    }
+
+    async Task SearchGrid()
+    {
+        // if (!string.IsNullOrEmpty(TextValue))
+        // {
+        //     // 刪除 TextValue 的前後空格
+        //     TextValue = TextValue.Trim();
+        //     _DetailTimeLists = _DetailTimeList.Where(x => x.WorkOrder == TextValue).OrderBy(x => x.WorkOrder).ThenByDescending(x => x.Index.Length).ToList();
+        //     TextValue = null;
+        // }
+
+            if (!string.IsNullOrEmpty(TextValue))
+    {
+        // 刪除 TextValue 的前後空格
+        TextValue = TextValue.Trim();
+
+        // 定義一個方法來去除括號及其內容
+        string RemoveParentheses(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+            return Regex.Replace(input, @"\s*\(.*?\)\s*", "");
+        }
+
+        var searchValue = RemoveParentheses(TextValue);
+
+        _DetailTimeLists = _DetailTimeList
+            .Where(x => RemoveParentheses(x.WorkOrder) == searchValue)
+            .OrderBy(x => x.WorkOrder)
+            .ThenByDescending(x => x.Index.Length)
+            .ToList();
+
+        TextValue = null;
+    }
+
+    }
+
+    async Task Refresh()
+    {
+        FilterValue = "";
+        await ReadPageData();
+    }
+
+    async Task Filter()
+    {
+        await ReadPageData();
+    }
+
+    void Grid_CustomizeElement(GridCustomizeElementEventArgs e)
+    {
+        if (e.ElementType == GridElementType.DataRow)
+        {
+            if ((System.String)e.Grid.GetRowValue(e.VisibleIndex, "Index") == "總工時")
+            {
+                e.CssClass = "highlighted-item-green";
+            }
+        }
+    }
+
+    bool IsExist(string StationItem)
+    {
+        bool Result = false;
+
+        foreach (var item in listFilterJointModuleTables)
+        {
+            if (item.StationName == StationItem)
+            {
+                Result = true;
+                break;
+            }
+        }
+
+        return Result;
+    }
+
+    void OnChangeBeginDayButtonClick(bool isAdd)
+    {
+        BeginCalendarVisible = false;
+        BeginDateTimeValue = BeginDateTimeValue.AddDays(isAdd ? 1 : -1);
+    }
+
+    void OnChangeEndDayButtonClick(bool isAdd)
+    {
+        EndCalendarVisible = false;
+        EndDateTimeValue = EndDateTimeValue.AddDays(isAdd ? 1 : -1);
+    }
+
+    async Task Search_Click()
+    {
+        await ReadPageData();
+    }
+    private void Showdetailwo(MouseEventArgs args)
+    {
+
+        OpenTrim = "詳細報工";
+        _DetailTimeLists = _DetailTimeList.OrderBy(x => x.WorkOrder).ThenBy(x => x.OPNO).ToList();
+    }
+    private void Summarywo(MouseEventArgs args)
+    {
+        OpenTrim = "工單總覽";
+        var totalWorkTimeItems = _DetailTimeList
+            .Where(x => x.Index == "總工時")
+            .ToList();
+
+        // 合併相同 WorkOrder 和 StationName 的項目
+        var groupedItems = _DetailTimeList
+            .Where(x => x.Index != "總工時") // 排除 Index 為 "總工時" 的項目
+            .GroupBy(x => new { x.WorkOrder, x.StationName }) // 按 WorkOrder 和 StationName 分組
+            .Select(g => new DetailTimeList
+                {
+                    WorkOrder = g.Key.WorkOrder,
+                    StationName = g.Key.StationName,
+                    WorkTimes = g.Aggregate(TimeSpan.Zero, (sum, next) => sum.Add(TimeSpan.Parse(next.WorkTimes))).ToString(@"hh\:mm\:ss"), // 加總 WorkTimes
+                    passCount = g.Sum(x => x.passCount), // 加總 passCount
+                    failCount = g.Sum(x => x.failCount), // 加總 failCount
+                    Index = null, // 丟棄 Index
+                    StartStep = g.Min(x => x.StartStep), // 該分組中最早的 StartStep
+                    EndStep = g.Max(x => x.EndStep), // 該分組中最晚的 EndStep
+                    WorkTime = 0 // 丟棄 WorkTime
+                })
+            .ToList();
+
+        // 合併分組結果和保留的 "總工時" 項目
+        _DetailTimeLists = groupedItems
+            .Concat(totalWorkTimeItems) // 合併 "總工時" 項目
+            .OrderBy(x => x.WorkOrder)
+            .ThenBy(x => x.StationName)
+            .ToList();
+    }
+
+}

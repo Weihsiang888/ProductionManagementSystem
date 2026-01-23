@@ -1,0 +1,147 @@
+﻿@using DxBlazorApplication7.Data
+@inject DataService DataService
+
+<DxGrid Data="_DirectoryStatus"
+        PageSize="24">
+    <Columns>
+        <DxGridDataColumn Width="120">
+            <CellDisplayTemplate>
+                <DxButton Text="開啟SOP" Click="@(() => OnRowAction((DirectoryStatus)context.DataItem))" />
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+
+        <DxGridDataColumn FieldName=@nameof(DirectoryStatus.DirectoryName) Caption="目錄" Width="180" />
+        <DxGridDataColumn FieldName=@nameof(DirectoryStatus.DirectoryMax) Caption="版本" Width="90" />
+        <DxGridDataColumn FieldName=@nameof(DirectoryStatus.FileName) Caption="檔案" MinWidth="90" />
+    </Columns>
+</DxGrid>
+
+<DxPopup Width="100%" Height="100%" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center" @bind-Visible="@EsopPopupVisible"
+         ShowHeader="false"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         BodyText="@_ESOPMsg">
+    <BodyContentTemplate Context="PopupContext">
+        @*<img class="fit-width" src="images/Techman Robot.png" style="height: 24%; width: 24%; float:right" align="bottom" />*@
+        @* <div style="width:100%; height:100%;">
+            <object data="@_ESOPData" type="application/pdf" style="width:100%; height:100%;"></object>
+            @*<iframe src='../Uploads/S00/P00/M01/更新License.pdf' width="500" height="678"> </iframe>
+        </div> *@
+        <div style="width:100%; height:100%;">
+            @if (!string.IsNullOrEmpty(_ESOPData))
+            {
+                @* <object data="@_ESOPData" type="application/pdf" style="width:100%; height:100%;" @key="_ESOPData"></object> *@
+                @* <iframe src="/pdfjs/web/viewer.html?file=@Uri.EscapeDataString(_ESOPData)"
+                        style="width:100%; height:100%; border:none;">
+                </iframe> *@
+                <iframe src="/pdfjs/web/viewer.html?file=@Uri.EscapeDataString(_ESOPData)#zoom=page-width"
+                        style="width:100%; height:100%; border:none;">
+                </iframe>
+
+            }
+        </div>
+    </BodyContentTemplate>
+    <FooterContentTemplate Context="Context">
+        <div class="d-flex align-items-center w-100">
+            <!-- 第一個靠左的按鈕 -->
+            <DxButton CssClass="popup-button my-1 me-2"
+                      RenderStyle="ButtonRenderStyle.Secondary"
+                      Text="繁體中文"
+                      Click="Selected_LanguageChanged" />
+
+            <!-- 第二個靠左的按鈕 -->
+            <DxButton CssClass="popup-button my-1 me-2"
+                      RenderStyle="ButtonRenderStyle.Secondary"
+                      Text="English"
+                      Click="Selected_LanguageChanged" />
+
+            <!-- 第三個靠最右的按鈕 -->
+            <DxButton CssClass="popup-button my-1 ms-auto"
+                      RenderStyle="ButtonRenderStyle.Primary"
+                      Text="Close"
+                      Click="CloseEulaClick" />
+        </div>
+
+
+        @*         <div class="d-flex justify-content-start w-100">
+            <!-- 第一個靠左的按鈕 -->
+            <DxButton CssClass="popup-button my-1 me-2"
+                      RenderStyle="ButtonRenderStyle.Secondary"
+                      Text="繁體中文"
+                      Click="CloseEulaClick" />
+
+            <!-- 第二個靠左的按鈕 -->
+            <DxButton CssClass="popup-button my-1"
+                      RenderStyle="ButtonRenderStyle.Secondary"
+                      Text="English"
+                      Click="CloseEulaClick" />
+        </div>
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="Close" Click="CloseEulaClick" />
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="Cancel" Click="CancelEulaClick" />*@
+    </FooterContentTemplate>
+</DxPopup>
+
+@code {
+    [Parameter] public string FolderNumber { get; set; } = string.Empty;
+
+    private List<DirectoryStatus> _DirectoryStatus = new();
+
+    bool EsopPopupVisible { get; set; } = false;
+    string _ESOPMsg;
+    string _ESOPData;
+    string _ESOPFolder;
+    string _ESOPFile;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrEmpty(FolderNumber))
+        {
+            string folderPath = @"\\172.25.210.8\01.product$\" + FolderNumber;
+            var tuple = await DataService.GetESOPDirectoryStatusAsync(folderPath);
+
+            // 確保建立新 List，不共用同一個參考
+            _DirectoryStatus = tuple.Item1.ToList();
+        }
+    }
+
+    void OnRowAction(DirectoryStatus item)
+    {
+        if (item != null)
+        {
+            EsopPopupVisible = true;
+            // _ESOPData = "../esop/" + ModelName.ESOPCode + "/" + _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == ModelName.ESOPCode).DirectoryMax + "/" + _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == ModelName.ESOPCode).FileName;
+            //_ESOPData = "/esop/" + ModelName.ESOPCode + "/" + _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == ModelName.ESOPCode).DirectoryMax + "/" + _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == ModelName.ESOPCode).FileName;
+            _ESOPFolder = "/mainesop/" + FolderNumber + "/" + item.DirectoryName + "/" + _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == item.DirectoryName).DirectoryMax;
+            _ESOPFile = _DirectoryStatus.SingleOrDefault(x => x.DirectoryName == item.DirectoryName).FileName;
+            _ESOPData = _ESOPFolder + "//" + _ESOPFile;
+        }
+    }
+
+    async Task CloseEulaClick()
+    {
+        EsopPopupVisible = false;
+    }
+
+    async Task Selected_LanguageChanged()
+    {
+        if (!string.IsNullOrEmpty(_ESOPData))
+        {
+            if (_ESOPFile.StartsWith("EN_"))
+            {
+                _ESOPData = _ESOPFolder + "//" + _ESOPFile.Replace("EN_", "");
+                _ESOPFile = _ESOPFile.Replace("EN_", "");
+            }
+            else
+            {
+                _ESOPData = _ESOPFolder + "//" + "EN_" + _ESOPFile;
+                _ESOPFile = "EN_" + _ESOPFile;
+            }
+        }
+        StateHasChanged();
+    }
+
+}
+
+
+

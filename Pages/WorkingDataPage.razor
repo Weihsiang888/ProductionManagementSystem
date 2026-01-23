@@ -1,0 +1,83 @@
+﻿@page "/-WorkingData-"
+@using DxBlazorApplication7.Data
+@inject DataService DataService
+
+<br />
+<h3>產線人員工作狀況</h3>
+<br />
+
+<DxGrid Data="_WorkingDatas"
+        @ref="MyGrid"
+        PageSize="24"
+
+        EditModelSaving="OnEditModelSaving">
+    <Columns>
+        <DxGridCommandColumn Width="90">
+            <HeaderTemplate>
+                <a class="oi oi-plus" @onclick="@(() => MyGrid.StartEditNewRowAsync())" style="text-decoration: none;" href="javascript:void(0);"></a>
+            </HeaderTemplate>
+            <CellDisplayTemplate>
+                <a class="oi oi-pencil" @onclick="@(() => MyGrid.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                <a class="oi oi-x" @onclick="@(() => Delete((WorkingData)context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+            </CellDisplayTemplate>
+        </DxGridCommandColumn>
+        <DxGridDataColumn FieldName=@nameof(WorkingData.WorkingDate) Caption="工作日" MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(WorkingData.WorkingType) Caption="工作時段" MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(WorkingData.WorkingID) Caption="作業程序" MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(WorkingData.WorkingDescription) Caption="作業程序描述" MinWidth="300" />
+        <DxGridDataColumn FieldName=@nameof(WorkingData.WorkingGroup) Caption="作業站" MinWidth="150" />
+        <DxGridDataColumn FieldName=@nameof(WorkingData.OPNO) Caption="作業人員" MinWidth="120" />
+        <DxGridDataColumn FieldName=@nameof(WorkingData.QTY) Caption="數量(產出)" MinWidth="90" />
+    </Columns>
+    <EditFormTemplate Context="EditFormContext">
+        @{
+            var _WorkingData = (WorkingData)EditFormContext.EditModel;
+        }
+        <DxFormLayout>
+            <DxFormLayoutItem Caption="工作日 :">
+                <DxDateEdit @bind-Date=_WorkingData.WorkingDate />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="工作時段 :">
+                <DxTextBox @bind-Text=_WorkingData.WorkingType />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="作業程序 :">
+                <DxTextBox @bind-Text=_WorkingData.WorkingID />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="作業程序描述 :">
+                <DxTextBox @bind-Text=_WorkingData.WorkingDescription />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="作業站 :">
+                <DxTextBox @bind-Text=_WorkingData.WorkingGroup />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="作業人員 :">
+                <DxTextBox @bind-Text=_WorkingData.OPNO />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="數量(產出) :">
+                <DxSpinEdit @bind-Value=_WorkingData.QTY />
+            </DxFormLayoutItem>
+        </DxFormLayout>
+    </EditFormTemplate>
+</DxGrid>
+@code {
+    private List<WorkingData>? _WorkingDatas;
+    DxGrid? MyGrid;
+    protected override async Task OnInitializedAsync()
+    {
+        _WorkingDatas = await DataService.GetWorkingDatasAsync();
+    }
+    async Task OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (WorkingData)e.EditModel;
+        //editModel.UserName = "Test"; //Login User
+        editModel.UpdateTime = DateTime.Now;
+        editModel.CreateTime = DateTime.Now;
+        _WorkingDatas = await DataService.ChangeWorkingDatasAsync((WorkingData)e.EditModel);
+    }
+    async Task Delete(WorkingData item)
+    {
+        if (item != null)
+        {
+            await DataService.Remove(item);
+        }
+    }
+}

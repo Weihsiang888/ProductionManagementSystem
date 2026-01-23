@@ -1,0 +1,297 @@
+﻿@page "/-OvertimeSchedule-"
+@using DxBlazorApplication7.Data
+@inject AuthenticationStateProvider authenticationStateProvider
+@inherits AuthComponentBase
+@inject DataService DataService
+
+<br />
+<h3>產線加班時段</h3>
+<br />
+
+<DxGrid Data="_OvertimeSchedules"
+        @ref="MyGrid"
+        PageSize="24"
+        EditModelSaving="OnEditModelSaving"
+        EditCanceling="OnEditCanceling"
+        CustomizeEditModel="Grid_CustomizeEditModel">
+    <Columns>
+        @if (customAuth.user.role != Role.Guest && customAuth.user.department == "Manager")
+        {
+            <DxGridCommandColumn Width="90">
+                <HeaderTemplate>
+                    <a class="oi oi-plus" @onclick="@(() => MyGrid.StartEditNewRowAsync())" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </HeaderTemplate>
+                <CellDisplayTemplate>
+                    <a class="oi oi-pencil" @onclick="@(() => MyGrid.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                    <a class="oi oi-x" @onclick="@(() => Delete((OvertimeSchedule)context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </CellDisplayTemplate>
+            </DxGridCommandColumn>
+        }
+        <DxGridDataColumn FieldName=@nameof(OvertimeSchedule.OverTimeDate) TextAlignment="GridTextAlignment.Left" Caption="加班日期" MinWidth="90" />
+        @*<DxGridDataColumn FieldName=@nameof(OvertimeSchedule.OverTimeType) TextAlignment="GridTextAlignment.Left" Caption="加班時段" MinWidth="90" />*@
+        <DxGridDataColumn FieldName=@nameof(OvertimeSchedule.Description) TextAlignment="GridTextAlignment.Left" Caption="加班時段" MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(OvertimeSchedule.OPNO) Caption="作業人員" MinWidth="90" />
+    </Columns>
+    <EditFormTemplate Context="EditFormContext">
+        @{
+            var _OvertimeSchedule = (OvertimeSchedule)EditFormContext.EditModel;
+        }
+        <DxFormLayout>
+
+            @if (_OvertimeSchedule.OverTimeDate is not null)
+            {
+                <DxFormLayoutItem Caption="加班日期 :">
+                    <DxDateEdit @bind-Date=_OvertimeSchedule.OverTimeDate />
+                </DxFormLayoutItem>
+            }
+            else
+            {
+                <DxFormLayoutItem Caption="加班日期 :" ColSpanMd="12">
+                    <div class="d-flex flex-row flex-wrap">
+                        @foreach (var item in _TimeDays)
+                        {
+                            <div class="me-2 mb-2">
+                                @if (item.IsSelect == false)
+                                {
+                                    <button class="dxbl-btn dxbl-btn-outline-info w-10" type="button" @onclick="@(() => SetDayStep(item.TimeDayType.ToString()))">
+                                        <span>@item.Description</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="dxbl-btn dxbl-btn-info w-10" type="button" @onclick="@(() => SetDayStep(item.TimeDayType.ToString()))">
+                                        <span>@item.Description</span>
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
+                </DxFormLayoutItem>
+            }
+
+            @if (_OvertimeSchedule.OverTimeType is not null)
+            {
+                <DxFormLayoutItem Caption="加班時段 :">
+                    <DxTextBox @bind-Text=_OvertimeSchedule.OverTimeType />
+                </DxFormLayoutItem>
+            }
+            else
+            {
+                <DxFormLayoutItem Caption="加班時段 :" ColSpanMd="12">
+                    <div class="d-flex flex-row flex-wrap">
+                        @foreach (var item in _TimeSteps)
+                        {
+                            <div class="me-2 mb-2">
+                                @if (item.IsSelect == false)
+                                {
+                                    <button class="dxbl-btn dxbl-btn-outline-info w-10" type="button" @onclick="@(() => SetTimeStep(item.TimeType.ToString()))">
+                                        <span>@item.Description</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="dxbl-btn dxbl-btn-info w-10" type="button" @onclick="@(() => SetTimeStep(item.TimeType.ToString()))">
+                                        <span>@item.Description</span>
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
+                </DxFormLayoutItem>
+            }
+
+            @if (_OvertimeSchedule.OPNO is not null)
+            {
+                <DxFormLayoutItem Caption="作業人員 :">
+                    <DxTextBox @bind-Text=_OvertimeSchedule.OPNO />
+                </DxFormLayoutItem>
+            }
+            else
+            {
+                <DxFormLayoutItem Caption="作業人員 :" ColSpanMd="12">
+                    <div class="d-flex flex-row flex-wrap">
+                        @foreach (var item in _Operators)
+                        {
+                            <div class="me-2 mb-2">
+                                @if (item.IsSelect == false)
+                                {
+                                    <button class="dxbl-btn dxbl-btn-outline-info w-10" type="button" @onclick="@(() => SetManufacturingProcess(item.OperatorID.ToString()))">
+                                        <span>@item.OperatorName</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="dxbl-btn dxbl-btn-info w-10" type="button" @onclick="@(() => SetManufacturingProcess(item.OperatorID.ToString()))">
+                                        <span>@item.OperatorName</span>
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
+                </DxFormLayoutItem>
+            }
+
+        </DxFormLayout>
+    </EditFormTemplate>
+</DxGrid>
+
+<DxPopup @bind-Visible="@PopupVisible"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         HeaderText="加班作業通知"
+         BodyText="@_Duplicate">
+    <FooterContentTemplate Context="Context">
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="OK" Click="OkEulaClick" />
+    </FooterContentTemplate>
+</DxPopup>
+
+@code {
+    private List<OvertimeSchedule>? _OvertimeSchedules;
+    private List<TimeStep>? _TimeSteps;
+    private List<TimeDay>? _TimeDays;
+    List<Operator>? _Operators;
+    bool PopupVisible { get; set; } = false;
+    string _Duplicate;
+
+    DxGrid? MyGrid;
+    protected override async Task OnInitializedAsync()
+    {
+        _OvertimeSchedules = await DataService.GetOvertimeSchedulesAsync();
+        _Operators = await DataService.GetOperatorsAsync("18");
+        _TimeSteps = await DataService.GetTimeStepsAsync();
+        _TimeDays = await DataService.GetTimeDaysAsync();
+    }
+    async Task OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        if (e.IsNew == true)
+        {
+            DateTime _TimeDay = Convert.ToDateTime(_TimeDays.Single(x => x.IsSelect == true).Description);
+            string _TimeStep = _TimeSteps.Single(x => x.IsSelect == true).TimeType;
+            string _Description = _TimeSteps.Single(x => x.IsSelect == true).Description;
+            List<OvertimeSchedule>? _NewOvertimeSchedules = new List<OvertimeSchedule>();
+            _Duplicate = "";
+
+            foreach (var item in _Operators)
+            {
+                if (item.IsSelect == true)
+                {
+                    var orginalForecast = _OvertimeSchedules.FirstOrDefault(i => i.OverTimeDate == _TimeDay && i.OverTimeType == _TimeStep && i.OPNO == item.OperatorID);
+                    if (orginalForecast != null)
+                    {
+                        _Duplicate = _Duplicate + "," + item.OperatorID;
+                    }
+                    else
+                    {
+                        _NewOvertimeSchedules.Add(new OvertimeSchedule
+                            {
+                                OverTimeDate = _TimeDay,
+                                OverTimeType = _TimeStep,
+                                Description = _Description,
+                                IsDel = false,
+                                OPNO = item.OperatorID
+                            });
+                    }
+                    //_NewOvertimeSchedules.Add(new OvertimeSchedule
+                    //{
+                    //    OverTimeDate = _TimeDay,
+                    //    OverTimeType = _TimeStep,
+                    //    OPNO = item.OperatorID
+                    //});
+                }
+            }
+            if (!string.IsNullOrEmpty(_Duplicate))
+            {
+                _Duplicate = _Duplicate.Substring(1);
+                _Duplicate = _Duplicate + " 於同時段已經有加班作業";
+                PopupVisible = true;
+            }
+            _OvertimeSchedules = await DataService.ChangeOvertimeSchedulesAsync(_NewOvertimeSchedules);
+        }
+        else
+        {
+            var editModel = (OvertimeSchedule)e.EditModel;
+            //editModel.UserName = "Test"; //Login User
+            //editModel.UpdateTime = DateTime.Now;
+            //editModel.CreateTime = DateTime.Now;
+            _OvertimeSchedules = await DataService.ChangeOvertimeSchedulesAsync((OvertimeSchedule)e.EditModel);
+        }
+    }
+    async Task Delete(OvertimeSchedule item)
+    {
+        if (item != null)
+        {
+            await DataService.Remove(item);
+        }
+    }
+
+    async Task OnEditCanceling(GridEditCancelingEventArgs e)
+    {
+        _Operators = null;
+        _TimeSteps = null;
+        _Operators = await DataService.GetOperatorsAsync("18");
+        _TimeSteps = await DataService.GetTimeStepsAsync();
+    }
+
+    async Task SetManufacturingProcess(string item1)
+    {
+        if (_Operators.Single(x => x.OperatorID == item1).IsSelect == false)
+        {
+            _Operators.Single(x => x.OperatorID == item1).IsSelect = true;
+        }
+        else
+        {
+            _Operators.Single(x => x.OperatorID == item1).IsSelect = false;
+        }
+    }
+
+    async Task SetTimeStep(string item1)
+    {
+        foreach (var items in _TimeSteps)
+        {
+            items.IsSelect = false;
+        }
+        if (_TimeSteps.Single(x => x.TimeType == item1).IsSelect == false)
+        {
+            _TimeSteps.Single(x => x.TimeType == item1).IsSelect = true;
+        }
+        else
+        {
+            _TimeSteps.Single(x => x.TimeType == item1).IsSelect = false;
+        }
+    }
+
+    async Task SetDayStep(string item1)
+    {
+        foreach (var items in _TimeDays)
+        {
+            items.IsSelect = false;
+        }
+        if (_TimeDays.Single(x => x.TimeDayType == item1).IsSelect == false)
+        {
+            _TimeDays.Single(x => x.TimeDayType == item1).IsSelect = true;
+        }
+        else
+        {
+            _TimeDays.Single(x => x.TimeDayType == item1).IsSelect = false;
+        }
+    }
+
+    async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+        if (e.IsNew)
+        {
+            _Operators = null;
+            _TimeSteps = null;
+            _TimeDays = null;
+            _Operators = await DataService.GetOperatorsAsync("18");
+            _TimeSteps = await DataService.GetTimeStepsAsync();
+            _TimeDays = await DataService.GetTimeDaysAsync();
+        }
+    }
+
+    async Task OkEulaClick()
+    {
+        PopupVisible = false;
+    }
+}

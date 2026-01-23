@@ -1,0 +1,391 @@
+﻿@using DevExpress.Export
+@using DxBlazorApplication7.Data
+@using Microsoft.Build.Framework
+@inject DataService DataService
+
+<DxScheduler @ref="Scheduler"
+             DataStorage="@DataStorage"
+             StartDate="@StartDate"
+             StartDateChanged="@OnStartDateChanged"
+             ResourceNavigatorVisible="false"
+             @bind-ActiveViewType="@ActiveViewType"
+             ValidateEditForm="true"
+             @bind-AppointmentFormMode="@AppointmentFormMode"
+             GroupType="@SchedulerGroupType.Resource"
+             ResourceColorInHeaderVisible="false"
+             AllowCreateAppointment="false"
+             AllowEditAppointment="false"
+             AllowDeleteAppointment="false">
+    <Views>
+        <DxSchedulerDayView 
+            DayCount="2" 
+            ShowWorkTimeOnly="true" 
+            CellMinWidth="120" 
+            TimeScale="@(new TimeSpan(0,30,0))"
+            WorkTime="@(new DxSchedulerTimeSpanRange(TimeSpan.FromHours(8), TimeSpan.FromHours(22)))">
+
+            <ResourceHeaderCellTemplate>
+                <div class="card" style="display: flex; flex-direction: row; align-items: center;">
+                    <div style="padding: 0.4725rem;">@context.Resource.Caption</div>
+                </div>
+            </ResourceHeaderCellTemplate>
+        </DxSchedulerDayView>
+    </Views>
+    
+    <AppointmentTooltipHeaderTemplate>
+        <div class="tooltip-text-header">@context.Appointment.Description</div>
+
+    </AppointmentTooltipHeaderTemplate>
+</DxScheduler>
+
+@code {
+
+    DxScheduler Scheduler { get; set; }
+    DateTime StartDate { get; set; } = Convert.ToDateTime((DateTime.Now.AddDays(-1).ToString("yyyy/MM/dd") + " 00:00:00"));
+    DateTime EndDate { get; set; } = DateTime.Now;
+    SchedulerViewType ActiveViewType { get; set; } = SchedulerViewType.Day;
+    SchedulerAppointmentFormMode AppointmentFormMode { get; set; } = SchedulerAppointmentFormMode.Both;
+    ResourceCollection _ResourceCollection = new ResourceCollection();
+    ResourceAppointmentCollection _ResourceAppointmentCollection = new ResourceAppointmentCollection();
+    List<Appointment> _Appointment = new List<Appointment>();
+    List<Resource> _Resource = new List<Resource>();
+    public class Appointment
+    {
+        public Appointment()
+        {
+
+        }
+
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string Description { get; set; }
+        public string Station { get; set; }
+        public int Status { get; set; }
+        public string Recurrence { get; set; }
+        public int? ResourceId { get; set; }
+        public string Resources { get; set; }
+        public bool Accepted { get; set; }
+    }
+
+    public class Resource
+    {
+        public int Id { get; set; }
+        public int? GroupId { get; set; }
+        public string Name { get; set; }
+        public string Number { get; set; }
+        public bool IsGroup { get; set; }
+        public string TextCss { get; set; }
+        public string BackgroundCss { get; set; }
+    }
+
+    public partial class ResourceCollection
+    {
+        public List<Resource> GetResourcesForGrouping()
+        {
+            return GetResources().Take(5).ToList();
+        }
+
+        public List<Resource> GetResources()
+        {
+            DateTime StartDate = DateTime.Today;
+            // List<Resource> _Resource = new List<Resource>();
+            // List<OperatorInformation>? _OperatorInformations;
+
+            return new List<Resource>() {
+                new Resource() { Id=0 , Name="Nancy Davolio", GroupId=100, BackgroundCss="", TextCss="text-black" },
+                new Resource() { Id=1 , Name="Andrew Fuller", GroupId=101, BackgroundCss="", TextCss="text-black" },
+                new Resource() { Id=2 , Name="Janet Leverling", GroupId=100, BackgroundCss="", TextCss="text-black" },
+                new Resource() { Id=3 , Name="Margaret Peacock", GroupId=101, BackgroundCss="", TextCss="text-black" },
+                new Resource() { Id=4 , Name="Steven Buchanan", GroupId=100, BackgroundCss="", TextCss="text-black" }
+            };
+        }
+
+        public List<Resource> GetResourceGroups()
+        {
+            return new List<Resource>() {
+                new Resource() { Id=100, Name="Manager", IsGroup=true },
+                new Resource() { Id=101, Name="Operator", IsGroup=true }
+            };
+        }
+    }
+
+    public partial class ResourceAppointmentCollection
+    {
+        public List<Appointment> GetAppointments()
+        {
+            DateTime date = DateTime.Now.Date;
+            var dataSource = new List<Appointment>() {
+                new Appointment {
+                    Accepted = true,
+                    Description = "Install New Router in Dev Room",
+                    StartDate = date + (new TimeSpan(0, 10, 0, 0)),
+
+                    Status = 1,
+                    ResourceId = 0
+                },
+                new Appointment {
+                    Description = "Upgrade Personal Computers",
+                    Accepted = false,
+                    StartDate = date + (new TimeSpan(0,  13, 0, 0)),
+                    EndDate = date + (new TimeSpan(0, 14, 30, 0)),
+                    Status = 1,
+                    ResourceId = 0
+                },
+                new Appointment {
+                    Description = "Website Redesign Plan",
+                    Accepted = false,
+                    StartDate = date + (new TimeSpan(1, 9, 30, 0)),
+                    EndDate = date + (new TimeSpan(1, 11, 30, 0)),
+                    Status = 1,
+                    ResourceId = 0
+                },
+                new Appointment {
+                    Description = "New Brochures",
+                    Accepted = true,
+                    StartDate = date + (new TimeSpan(1, 13, 30, 0)),
+                    EndDate = date + (new TimeSpan(1, 15, 15, 0)),
+                    Status = 1,
+                    ResourceId = 0
+                },
+                new Appointment {
+                    Description = "Book Flights to San Fran for Sales Trip",
+                    Accepted = false,
+                    StartDate = date + (new TimeSpan(1, 12, 0, 0)),
+                    EndDate = date + (new TimeSpan(1, 13, 0, 0)),
+                    Status = 1,
+                    ResourceId = 0
+                },
+                new Appointment {
+                    Description = "Approve Personal Computer Upgrade Plan",
+                    Accepted = true,
+                    StartDate = date + (new TimeSpan(0, 10, 0, 0)),
+                    Status = 1
+                },
+                new Appointment {
+                    Description = "Final Budget Review",
+                    Accepted = true,
+                    StartDate = date + (new TimeSpan(0, 13, 0, 0)),
+                    EndDate = date + (new TimeSpan(0, 15, 0, 0)),
+                    Status = 1,
+                    ResourceId = 1
+                },
+                new Appointment {
+                    Description = "Install New Database",
+                    Accepted = false,
+                    StartDate = date + (new TimeSpan(0, 9, 45, 0)),
+                    EndDate = date + (new TimeSpan(1, 11, 15, 0)),
+                    Status = 1,
+                    ResourceId = 1
+                },
+                new Appointment {
+                    Accepted = true,
+                    Description = "Approve New Online Marketing Strategy",
+                    StartDate = date + (new TimeSpan(1,  12, 0, 0)),
+                    EndDate = date + (new TimeSpan(1, 14, 0, 0)),
+                    Status = 1,
+                    ResourceId = 1
+                },
+                new Appointment {
+                    Accepted = true,
+                    Description = "Customer Workshop",
+                    StartDate = date + (new TimeSpan(0,  11, 0, 0)),
+                    EndDate = date + (new TimeSpan(0, 12, 0, 0)),
+                    Status = 1,
+                    ResourceId = 2
+                },
+                new Appointment {
+                    Accepted = true,
+                    Description = "Prepare 2021 Marketing Plan",
+                    StartDate = date + (new TimeSpan(0,  11, 0, 0)),
+                    EndDate = date + (new TimeSpan(0, 13, 30, 0)),
+                    Status = 1,
+                    ResourceId = 2
+                },
+                new Appointment {
+                    Accepted = false,
+                    Description = "Brochure Design Review",
+                    StartDate = date + (new TimeSpan(0, 14, 0, 0)),
+                    EndDate = date + (new TimeSpan(0, 15, 30, 0)),
+                    Status = 1,
+                    ResourceId = 2
+                },
+                new Appointment {
+                    Accepted = true,
+                    Description = "Create Icons for Website",
+                    StartDate = date + (new TimeSpan(1, 10, 0, 0)),
+                    EndDate = date + (new TimeSpan(1, 11, 30, 0)),
+                    Status = 1,
+                    ResourceId = 1
+                },
+                new Appointment {
+                    Accepted = true,
+                    Description = "Launch New Website",
+                    StartDate = date + (new TimeSpan(1, 12, 20, 0)),
+                    EndDate = date + (new TimeSpan(1, 14, 0, 0)),
+                    Status = 1,
+                    ResourceId = 2
+                },
+                new Appointment {
+                    Accepted = false,
+                    Description = "Upgrade Server Hardware",
+                    StartDate = date + (new TimeSpan(1, 9, 0, 0)),
+                    EndDate = date + (new TimeSpan(1, 12, 0, 0)),
+                    Status = 1,
+                    ResourceId = 2
+                },
+                new Appointment {
+                    Accepted = true,
+                    Description = "Book Flights to San Fran for Sales Trip",
+                    StartDate = date + (new TimeSpan(0, 14, 0, 0)),
+                    EndDate = date + (new TimeSpan(0, 17, 0, 0)),
+                    Status = 1,
+                    ResourceId = 3
+                },
+                new Appointment {
+                    Accepted = true,
+                    Description = "Approve New Online Marketing Strategy",
+                    StartDate = date + (new TimeSpan(0,  12, 0, 0)),
+                    EndDate = date + (new TimeSpan(0, 15, 0, 0)),
+                    Status = 1,
+                    ResourceId = 4
+                }
+            };
+            return dataSource;
+        }
+    }
+
+    DxSchedulerDataStorage DataStorage = new DxSchedulerDataStorage()
+    {
+        //AppointmentsSource = ResourceAppointmentCollection.GetAppointments(),
+        AppointmentMappings = new DxSchedulerAppointmentMappings()
+        {
+            Start = "StartDate",
+            End = "EndDate",
+            Subject = "Station",
+            Description = "Description",
+            StatusId = "Status",
+            RecurrenceInfo = "Recurrence",
+            ResourceId = "ResourceId"
+        },
+        //ResourcesSource = ResourceCollection.GetResourcesForGrouping(),
+        ResourceMappings = new DxSchedulerResourceMappings()
+        {
+            Id = "Id",
+            Caption = "Name",
+            BackgroundCssClass = "BackgroundCss",
+            TextCssClass = "TextCss"
+        }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        ReadPageData();
+    }
+
+    public async Task ReadPageData()
+    {
+        //_Appointment = _ResourceAppointmentCollection.GetAppointments();
+        //DataStorage.AppointmentsSource = _Appointment;
+        //_Resource = _ResourceCollection.GetResourcesForGrouping();
+        //List<Resource> _Resource = new List<Resource>();
+
+        EndDate = Convert.ToDateTime((StartDate.AddDays(+1).ToString("yyyy/MM/dd") + " 23:59:59"));
+
+        List<WorkingOrderStepList> _WorkingOrderStepLists;
+        _WorkingOrderStepLists = await DataService.GetWorkingOrderStepListAsync();
+        //_WorkingOrderStepLists = _WorkingOrderStepLists.OrderBy(x => x.WOID).OrderBy(x => x.StatusTime).ToList();
+
+        var _NewWorkingOrderStepLists = _WorkingOrderStepLists.Where(x => x.WorkingTime > StartDate && x.WorkingTime < EndDate).Select((x, i) => new { Value = x, Index = i }).ToList();
+        _NewWorkingOrderStepLists = _NewWorkingOrderStepLists.OrderBy(x => x.Value.WOID).OrderBy(x => x.Value.StatusTime).ToList();
+
+        List<OperatorInformation>? _OperatorInformations;
+        _OperatorInformations = await DataService.GetOperatorInformationsAsync();
+
+        int _ID = 0;
+
+        _Resource.Clear();
+        foreach (var item in _OperatorInformations.OrderBy(x => x.Department))
+        {
+            var IsExist = _NewWorkingOrderStepLists.Where(x => x.Value.OPNO == item.OPNO).ToList();
+            if (IsExist.Count != 0)
+            {
+                int _GroupId = 101;
+                if (item.Department == "Manager")
+                {
+                    _GroupId = 100;
+                }
+                _Resource.Add(new Resource
+                    {
+                        Id = _ID,
+                        Name = item.OperatorName + " (" + item.OPNO + ") ",
+                        Number = item.OPNO,
+                        GroupId = _GroupId,
+                        BackgroundCss = "",
+                        TextCss = "text-black"
+                    });
+                _ID++;
+            }
+        }
+
+        _Appointment.Clear();
+        foreach (var item in _NewWorkingOrderStepLists)
+        {
+            if (item.Value.WorkingStatus == "作業已新增")
+            {
+                continue;
+                // _Appointment.Add(new Appointment
+                // {
+                //     Accepted = true,
+                //     Station = item.Value.StationName,
+                //     Description = item.Value.WorkOrder,
+                //     StartDate = item.Value.StatusTime,
+                //     Status = 2,
+                //     ResourceId = _Resource.FirstOrDefault(x => x.Number == item.Value.OPNO).Id
+                // });
+            }
+            else if (item.Value.WorkingStatus == "作業已接收")
+            {
+                int ItemStatus = 1;
+                string ItemStation = item.Value.StationName;
+                var ItemValue = _NewWorkingOrderStepLists.FirstOrDefault(x => x.Index == item.Index + 1);
+                DateTime? ValueTime;
+                if (ItemValue == null)
+                {
+                    ValueTime = item.Value.StatusTime;
+                    ItemStatus = 2;
+                    ItemStation = item.Value.StationName + " (處理中)";
+                }
+                else
+                {
+                    ValueTime = ItemValue.Value.StatusTime;
+                }
+                _Appointment.Add(new Appointment
+                {
+                    Accepted = true,
+                    Station = ItemStation,
+                    Description = item.Value.WorkOrder,
+                    StartDate = item.Value.StatusTime,
+                    EndDate = ValueTime,
+                        Status = ItemStatus,
+                    ResourceId = _Resource.FirstOrDefault(x => x.Number == item.Value.OPNO).Id
+                });
+            }
+            else if (item.Value.WorkingStatus == "作業已暫停" || item.Value.WorkingStatus == "作業已結束")
+            {
+                continue;
+            }
+
+        }
+
+        DataStorage.AppointmentsSource = _Appointment;
+        DataStorage.ResourcesSource = _Resource;
+        DataStorage.RefreshData();
+    }
+
+    void OnStartDateChanged(DateTime newStartDate)
+    {
+        StartDate = Convert.ToDateTime((newStartDate.ToString("yyyy/MM/dd") + " 00:00:00"));
+        ReadPageData();
+        /// Your code that handles the start date changes
+    }
+}

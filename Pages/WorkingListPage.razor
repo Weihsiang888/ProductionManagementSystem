@@ -1,0 +1,445 @@
+﻿@page "/-WorkingList-"
+@using DxBlazorApplication7.Data
+@inject DataService DataService
+@using System.Globalization
+
+<br />
+<h3>產線人員派工作業</h3>
+<br />
+
+<DxGrid Data="_WorkingLists"
+        @ref="MyGrid"
+        PageSize="24"
+        EditModelSaving="OnEditModelSaving"
+        CustomizeEditModel="Grid_CustomizeEditModel">
+    <Columns>
+        <DxGridCommandColumn Width="90">
+            <HeaderTemplate>
+                <a class="oi oi-plus" @onclick="@(() => MyGrid.StartEditNewRowAsync())" style="text-decoration: none;" href="javascript:void(0);"></a>
+            </HeaderTemplate>
+            <CellDisplayTemplate>
+                <a class="oi oi-pencil" @onclick="@(() => MyGrid.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                <a class="oi oi-x" @onclick="@(() => Delete((WorkingList)context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+            </CellDisplayTemplate>
+        </DxGridCommandColumn>
+        <DxGridDataColumn FieldName=@nameof(WorkingList.WorkingTime) Caption="工作日" MinWidth="90" />
+        @*<DxGridDataColumn FieldName=@nameof(WorkingList.WorkingID) Caption="作業序號" MinWidth="90" />*@
+        @*<DxGridDataColumn FieldName=@nameof(WorkingList.WorkingPeriod) Caption="工作時段" MinWidth="90" />*@
+        <DxGridDataColumn FieldName=@nameof(WorkingList.WorkingName) Caption="作業工站" MinWidth="150" />
+        <DxGridDataColumn FieldName=@nameof(WorkingList.ProcessName) Caption="作業程序" MinWidth="150" />
+        <DxGridDataColumn FieldName=@nameof(WorkingList.WorkOrder) Caption="工單號碼" MinWidth="300" />
+        <DxGridDataColumn FieldName=@nameof(WorkingList.OPNO) Caption="作業人員" MinWidth="150" />
+        <DxGridDataColumn FieldName=@nameof(WorkingList.SeriaNumber) Caption="手臂序號" MinWidth="300" />
+        @*<DxGridDataColumn FieldName=@nameof(WorkingList.QTY) Caption="數量" MinWidth="90" />*@
+    </Columns>
+    <EditFormTemplate Context="EditFormContext">
+        @{
+            var _WorkingList = (WorkingList)EditFormContext.EditModel;
+        }
+
+        <DxFormLayout>
+            @if (_WorkingList.AssignTime is null)
+            {
+                <DxFormLayoutItem Caption="工作日 :">
+                    <DxDateEdit @bind-Date=_WorkingList.WorkingTime />
+                </DxFormLayoutItem>
+            }
+            else
+            {
+                <DxFormLayoutItem Caption="工作日 :">
+                    <DxDateEdit @bind-Date=_WorkingList.WorkingTime ReadOnly="true" />
+                </DxFormLayoutItem>
+            }
+@*            <DxFormLayoutItem Caption="作業序號 :">
+                <DxSpinEdit @bind-Value=_WorkingList.WorkingID />
+            </DxFormLayoutItem>*@
+@*            <DxFormLayoutItem Caption="工作時段 :">
+                <DxTextBox @bind-Text=_WorkingList.WorkingPeriod />
+            </DxFormLayoutItem>*@
+
+            @*<DxFormLayoutItem Caption="工作時段 :" ColSpanMd="6">
+                <DxComboBox Data="@_OperatorWorkTimes"
+                            AllowUserInput="true"
+                            NullText="工作時段..."
+                            TextFieldName="@nameof(OperatorWorkTime.OperatorWorkTimeName)"
+                            @bind-Text=_WorkingList.WorkingPeriod
+                            @bind-Value="@OperatorWorkTimeValue">
+                </DxComboBox>
+            </DxFormLayoutItem>*@
+
+@*            <DxFormLayoutItem Caption="作業程序 :">
+            <DxTextBox @bind-Text=_WorkingList.WorkingName />
+            </DxFormLayoutItem>*@
+
+            <DxFormLayoutItem Caption="作業工站 :" ColSpanMd="6">
+                <DxComboBox Data="@_OperatorProcedures"
+                            AllowUserInput="true"
+                            NullText="作業工站..."
+                            TextFieldName="@nameof(OperatorProcedure.OperatorProcedureName)"
+                            @bind-Text=_WorkingList.WorkingName
+                            @bind-Value="@OperatorProcedureValue"
+                            SelectedItemChanged="@((OperatorProcedure item) => SelectedItemChanged(item))">
+                </DxComboBox>
+            </DxFormLayoutItem>
+
+            @if (_WorkingTypeDetail is not null)
+            {
+                <DxFormLayoutItem Caption="作業程序 :" ColSpanLg="12">
+                    <div class="d-flex flex-row flex-wrap">
+                        @foreach (var item in _WorkingTypeDetail)
+                        {
+                            <div class="me-2 mb-2">
+                                @if (item.IsSelect == false)
+                                {
+                                    <button class="dxbl-btn dxbl-btn-outline-info w-10" type="button" @onclick="@(() => SetWorkProcess(@item.TypeName.ToString()))">
+                                        <span>@item.TypeName</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="dxbl-btn dxbl-btn-info w-10" type="button" @onclick="@(() => SetWorkProcess(@item.TypeName.ToString()))">
+                                        <span>@item.TypeName</span>
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
+                </DxFormLayoutItem>
+            }
+            else
+            {
+                <DxFormLayoutItem Caption="作業程序 :" ColSpanMd="6">
+                    <DxTextBox @bind-Text=_WorkingList.ProcessName />
+                </DxFormLayoutItem>
+            }
+
+            @if (_WorkOrderSelections is not null)
+            {
+                <DxFormLayoutItem Caption="工單號碼 :" ColSpanLg="12">
+                    <div class="d-flex flex-row flex-wrap">
+                        @foreach (var item in _WorkOrderSelections)
+                        {
+                            <div class="me-2 mb-2">
+                            @if (item.IsSelect == false)
+                            {
+                                    <button class="dxbl-btn dxbl-btn-outline-info w-10" type="button" @onclick="@(() => SetWorkOrder(@item.WorkOrder.ToString()))">
+                                    <span>@item.WorkOrder</span>
+                                </button>
+                            }
+                            else
+                            {
+                                    <button class="dxbl-btn dxbl-btn-info w-10" type="button" @onclick="@(() => SetWorkOrder(@item.WorkOrder.ToString()))">
+                                    <span>@item.WorkOrder</span>
+                                </button>
+                            }
+                            </div>
+                        }
+                    </div>
+                </DxFormLayoutItem>
+            }
+
+            <DxFormLayoutItem Caption="工單號碼 :" ColSpanMd="6">
+                <DxTextBox @bind-Text=_WorkingList.WorkOrder />
+            </DxFormLayoutItem>
+
+            @if (_WorkOrderSelections is not null)
+            {
+                <DxFormLayoutItem Caption="" ColSpanMd="6">
+                </DxFormLayoutItem>
+            }
+@*            <DxFormLayoutItem Caption="作業人員 :">
+                <DxTextBox @bind-Text=_WorkingList.OPNO />
+            </DxFormLayoutItem>*@
+
+            @if (_WorkingList.AssignTime is null)
+            {
+@*                <DxFormLayoutItem Caption="作業人員:" ColSpanMd="6">
+                    <DxComboBox Data="@_Operators"
+                            AllowUserInput="true"
+                            NullText="作業人員..."
+                            TextFieldName="@nameof(Operator.OperatorID)"
+                            @bind-Text=_WorkingList.OPNO
+                            @bind-Value="@OperatorValue">
+                    </DxComboBox>
+                </DxFormLayoutItem>*@
+                @if (_WorkOrderSelections is not null)
+                {
+                    <DxFormLayoutItem Caption="作業人員 :" ColSpanMd="12">
+                    <div class="d-flex flex-row flex-wrap">
+                        @foreach (var item in _Operators)
+                        {
+                            <div class="me-2 mb-2">
+                                @if (item.IsSelect == false)
+                                {
+                                    <button class="dxbl-btn dxbl-btn-outline-info w-10" type="button" @onclick="@(() => SetManufacturingProcess(item.OperatorID.ToString()))">
+                                        <span>@item.OperatorID</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="dxbl-btn dxbl-btn-info w-10" type="button" @onclick="@(() => SetManufacturingProcess(item.OperatorID.ToString()))">
+                                        <span>@item.OperatorID</span>
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
+                    </DxFormLayoutItem>
+                }
+                else
+                {
+                    <DxFormLayoutItem Caption="作業人員 :" ColSpanMd="6">
+                        <DxComboBox Data="@_Operators"
+                            AllowUserInput="true"
+                            NullText="作業人員..."
+                            TextFieldName="@nameof(Operator.OperatorID)"
+                            @bind-Text=_WorkingList.OPNO
+                            @bind-Value="@OperatorValue">
+                        </DxComboBox>
+                    </DxFormLayoutItem>
+                }
+            }
+            else
+            {
+                <DxFormLayoutItem Caption="作業人員 :">
+                    <DxTextBox @bind-Text=_WorkingList.OPNO ReadOnly="true" />
+                </DxFormLayoutItem>
+            }
+
+            @if (_SerialNumberSelections is not null)
+            {
+            <DxFormLayoutItem Caption="手臂序號 :" ColSpanLg="12">
+                <div class="d-flex flex-row flex-wrap">
+                    @foreach (var item in _SerialNumberSelections)
+                    {
+                        <div class="me-2 mb-2">
+                            @if (item.IsWorkOrderSelect == true)
+                            {
+                                @if (item.IsSerialNumberSelect == false)
+                                {
+                                    <button class="dxbl-btn dxbl-btn-outline-success w-10" type="button" @onclick="@(() => SetSerialNumber(@item.SerialNumber.ToString()))">
+                                        <span>@item.SerialNumber</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="dxbl-btn dxbl-btn-success w-10" type="button" @onclick="@(() => SetSerialNumber(@item.SerialNumber.ToString()))">
+                                        <span>@item.SerialNumber</span>
+                                    </button>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+            </DxFormLayoutItem>
+            }
+
+@*            @if (_WorkOrderSelections is not null)
+            {
+                <DxFormLayoutItem Caption="" ColSpanMd="6">
+                </DxFormLayoutItem>
+            }*@
+
+            <DxFormLayoutItem Caption="手臂序號 :" ColSpanMd="6">
+                <DxTextBox @bind-Text=_WorkingList.SeriaNumber />
+            </DxFormLayoutItem>
+
+            @if (_WorkOrderSelections is not null)
+            {
+                <DxFormLayoutItem Caption="" ColSpanMd="6">
+                </DxFormLayoutItem>
+            }
+
+@*            <DxFormLayoutItem Caption="數量 :" ColSpanMd="6">
+                <DxSpinEdit @bind-Value=_WorkingList.QTY />
+            </DxFormLayoutItem>*@
+
+        </DxFormLayout>
+
+        <br />
+    </EditFormTemplate>
+</DxGrid>
+
+@*<DxPopup HeaderText="Header"
+         @bind-Visible="@PopupVisible"
+         BodyText="OperatorValue">
+</DxPopup>*@
+
+<DxPopup @bind-Visible="@PopupVisible"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         HeaderText="派工作業通知"
+         BodyText="此作業人員於同時段已經被安排其他作業">
+    <FooterContentTemplate Context="Context">
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="OK" Click="OkEulaClick" />
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="Cancel" Click="CancelEulaClick" />
+    </FooterContentTemplate>
+</DxPopup>
+
+
+@code {
+    private List<WorkingList>? _WorkingLists;
+    DxGrid? MyGrid;
+
+    List<OperatorWorkTime>? _OperatorWorkTimes { get; set; }
+    string? OperatorWorkTimeValue { get; set; }
+
+    List<Operator>? _Operators { get; set; }
+    string? OperatorValue { get; set; }
+
+    List<OperatorProcedure>? _OperatorProcedures { get; set; }
+    string? OperatorProcedureValue { get; set; }
+
+    private List<WorkOrderSelection>? _WorkOrderSelections;
+
+    private List<SerialNumberSelection>? _SerialNumberSelections;
+
+    private List<WorkingTypeDetail> _WorkingTypeDetail;
+
+    WorkingList _EditModel;
+
+    bool PopupVisible { get; set; } = false;
+
+    async Task OkEulaClick()
+    {
+        _WorkingLists = await DataService.ChangeWorkingListsAsync(_EditModel, true);
+        PopupVisible = false;
+    }
+
+    void CancelEulaClick()
+    {
+        PopupVisible = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _WorkingLists = await DataService.GetWorkingListsAsync("Detail");
+        _OperatorWorkTimes = await DataService.GetOperatorWorkTimesAsync();
+        _Operators = await DataService.GetOperatorsAsync();
+        _OperatorProcedures = await DataService.GetOperatorProceduresAsync();
+        //_WorkOrderSelections = await DataService.GetWorkOrderSelectionAsync("RobotAssembly");
+        //_SerialNumberSelections = await DataService.GetSerialNumberSelectionAsync("RobotAssembly");
+    }
+    async Task OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (WorkingList)e.EditModel;
+        //editModel.UserName = "Test"; //Login User
+        //editModel.UpdateTime = DateTime.Now;
+        editModel.AssignTime = DateTime.Now;
+        _EditModel = editModel;
+        if (e.IsNew)
+        {
+            if (await DataService.CheckWorkingListsAsync((WorkingList)e.EditModel))
+            {
+                PopupVisible = true;
+            }
+            else
+            {
+                _WorkingLists = await DataService.ChangeWorkingListsAsync((WorkingList)e.EditModel, e.IsNew);
+            }
+        }
+        else
+        {
+            _WorkingLists = await DataService.ChangeWorkingListsAsync((WorkingList)e.EditModel, e.IsNew);
+        }
+    }
+    async Task Delete(WorkingList item)
+    {
+        if (item != null)
+        {
+            await DataService.Remove(item);
+        }
+    }
+    async Task SetWorkOrder(string item)
+    {
+        if (_WorkOrderSelections.Single(x => x.WorkOrder == item).IsSelect == false)
+        {
+            _WorkOrderSelections.Single(x => x.WorkOrder == item).IsSelect = true;
+            foreach (var items in _SerialNumberSelections.Where(x => x.WorkOrder == item))
+            {
+                items.IsWorkOrderSelect = true;
+            }
+        }
+        else
+        {
+            _WorkOrderSelections.Single(x => x.WorkOrder == item).IsSelect = false;
+            foreach (var items in _SerialNumberSelections.Where(x => x.WorkOrder == item))
+            {
+                items.IsWorkOrderSelect = false;
+            }
+        }
+    }
+    async Task SetSerialNumber(string item)
+    {
+        if (_SerialNumberSelections.Single(x => x.SerialNumber == item).IsSerialNumberSelect == false)
+        {
+            _SerialNumberSelections.Single(x => x.SerialNumber == item).IsSerialNumberSelect = true;
+        }
+        else
+        {
+            _SerialNumberSelections.Single(x => x.SerialNumber == item).IsSerialNumberSelect = false;
+        }
+    }
+
+    async Task SetWorkProcess(string item)
+    {
+        if (_WorkingTypeDetail.Single(x => x.TypeName == item).IsSelect == false)
+        {
+            _WorkingTypeDetail.Single(x => x.TypeName == item).IsSelect = true;
+        }
+        else
+        {
+            _WorkingTypeDetail.Single(x => x.TypeName == item).IsSelect = false;
+        }
+    }
+
+    async Task SelectedItemChanged(OperatorProcedure item)
+    {
+        if (item is not null)
+        {
+            if (!string.IsNullOrEmpty(item.OperatorProcedureSFC))
+            {
+                _WorkOrderSelections = null;
+                _SerialNumberSelections = null;
+                _Operators = null;
+                _WorkOrderSelections = await DataService.GetWorkOrderSelectionAsync(item.OperatorProcedureSFC);
+                _SerialNumberSelections = await DataService.GetSerialNumberSelectionAsync(item.OperatorProcedureSFC);
+                _WorkingTypeDetail = await DataService.GetWorkingTypeDetailAsync(item.OperatorProcedureID);
+                _Operators = await DataService.GetOperatorsAsync(item.OperatorProcedureID);
+            }
+        }
+        else 
+        {
+            _WorkOrderSelections = null;
+            _SerialNumberSelections = null;
+            _Operators = await DataService.GetOperatorsAsync();
+        }
+    }
+
+    async Task SetManufacturingProcess(string item1)
+    {
+        foreach (var items in _Operators)
+        {
+            items.IsSelect = false;
+        }
+        if (_Operators.Single(x => x.OperatorID == item1).IsSelect == false)
+        {
+            _Operators.Single(x => x.OperatorID == item1).IsSelect = true;
+        }
+        else
+        {
+            _Operators.Single(x => x.OperatorID == item1).IsSelect = false;
+        }
+    }
+
+    async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+        if (e.IsNew)
+        {
+            var editModel = (WorkingList)e.EditModel;
+            _WorkOrderSelections = null;
+            _SerialNumberSelections = null;
+        }
+    }
+}

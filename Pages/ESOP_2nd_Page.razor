@@ -1,0 +1,58 @@
+﻿@using DxBlazorApplication7.Data
+@inject DataService DataService
+
+<DxTabs CssClass="tabs" SizeMode="SizeMode.Large">
+    <DxTabPage >
+        <TabTemplate>
+            <div style="padding:9px 27px; text-align:center;
+                                    color:dodgerblue">
+                <span class="tab-title-bold">@GetSegmentVaule(Param1)</span>
+            </div>
+        </TabTemplate>
+        <ChildContent>
+            <DxGridLayout RowSpacing="0.8rem" ColumnSpacing="3rem">
+                <Rows>
+                    <DxGridLayoutRow Height="auto"></DxGridLayoutRow>
+                </Rows>
+                <Columns>
+                    <DxGridLayoutColumn></DxGridLayoutColumn>
+                </Columns>
+                <Items>
+                    <DxGridLayoutItem Row="0">
+                        <Template>
+                            <div class="background-cards">
+                                <ESOP_3rd_Page Param="@_ESOPStatus"></ESOP_3rd_Page>
+                            </div>
+                        </Template>
+                    </DxGridLayoutItem>
+                </Items>
+            </DxGridLayout>
+        </ChildContent>
+    </DxTabPage>
+    @* <DxTabPage Text="設備終端狀態">
+        <div class="background-cards"></div>
+    </DxTabPage>
+    <DxTabPage Text="運作參數列表">
+        <div></div>
+    </DxTabPage> *@
+</DxTabs>
+
+@code {
+    [Parameter]
+    public string Param1 { get; set; }
+
+    private List<StationStatus>? _StationStatus;
+    private List<ESOPStatus>? _ESOPStatus;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _StationStatus = await DataService.GetStationStatusAsync();
+        _ESOPStatus = await DataService.GetESOPStatusAsync();
+        _ESOPStatus = _ESOPStatus.Where(x => x.StationID == Param1).ToList();
+    }
+
+    string? GetSegmentVaule(string item)
+    {
+        return _StationStatus.SingleOrDefault(x => x.StationKey + x.StationID.ToString() == item).StationName;
+    }
+}

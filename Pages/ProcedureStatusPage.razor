@@ -1,0 +1,211 @@
+﻿@page "/-ProcedureStatus-"
+@using DxBlazorApplication7.Data
+@inject AuthenticationStateProvider authenticationStateProvider
+@inherits AuthComponentBase
+@inject DataService DataService
+
+<br />
+<h3 style="color:dodgerblue">處理程序</h3>
+<br />
+
+<DxGrid Data="_ProcedureStatus"
+        @ref="MyGrid"
+        PageSize="24"
+        KeyFieldName="ProcedureID"
+        EditModelSaving="OnEditModelSaving"
+        CustomizeEditModel="Grid_CustomizeEditModel">
+    <Columns>
+        @if (customAuth.user.role != Role.Guest && customAuth.user.department == "Manager")
+        {
+            <DxGridCommandColumn Width="90">
+                <HeaderTemplate>
+                    <a class="oi oi-plus" @onclick="@(() => MyGrid.StartEditNewRowAsync())" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </HeaderTemplate>
+                <CellDisplayTemplate>
+                    <a class="oi oi-pencil" @onclick="@(() => MyGrid.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                    <a class="oi oi-x" @onclick="@(() => Delete((ProcedureStatus)context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+                </CellDisplayTemplate>
+            </DxGridCommandColumn>
+        }
+        @* <DxGridDataColumn FieldName=@nameof(ProcedureStatus.ProcedureID) TextAlignment="GridTextAlignment.Left" Caption="程序編號" MinWidth="90" /> *@
+        <DxGridDataColumn FieldName=@nameof(ProcedureStatus.ProcedureName) Caption="程序名稱" MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(ProcedureStatus.StationID) Caption="作業站名稱" MinWidth="90" >
+            <CellDisplayTemplate>
+                <div class="d-flex flex-row flex-wrap">
+                    <span>@GetStationIDVaule((ProcedureStatus)context.DataItem)</span>
+                </div>
+            </CellDisplayTemplate>
+        </DxGridDataColumn>
+    </Columns>
+    <EditFormTemplate Context="EditFormContext">
+        @{
+            var _ProcedureStatus = (ProcedureStatus)EditFormContext.EditModel;
+        }
+        <DxFormLayout>
+            @* <DxFormLayoutItem Caption="程序編號:">
+                <DxTextBox @bind-Text=_ProcedureStatus.ProcedureID ReadOnly=@IsEdit />
+            </DxFormLayoutItem> *@
+            <DxFormLayoutItem Caption="程序名稱 :">
+                <DxTextBox @bind-Text=_ProcedureStatus.ProcedureName />
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="作業站名稱 :" ColSpanMd="6">
+                <DxComboBox Data="@_StationStatus"
+                            AllowUserInput="false"
+                            NullText="作業站名稱..."
+                            TextFieldName="@nameof(StationStatus.StationName)"
+                            @bind-Text=_ProcedureStatus.StationID
+                            @bind-Value="@StationIDVaule">
+                </DxComboBox>
+            </DxFormLayoutItem>
+        </DxFormLayout>
+    </EditFormTemplate>
+</DxGrid>
+
+<DxPopup @bind-Visible="@PopupVisible"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         HeaderText="錯誤提示"
+         BodyText="@_ErrorMsg">
+    <FooterContentTemplate Context="Context">
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="OK" Click="OkEulaClick" />
+        @*<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="Cancel" Click="CancelEulaClick" />*@
+    </FooterContentTemplate>
+</DxPopup>
+
+<DxPopup @bind-Visible="@DelPopupVisible"
+         CloseOnEscape="false"
+         CloseOnOutsideClick="false"
+         ShowFooter="true"
+         HeaderText="是否確認要刪除"
+         BodyText="@_DelMsg">
+    <FooterContentTemplate Context="Context">
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="OK" Click="ConfirmEulaClick" />
+        <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="Cancel" Click="CancelEulaClick" />
+    </FooterContentTemplate>
+</DxPopup>
+
+@code {
+    DxGrid? MyGrid;
+    private List<StationStatus>? _StationStatus;
+    private List<ProcedureStatus>? _ProcedureStatus;
+    private List<ESOPStatus>? _ESOPStatus;
+    bool IsEdit;
+    StationStatus StationIDVaule;
+    string _ErrorMsg;
+    string _DelMsg;
+    bool PopupVisible { get; set; } = false;
+    bool DelPopupVisible { get; set; } = false;
+    ProcedureStatus ProcedureStatusValue;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _StationStatus = await DataService.GetStationStatusAsync();
+        _ProcedureStatus = await DataService.GetProcedureStatusAsync();
+        _ESOPStatus = await DataService.GetESOPStatusAsync();
+    }
+    async Task OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (ProcedureStatus)e.EditModel;
+        if (!string.IsNullOrEmpty(editModel.ProcedureName) && !string.IsNullOrEmpty(StationIDVaule.StationName))
+        {
+            editModel.StationID = StationIDVaule.StationKey + StationIDVaule.StationID.ToString();
+            _ProcedureStatus = await DataService.UpdateProcedureStatusAsync(editModel);
+        }
+        _StationStatus = await DataService.GetStationStatusAsync();
+        _ProcedureStatus = await DataService.GetProcedureStatusAsync();
+        _ESOPStatus = await DataService.GetESOPStatusAsync();
+    }
+    async Task Delete(ProcedureStatus item)
+    {
+        ProcedureStatusValue = item;
+        _DelMsg = "是否要刪除作業, " + item.ProcedureName;
+        DelPopupVisible = true;
+
+        // if (item != null)
+        // {
+        //     int StationCount = _StationStatus.Where(x => (x.StationKey + x.StationID.ToString()) == item.StationID).Count();
+        //     int ProcedureCount = _ProcedureStatus.Where(x => x.StationID == item.StationID).Count();
+        //     int ESOPCount = _ESOPStatus.Where(x => x.ProcedureID == (item.ProcedureKey + item.ProcedureID.ToString())).Count();
+        //     //if (StationCount != 0 || ESOPCount != 0)
+        //     if (ESOPCount != 0)
+        //     {
+        //         _ErrorMsg = "無法刪除作業程序，因已綁定作業站或SOP文件";
+        //         PopupVisible = true;
+        //     }
+        //     else
+        //     {
+        //         await DataService.Remove(item);
+        //     }
+        // }
+        _StationStatus = await DataService.GetStationStatusAsync();
+        _ProcedureStatus = await DataService.GetProcedureStatusAsync();
+        _ESOPStatus = await DataService.GetESOPStatusAsync();
+    }
+    async Task Grid_CustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+        if (e.IsNew)
+        {
+            IsEdit = false;
+            StationIDVaule = null;
+        }
+        else
+        {
+            IsEdit = true;
+            var editModel = (ProcedureStatus)e.EditModel;
+            StationIDVaule = _StationStatus.SingleOrDefault(x => (x.StationKey + x.StationID.ToString()) == editModel.StationID);
+        }
+        _StationStatus = await DataService.GetStationStatusAsync();
+        _ProcedureStatus = await DataService.GetProcedureStatusAsync();
+        _ESOPStatus = await DataService.GetESOPStatusAsync();
+    }
+    string? GetStationIDVaule(ProcedureStatus item)
+    {
+        try
+        {
+            return _StationStatus.Single(x => (x.StationKey + x.StationID.ToString()) == item.StationID).StationName;
+        }
+        catch (Exception ex)
+        {
+            return "";
+        }
+    }
+    async Task OkEulaClick()
+    {
+        PopupVisible = false;
+        _StationStatus = await DataService.GetStationStatusAsync();
+        _ProcedureStatus = await DataService.GetProcedureStatusAsync();
+        _ESOPStatus = await DataService.GetESOPStatusAsync();
+    }
+
+    async Task ConfirmEulaClick()
+    {
+        if (ProcedureStatusValue != null)
+        {
+            int StationCount = _StationStatus.Where(x => (x.StationKey + x.StationID.ToString()) == ProcedureStatusValue.StationID).Count();
+            int ProcedureCount = _ProcedureStatus.Where(x => x.StationID == ProcedureStatusValue.StationID).Count();
+            int ESOPCount = _ESOPStatus.Where(x => x.ProcedureID == (ProcedureStatusValue.ProcedureKey + ProcedureStatusValue.ProcedureID.ToString())).Count();
+            //if (StationCount != 0 || ESOPCount != 0)
+            if (ESOPCount != 0)
+            {
+                _ErrorMsg = "無法刪除作業程序，因已綁定作業站或SOP文件";
+                PopupVisible = true;
+            }
+            else
+            {
+                await DataService.Remove(ProcedureStatusValue);
+            }
+        }
+        _StationStatus = await DataService.GetStationStatusAsync();
+        _ProcedureStatus = await DataService.GetProcedureStatusAsync();
+        _ESOPStatus = await DataService.GetESOPStatusAsync();
+    }
+
+    async Task CancelEulaClick()
+    {
+        DelPopupVisible = false;
+        _StationStatus = await DataService.GetStationStatusAsync();
+        _ProcedureStatus = await DataService.GetProcedureStatusAsync();
+        _ESOPStatus = await DataService.GetESOPStatusAsync();
+    }
+}

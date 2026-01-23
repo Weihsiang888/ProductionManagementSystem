@@ -1,0 +1,1204 @@
+﻿@page "/WorkingOrderResponsePage"
+@using DxBlazorApplication7.Data
+@using DxBlazorApplication7.Services;
+@inject AuthenticationStateProvider authenticationStateProvider
+@inherits AuthComponentBase
+@inject DataService DataService
+@inject NavigationManager navigationManager
+@inject IJSRuntime JSRuntime
+@implements IDisposable;
+
+<style>
+	.main_nav {
+	left: -42%;
+	top: 0;
+	}
+
+	.divstyle {
+	padding: 6px 0 0 0;
+	word-break: break-all;
+	}
+
+	.fontstyle {
+	font-size: 16.5px;
+	}
+</style>
+
+@if (customAuth.user.role != Role.Guest && customAuth.isAuthenticated())
+{
+	<br />
+	<h3>作業員 - @customAuth.user.userName - 線上報工作業</h3>
+	<br />
+
+	<DxGrid Data="_WorkingOrderLists"
+	@ref="MyGrid"
+	PageSize="12"
+	EditModelSaving="OnEditModelSaving"
+	SizeMode="SizeMode.Large">
+		<Columns>
+			<DxGridCommandColumn Width="90">
+				<HeaderTemplate>
+					@* <DxButton RenderStyle="ButtonRenderStyle.Info" Text="新增" Click="@(() => EditModelSaving())" style="width: 90px;" /> *@
+					<button class="dxbl-btn dxbl-btn-outline-info w-100 fontstyle" type="button" @onclick="@(() => EditModelSaving())">
+						<span>新增</span>
+					</button>
+					@* <a class="oi oi-plus" @onclick="@(() => MyGrid.StartEditNewRowAsync())" style="text-decoration: none;" href="javascript:void(0);"></a> *@
+				</HeaderTemplate>
+				<CellDisplayTemplate>
+					@* <a class="oi oi-pencil" @onclick="@(() => MyGrid.StartEditRowAsync(context.VisibleIndex))" style="text-decoration: none;" href="javascript:void(0);"></a> *@
+					@if (GetDeleteResult((WorkingOrderList)context.DataItem))
+					{
+						<a class="oi oi-x" @onclick="@(() => Delete((WorkingOrderList)context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
+					}
+				</CellDisplayTemplate>
+			</DxGridCommandColumn>
+			<DxGridDataColumn FieldName=@nameof(WorkingOrderList.WorkingTime) Caption="時間" Width="120" />
+			<DxGridDataColumn FieldName=@nameof(WorkingOrderList.StationName) Caption="作業站" MinWidth="150" />
+			<DxGridDataColumn FieldName=@nameof(WorkingOrderList.WorkOrder) Caption="工單" MinWidth="150" />
+			<DxGridDataColumn FieldName=@nameof(WorkingOrderList.ProcessType) Caption="類型" MinWidth="150" />
+			<DxGridDataColumn FieldName=@nameof(WorkingOrderList.SerialNumber) Caption="序號" MinWidth="150" />
+			@* <DxGridDataColumn FieldName=@nameof(WorkingOrderList.WorkOrderCount) Caption="總數量" Width="90" /> *@
+			<DxGridDataColumn FieldName=@nameof(WorkingOrderList.IsReceive) Caption="工作接收" MinWidth="120">
+				<CellDisplayTemplate>
+					@if (!(bool)context.Value)
+					{
+						<button class="dxbl-btn dxbl-btn-outline-info w-100 fontstyle" type="button" @onclick="@(() => GetReceive((WorkingOrderList)context.DataItem))">
+							<span>未接收 / SOP</span>
+						</button>
+					}
+					else
+					{
+						<button class="dxbl-btn dxbl-btn-info w-100 fontstyle" type="button" @onclick="@(() => GetReceive((WorkingOrderList)context.DataItem))">
+							<span>已接收 / SOP</span>
+						</button>
+					}
+				</CellDisplayTemplate>
+			</DxGridDataColumn>
+
+			<DxGridDataColumn FieldName=@nameof(WorkingOrderList.IsResponse) Caption="工作報工" MinWidth="120">
+				<CellDisplayTemplate>
+					@if (!(bool)context.Value)
+					{
+						<button class="dxbl-btn dxbl-btn-outline-success w-100 fontstyle" type="button" @onclick="@(() => GetResponse((WorkingOrderList)context.DataItem))">
+							<span>未報工</span>
+						</button>
+					}
+					else
+					{
+						<button class="dxbl-btn dxbl-btn-success w-100 fontstyle" type="button" @onclick="@(() => GetResponse((WorkingOrderList)context.DataItem))">
+							<span>已報工</span>
+						</button>
+					}
+				</CellDisplayTemplate>
+			</DxGridDataColumn>
+
+			<DxGridDataColumn FieldName=@nameof(WorkingOrderList.IsPause) Caption="工作暫停" MinWidth="120">
+				<CellDisplayTemplate>
+					@if (!(bool)context.Value)
+					{
+						<button class="dxbl-btn dxbl-btn-outline-warning w-100 fontstyle" type="button" @onclick="@(() => GetPause((WorkingOrderList)context.DataItem))">
+							<span>@GetWorkingStatus((WorkingOrderList)context.DataItem)</span>
+						</button>
+					}
+					else
+					{
+						<button class="dxbl-btn dxbl-btn-warning w-100 fontstyle" type="button" @onclick="@(() => GetPause((WorkingOrderList)context.DataItem))">
+							<span>已暫停</span>
+						</button>
+					}
+				</CellDisplayTemplate>
+			</DxGridDataColumn>
+
+		</Columns>
+		<ToolbarTemplate>
+			<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+				<DxToolbarItem CssClass="fontstyle" Text="作業清單【處理中】" BeginGroup="true" />
+			</DxToolbar>
+		</ToolbarTemplate>
+		<EditFormTemplate Context="EditFormContext">
+			@{
+				var _WorkingOrderList = (WorkingOrderList)EditFormContext.EditModel;
+			}
+			<DxFormLayout>
+
+			</DxFormLayout>
+		</EditFormTemplate>
+	</DxGrid>
+	<p>&nbsp;</p>
+	<DxGrid Data="_WorkingOrderFinishLists"
+	@ref="MyGrid"
+	PageSize="12"
+	EditModelSaving="OnEditModelSaving"
+	SizeMode="SizeMode.Large">
+		<Columns>
+			<DxGridDataColumn FieldName=@nameof(WorkingOrderList.ResponseTime) Caption="報工時間" Width="300" />
+			<DxGridDataColumn FieldName=@nameof(WorkingOrderList.StationName) Caption="作業站" MinWidth="150" />
+			<DxGridDataColumn FieldName=@nameof(WorkingOrderList.WorkOrder) Caption="工單" MinWidth="150" />
+			<DxGridDataColumn FieldName=@nameof(WorkingOrderList.ProcessType) Caption="類型" MinWidth="150" />
+			<DxGridDataColumn FieldName=@nameof(WorkingOrderList.SerialNumber) Caption="序號" MinWidth="150" />
+			<DxGridDataColumn FieldName=@nameof(WorkingOrderList.PassCount) Caption="良數量" MinWidth="150" />
+			<DxGridDataColumn FieldName=@nameof(WorkingOrderList.FailCount) Caption="不良數量" MinWidth="150" />
+			@* <DxGridDataColumn FieldName=@nameof(WorkingOrderList.WorkOrderCount) Caption="總數量" Width="150" /> *@
+		</Columns>
+		<ToolbarTemplate>
+			<DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+				<DxToolbarItem CssClass="fontstyle" Text="作業清單【已完成】" BeginGroup="true" />
+			</DxToolbar>
+		</ToolbarTemplate>
+		<EditFormTemplate Context="EditFormContext">
+			@{
+				var _WorkingOrderList = (WorkingOrderList)EditFormContext.EditModel;
+			}
+			<DxFormLayout>
+
+			</DxFormLayout>
+		</EditFormTemplate>
+	</DxGrid>
+
+	@* <p>&nbsp;</p>
+    <DxGrid Data="_WorkingOrderTimeList"
+            @ref="MyGrid"
+            PageSize="12"
+            EditModelSaving="OnEditModelSaving"
+            SizeMode="SizeMode.Large">
+        <Columns>
+            <DxGridDataColumn FieldName=@nameof(StationTimeList.WorkOrder) Caption="工單" MinWidth="300" />
+            <DxGridDataColumn FieldName=@nameof(StationTimeList.StationName) Caption="作業站" MinWidth="150" />
+            <DxGridDataColumn FieldName=@nameof(StationTimeList.WorkTimes) Caption="工時" MinWidth="150" />
+            <DxGridDataColumn FieldName=@nameof(StationTimeList.WorkOrderCount) Caption="數量" MinWidth="150" />
+        </Columns>
+        <ToolbarTemplate>
+            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                <DxToolbarItem CssClass="fontstyle" Text="工時統計【工站】" BeginGroup="true" />
+            </DxToolbar>
+        </ToolbarTemplate>
+        <EditFormTemplate Context="EditFormContext">
+            @{
+                var _WorkingOrderList = (StationTimeList)EditFormContext.EditModel;
+            }
+            <DxFormLayout>
+
+            </DxFormLayout>
+        </EditFormTemplate>
+    </DxGrid>
+
+    <p>&nbsp;</p>
+    <DxGrid Data="_WorkingOrderTime"
+            @ref="MyGrid"
+            PageSize="12"
+            EditModelSaving="OnEditModelSaving"
+            SizeMode="SizeMode.Large">
+        <Columns>
+            <DxGridDataColumn FieldName=@nameof(OrderTimeList.WorkOrder) Caption="工單" MinWidth="300" />
+            <DxGridDataColumn FieldName=@nameof(OrderTimeList.StartStep) Caption="開始時間" MinWidth="300" DisplayFormat="G" />
+            <DxGridDataColumn FieldName=@nameof(OrderTimeList.EndStep) Caption="結束時間" MinWidth="300" DisplayFormat="G" />
+            <DxGridDataColumn FieldName=@nameof(OrderTimeList.WorkTimes) Caption="工時" MinWidth="150" />
+            <DxGridDataColumn FieldName=@nameof(OrderTimeList.WorkOrderCount) Caption="數量" MinWidth="150" />
+        </Columns>
+        <ToolbarTemplate>
+            <DxToolbar ItemRenderStyleMode="ToolbarRenderStyleMode.Plain">
+                <DxToolbarItem CssClass="fontstyle" Text="工時統計【工單】" BeginGroup="true" />
+            </DxToolbar>
+        </ToolbarTemplate>
+        <EditFormTemplate Context="EditFormContext">
+            @{
+                var _WorkingOrderList = (StationTimeList)EditFormContext.EditModel;
+            }
+            <DxFormLayout>
+
+            </DxFormLayout>
+        </EditFormTemplate>
+    </DxGrid> *@
+}
+else
+{
+	NavToLogin();
+}
+
+<DxPopup Width="420px" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center" @bind-Visible="@WorkOrderPopupVisible"
+CloseOnEscape="false"
+CloseOnOutsideClick="false"
+ShowCloseButton="false"
+ShowFooter="true"
+HeaderText="請輸入工單號碼">
+	<BodyContentTemplate>
+		@if (WorkOrderQuantityUpperLimitTip)
+		{
+			<p class="text-danger"> 此工單已關閉 </p>
+		}
+		<DxTextBox @bind-Text="@InputWorkOrder" NullText="工單號碼" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+	</BodyContentTemplate>
+	<FooterContentTemplate Context="Context">
+		<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="確認" Click="ConfirmWorkOrderClick" />
+		<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="取消" Click="CancelWorkOrderClick" />
+	</FooterContentTemplate>
+</DxPopup>
+
+<DxPopup Width="420px" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center" @bind-Visible="@StationNumberPopupVisible"
+CloseOnEscape="false"
+CloseOnOutsideClick="false"
+ShowCloseButton="false"
+ShowFooter="true"
+HeaderText="請輸入作業站編號">
+	<BodyContentTemplate>
+
+		@if (string.IsNullOrEmpty(InputType))
+		{
+			<p class="text-warning text-center fs-4">
+				工單類別：系統查無資料
+			</p>
+		}
+		else
+		{
+			<p class="text-info text-center fs-4">
+				工單類別：@InputType
+			</p>
+		}
+
+		@if (StationNotExistTip)
+		{
+			<p class="text-danger"> 查無此作業站 </p>
+		}
+		else if (StationQuantityLimitTip && !StationNotExistTip)
+		{
+			<p class="text-danger"> 此作業站已達到報工數量限制 </p>
+		}
+		<DxTextBox @bind-Text="@InputStationNumber" NullText="作業站編號" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+	</BodyContentTemplate>
+	<FooterContentTemplate Context="Context">
+		<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="確認" Click="ConfirmStationNumberClick" />
+		<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="取消" Click="CancelStationNumberClick" />
+	</FooterContentTemplate>
+</DxPopup>
+
+<DxPopup Width="420px" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center" @bind-Visible="@StationNamePopupVisible"
+CloseOnEscape="false"
+CloseOnOutsideClick="false"
+ShowCloseButton="false"
+ShowFooter="true"
+HeaderText="請確認作業站名稱">
+	<BodyContentTemplate>
+		@* <p class="text-md-center text-primary fs-3">
+			@InputStation
+		</p> *@
+
+		<div class="d-flex justify-content-center align-items-center" style="height: 100px;">
+			<p class="text-info fs-3">
+				@InputStation
+			</p>
+		</div>
+	</BodyContentTemplate>
+	<FooterContentTemplate Context="Context">
+		<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="確認" Click="ConfirmStationNameClick" />
+		<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="取消" Click="CancelStationNameClick" />
+	</FooterContentTemplate>
+</DxPopup>
+
+<DxPopup Width="420px" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center" @bind-Visible="@SerialNumberPopupVisible"
+CloseOnEscape="false"
+CloseOnOutsideClick="false"
+ShowCloseButton="false"
+ShowFooter="true"
+HeaderText="請輸入序號">
+	<BodyContentTemplate>
+		<DxTextBox @bind-Text="@InputSerialNumber" NullText="序號" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+	</BodyContentTemplate>
+	<FooterContentTemplate Context="Context">
+		<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="確認" Click="ConfirmSerialNumberClick" />
+		@* <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="取消" Click="CancelSeriaNumberClick" /> *@
+	</FooterContentTemplate>
+</DxPopup>
+
+<DxPopup Width="420px" HorizontalAlignment="HorizontalAlignment.Center" VerticalAlignment="VerticalAlignment.Center" @bind-Visible="@NumberPopupVisible"
+CloseOnEscape="false"
+CloseOnOutsideClick="false"
+ShowCloseButton="false"
+ShowFooter="true"
+HeaderText="請輸入良/不良數量">
+	<BodyContentTemplate>
+		<span>良:</span>
+		<DxTextBox @bind-Text="@PassQty" NullText="數量(沒有數量請輸入0)" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+		<br />
+		<span>不良:</span>
+		<DxTextBox @bind-Text="@FailQty" NullText="數量(沒有數量請輸入0)" ClearButtonDisplayMode="DataEditorClearButtonDisplayMode.Auto" />
+	</BodyContentTemplate>
+	<FooterContentTemplate Context="Context">
+		<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="確認" Click="ConfirmQuantityClick" />
+		<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="取消" Click="CancelNumberClick" />
+	</FooterContentTemplate>
+</DxPopup>
+
+<DxPopup @bind-Visible="@ErrorPopupVisible"
+CloseOnEscape="false"
+CloseOnOutsideClick="false"
+ShowCloseButton="false"
+ShowFooter="true"
+HeaderText="錯誤提示"
+BodyText="@_ErrorMsg">
+	<FooterContentTemplate Context="Context">
+		<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="OK" Click="CloseErrorClick" />
+		@*<DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Secondary" Text="Cancel" Click="CancelEulaClick" />*@
+	</FooterContentTemplate>
+</DxPopup>
+
+@code {
+	DxGrid? MyGrid;
+
+	public string? OPID { get; set; }
+
+	List<WorkingOrderList> _WorkingOrderLists = new List<WorkingOrderList>();
+	List<WorkingOrderList> _WorkingOrderFinishLists = new List<WorkingOrderList>();
+	List<WorkingOrderStepList> _WorkingOrderStepLists = new List<WorkingOrderStepList>();
+	List<string> _WorkingOrderStation = new List<string>();
+	List<JointModuleTables> Modules = new List<JointModuleTables>();
+	Dictionary<string, List<WorkingOrderList>> dcWorkingOrderList = new Dictionary<string, List<WorkingOrderList>>();
+	Dictionary<string, QuantityByWorkOrder_ERP> dcWorkingOrderQuantity = new Dictionary<string, QuantityByWorkOrder_ERP>();
+
+	bool ErrorPopupVisible;
+	string _ErrorMsg;
+
+	bool WorkOrderPopupVisible;
+	string InputWorkOrder;
+	string InputType;
+	bool StationNumberPopupVisible;
+	bool StationNamePopupVisible;
+	bool StationNotExistTip;
+	bool StationQuantityLimitTip;
+	bool WorkOrderQuantityUpperLimitTip;
+	string InputStation;
+	string InputStationNumber;
+	bool SerialNumberPopupVisible;
+	string InputSerialNumber;
+	bool NumberPopupVisible;
+	string PassQty; //良品數量
+	string FailQty; //不良品數量
+	int WorkOrderQuantity; //在erp上撈取到的工單總數量
+
+	WorkingOrderList ResponseWorkOrderList; //準備報工的資料(暫存在這)
+
+	List<OrderTimeList> _WorkingOrderTime;
+	List<StationTimeList> _WorkingOrderTimeList;
+
+	public class OrderTimeList
+	{
+		public string WorkOrder { get; set; } = "";
+
+		public string OPNO { get; set; } = "";
+
+		public DateTime StartStep { get; set; }
+
+		public DateTime EndStep { get; set; }
+
+		public string WorkTimes { get; set; } = "";
+
+		public int WorkTime { get; set; } = 0;
+
+		public int WorkOrderCount { get; set; } = 0;
+	}
+
+	public class StationTimeList
+	{
+		public string WorkOrder { get; set; } = "";
+
+		public string StationName { get; set; } = "";
+
+		public string OPNO { get; set; } = "";
+
+		public string WorkTimes { get; set; } = "";
+
+		public int WorkTime { get; set; } = 0;
+
+		public int WorkOrderCount { get; set; } = 0;
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (customAuth.user.role != Role.Guest && customAuth.user.role != null)
+		{
+			DataTimeService.dgUpdateWorkingReceivePauseStatus += UpdateStatus;
+		}
+		await ReadPageData();
+	}
+
+	public void Dispose()
+	{
+		if (customAuth.user.role != Role.Guest && customAuth.user.role != null)
+		{
+			DataTimeService.dgUpdateWorkingReceivePauseStatus -= UpdateStatus;
+		}
+	}
+
+
+	public async Task UpdateStatus()
+	{
+		if (customAuth.user.role != Role.Guest && customAuth.isAuthenticated())
+		{
+			await ReadPageData();
+			await InvokeAsync(StateHasChanged);
+		}
+	}
+
+	public async Task ReadPageData()
+	{
+		if (customAuth.user.role != Role.Guest && customAuth.user.role != null)
+		{
+			OPID = customAuth.user.userName;
+			_WorkingOrderLists = await DataService.GetWorkingOrderListAsync(OPID);
+			_WorkingOrderStation = _WorkingOrderLists.OrderByDescending(x => x.AddTime).Select(x => x.StationName).Distinct().ToList();
+			_WorkingOrderFinishLists = _WorkingOrderLists.Where(x => x.IsResponse == true).ToList();
+			_WorkingOrderLists = _WorkingOrderLists.Where(x => x.IsResponse != true).ToList();
+
+			Modules = await DataService.GetJointModuleTablesList();
+			dcWorkingOrderList = await GetdcWorkingOrderListAsync(_WorkingOrderLists);
+			dcWorkingOrderQuantity = await GetdcWorkingOrderQuantityAsync(_WorkingOrderLists);
+
+			_WorkingOrderStepLists = await DataService.GetWorkingOrderStepListAsync(OPID);
+			_WorkingOrderStepLists = _WorkingOrderStepLists.Where(x => x.WorkingStatus != "作業已新增").OrderBy(x => x.WorkOrder).ThenBy(x => x.WOID).ThenBy(x => x.StatusTime).ToList();
+			var NewWorkingOrderStepLists = _WorkingOrderStepLists.Select((x, i) => new { Value = x, Index = i }).ToList();
+
+			_WorkingOrderTime = new List<OrderTimeList>();
+			_WorkingOrderTimeList = new List<StationTimeList>();
+			DateTime StartTime = new DateTime();
+			DateTime EndTime = new DateTime();
+			int StationWorkTime = 0;
+			int OrderWorkTime = 0;
+			string WorkTimeString = "";
+			int WorkOrderCounts = 0;
+			DateTime StartStepValue = new DateTime();
+			DateTime EndStepValue = new DateTime();
+
+			foreach (var item in NewWorkingOrderStepLists)
+			{
+				if (item.Value.WorkingStatus == "作業已接收")
+				{
+					int StartItemCount = _WorkingOrderTime.Where(x => x.WorkOrder == item.Value.WorkOrder).ToList().Count;
+					if (StartItemCount == 0)
+					{
+						StartStepValue = DateTime.Parse(item.Value.StatusTime.ToString());
+					}
+					StartTime = DateTime.Parse(item.Value.StatusTime.ToString());
+					continue;
+				}
+				if (item.Value.WorkingStatus == "作業已暫停" || item.Value.WorkingStatus == "作業已結束")
+				{
+					EndTime = DateTime.Parse(item.Value.StatusTime.ToString()); ;
+					TimeSpan ts = new TimeSpan(EndTime.Ticks - StartTime.Ticks);
+					OrderWorkTime = OrderWorkTime + int.Parse(ts.TotalSeconds.ToString());
+					StationWorkTime = StationWorkTime + int.Parse(ts.TotalSeconds.ToString());
+
+					var NextItem = NewWorkingOrderStepLists.FirstOrDefault(x => x.Index == item.Index + 1);
+					if (NextItem != null)
+					{
+						if (item.Value.StationName != NextItem.Value.StationName)
+						{
+							ts = new TimeSpan(0, 0, StationWorkTime);
+							WorkTimeString = string.Format("{0:00}", ts.Hours) + ":" + string.Format("{0:00}", ts.Minutes) + ":" + string.Format("{0:00}", ts.Seconds);
+							if (_WorkingOrderFinishLists.Where(x => x.WorkOrder == item.Value.WorkOrder && x.StationName == item.Value.StationName).ToList().Count > 0)
+							{
+								var ItemCount = _WorkingOrderFinishLists.Where(x => x.WorkOrder == item.Value.WorkOrder && x.StationName == item.Value.StationName).ToList().Sum(x => x.WorkOrderCount);
+								WorkOrderCounts = int.Parse(ItemCount.ToString());
+							}
+							_WorkingOrderTimeList.Add(new StationTimeList
+								{
+									WorkOrder = item.Value.WorkOrder,
+									StationName = item.Value.StationName,
+									OPNO = item.Value.OPNO,
+									WorkTimes = WorkTimeString,
+									WorkTime = StationWorkTime,
+									WorkOrderCount = WorkOrderCounts
+								});
+							StationWorkTime = 0;
+						}
+						if (item.Value.WorkOrder != NextItem.Value.WorkOrder)
+						{
+							EndStepValue = DateTime.Parse(item.Value.StatusTime.ToString());
+							ts = new TimeSpan(0, 0, OrderWorkTime);
+							WorkTimeString = string.Format("{0:00}", ts.Hours) + ":" + string.Format("{0:00}", ts.Minutes) + ":" + string.Format("{0:00}", ts.Seconds);
+							if (_WorkingOrderFinishLists.Where(x => x.WorkOrder == item.Value.WorkOrder && x.StationName == item.Value.StationName).ToList().Count > 0)
+							{
+								var ItemCount = _WorkingOrderFinishLists.Where(x => x.WorkOrder == item.Value.WorkOrder).ToList().Sum(x => x.WorkOrderCount);
+								WorkOrderCounts = int.Parse(ItemCount.ToString());
+							}
+							_WorkingOrderTime.Add(new OrderTimeList
+								{
+									WorkOrder = item.Value.WorkOrder,
+									OPNO = item.Value.OPNO,
+									StartStep = StartStepValue,
+									EndStep = EndStepValue,
+									WorkTimes = WorkTimeString,
+									WorkTime = OrderWorkTime
+																																	,
+									WorkOrderCount = WorkOrderCounts
+								});
+
+							OrderWorkTime = 0;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	async Task<Dictionary<string, List<WorkingOrderList>>> GetdcWorkingOrderListAsync(List<WorkingOrderList> listWorkingOrder)
+	{
+		Dictionary<string, List<WorkingOrderList>> dc = new Dictionary<string, List<WorkingOrderList>>();
+
+		foreach (WorkingOrderList item in listWorkingOrder)
+		{
+			List<WorkingOrderList> list = await DataService.GetWorkingOrderListByWorkOrderAsync(item.WorkOrder);
+
+			if (!dc.ContainsKey(item.WorkOrder) && list.Count != 0)
+			{
+				dc.Add(item.WorkOrder, list);
+			}
+		}
+
+		return dc;
+	}
+
+	async Task<Dictionary<string, QuantityByWorkOrder_ERP>> GetdcWorkingOrderQuantityAsync(List<WorkingOrderList> listWorkingOrder)
+	{
+		Dictionary<string, QuantityByWorkOrder_ERP> dc = new Dictionary<string, QuantityByWorkOrder_ERP>();
+
+		foreach (WorkingOrderList item in listWorkingOrder)
+		{
+			QuantityByWorkOrder_ERP quantity = await DataService.GetQuantityByWorkerOrder(item.WorkOrder);
+
+			if (!dc.ContainsKey(item.WorkOrder) && quantity != null)
+			{
+				dc.Add(item.WorkOrder, quantity);
+			}
+		}
+
+		return dc;
+	}
+
+	async Task OnEditModelSaving(GridEditModelSavingEventArgs e)
+	{
+		var editModel = (WorkingOrderList)e.EditModel;
+		if (e.IsNew)
+		{
+			WorkOrderPopupVisible = true;
+		}
+	}
+
+	async Task EditModelSaving()
+	{
+		WorkOrderQuantityUpperLimitTip = false;
+		InputWorkOrder = "";
+		WorkOrderPopupVisible = true;
+	}
+
+	async Task GetReceive(WorkingOrderList item)
+	{
+		if (customAuth.user.role != Role.Guest)
+		{
+			if (item.IsReceive == true)
+			{
+				ErrorPopupVisible = true;
+				_ErrorMsg = "作業已接收";
+			}
+			else
+			{
+				_WorkingOrderLists = await DataService.GetWorkingOrderListAsync(OPID);
+
+				if (item.IsPause == true)
+				{
+					item.IsPause = false;
+					item.PauseTime = null;
+				}
+				item.IsReceive = true;
+				item.ReceiveTime = DateTime.Now;
+				await DataService.UpdateWorkingOrderListAsync(item);
+				await DataService.UpdateWorkingOrderStepListAsync(item);
+
+				foreach (WorkingOrderList list in _WorkingOrderLists.Where(x => x != item && x.IsReceive == true))
+				{
+					await GetPause(list);
+				}
+			}
+		}
+		await ReadPageData();
+	}
+
+	string? GetWorkingStatus(WorkingOrderList item)
+	{
+		string _Results = "未作業";
+		if (item != null && item.IsReceive == true && item.IsResponse == false && item.IsPause == false)
+		{
+			_Results = "作業中";
+		}
+		if (item != null && item.IsReceive == false && item.IsResponse == false && item.IsPause == false)
+		{
+			_Results = "未作業";
+		}
+		if (item != null && item.IsReceive == false && item.IsResponse == false && item.IsPause == true)
+		{
+			_Results = "已暫停";
+		}
+		if (item != null && item.IsReceive == false && item.IsResponse == true && item.IsPause == false)
+		{
+			_Results = "已完工";
+		}
+		return _Results;
+	}
+
+	async Task GetPause(WorkingOrderList item)
+	{
+		if (customAuth.user.role != Role.Guest)
+		{
+			if (item.IsReceive == true)
+			{
+				item.IsReceive = false;
+				item.ReceiveTime = null;
+				item.IsPause = true;
+				item.PauseTime = DateTime.Now;
+				await DataService.UpdateWorkingOrderListAsync(item);
+				await DataService.UpdateWorkingOrderStepListAsync(item);
+			}
+			else
+			{
+				ErrorPopupVisible = true;
+				_ErrorMsg = "作業尚未接收";
+			}
+		}
+		await ReadPageData();
+	}
+
+	async Task ConfirmQuantityClick()
+	{
+		if (customAuth.user.role != Role.Guest)
+		{
+			List<WorkingOrderList> workingOrders = await DataService.GetWorkingOrderListByWorkOrderAsync(ResponseWorkOrderList.WorkOrder);
+
+			var ResponseWorkOrderListtemp = workingOrders.FirstOrDefault(x => x.StationName == ResponseWorkOrderList.StationName);
+			if (ResponseWorkOrderListtemp != null && ResponseWorkOrderListtemp.IsReceive == true)
+			{
+				//這邊要改成檢查proccess type flow 裡面有無要卡數量 (TYPE就用WorkingOrderList裡面的processtype)
+				if (!string.IsNullOrEmpty(PassQty) && !string.IsNullOrEmpty(FailQty))
+				{
+					try
+					{
+						int qunatity = dcWorkingOrderQuantity[ResponseWorkOrderList.WorkOrder].Quantity;
+						float Pass = float.Parse(PassQty);
+						float Fail = float.Parse(FailQty);
+						var result = await checkStationQuantityLimitByProcessTypeFlow(ResponseWorkOrderList.WorkOrder,
+																							ResponseWorkOrderList.ProcessType,
+																							ResponseWorkOrderList.StationName,
+																							qunatity);
+
+						if (result.isMonitored)
+						{
+							float Judge = result.RemainQuantity - (Pass + Fail);
+
+							if (result.passed)
+							{
+								if (Judge < 0)
+								{
+									ErrorPopupVisible = true;
+									_ErrorMsg = string.Format("此站別可報工數量上限為 : {0}", result.RemainQuantity);
+									return;
+								}
+
+								ResponseWorkOrderList.PassCount = Pass;
+								ResponseWorkOrderList.FailCount = Fail;
+								await UpdateWorkOrderList();
+							}
+							else
+							{
+								ErrorPopupVisible = true;
+								_ErrorMsg = "此工單到達報工數量上限,已關閉";
+							}
+						}
+						else
+						{
+							ResponseWorkOrderList.PassCount = Pass;
+							ResponseWorkOrderList.FailCount = Fail;
+							await UpdateWorkOrderList();
+						}
+					}
+					catch
+					{
+						ErrorPopupVisible = true;
+						_ErrorMsg = "良/不良數量輸入格式錯誤";
+						return;
+					}
+				}
+				else
+				{
+					ErrorPopupVisible = true;
+					_ErrorMsg = "請輸入良/不良數量 (假如沒有數量請輸入0)";
+					return;
+				}
+			}
+			else
+			{
+				ErrorPopupVisible = true;
+				_ErrorMsg = "作業尚未接收";
+			}
+		}
+		NumberPopupVisible = false;
+		PassQty = "";
+		FailQty = "";
+		ReadPageData();
+	}
+
+	async Task UpdateWorkOrderList()
+	{
+		ResponseWorkOrderList.IsReceive = false;
+		ResponseWorkOrderList.ReceiveTime = null;
+		ResponseWorkOrderList.IsResponse = true;
+		ResponseWorkOrderList.ResponseTime = DateTime.Now;
+		await DataService.UpdateWorkingOrderListAsync(ResponseWorkOrderList);
+		await DataService.UpdateWorkingOrderStepListAsync(ResponseWorkOrderList);
+	}
+
+	async Task CancelNumberClick()
+	{
+		PassQty = "";
+		FailQty = "";
+		NumberPopupVisible = false;
+	}
+
+	async Task GetResponse(WorkingOrderList item)
+	{
+		if (customAuth.user.role != Role.Guest)
+		{
+			QuantityByWorkOrder_ERP quantity;
+			List<WorkingOrderList> workingOrders = await DataService.GetWorkingOrderListByWorkOrderAsync(item.WorkOrder);
+
+			if (workingOrders == null || !dcWorkingOrderQuantity.ContainsKey(item.WorkOrder))
+			{
+				ErrorPopupVisible = true;
+				_ErrorMsg = "系統查無此工單/ DB連線錯誤";
+				return;
+			}
+
+			ResponseWorkOrderList = item;
+			int incompleteQuantity = 0;
+			int completedQuantity = 0;
+			quantity = dcWorkingOrderQuantity[item.WorkOrder];
+
+			foreach (WorkingOrderList list in workingOrders.Where(x => x.IsResponse == true))
+			{
+				var module = Modules.FirstOrDefault(x => x.StationName == list.StationName);
+
+				bool _isFinal = true;
+
+				if (module != null)
+					_isFinal = module.IsFinal;
+
+				if (_isFinal)
+				{
+					completedQuantity += Convert.ToInt32(list.PassCount);
+					completedQuantity += Convert.ToInt32(list.FailCount);
+				}
+				else
+				{
+					completedQuantity += Convert.ToInt32(list.FailCount);
+				}
+			}
+
+			incompleteQuantity = quantity.Quantity - completedQuantity;
+
+			if (incompleteQuantity > 0)
+			{
+				NumberPopupVisible = true;
+			}
+			else
+			{
+				ErrorPopupVisible = true;
+				_ErrorMsg = "此工單已關閉";
+				NumberPopupVisible = false;
+			}
+		}
+
+		await ReadPageData();
+
+		// if (customAuth.user.role != Role.Guest)
+		// {
+		//     if (item.IsReceive == true)
+		//     {
+		//         item.IsReceive = false;
+		//         item.ReceiveTime = null;
+		//         item.IsResponse = true;
+		//         item.ResponseTime = DateTime.Now;
+		//         await DataService.UpdateWorkingOrderListAsync(item);
+		//         await DataService.UpdateWorkingOrderStepListAsync(item);
+		//     }
+		//     else
+		//     {
+		//         ErrorPopupVisible = true;
+		//         _ErrorMsg = "作業尚未接收";
+		//     }
+		// }
+		// ReadPageData();
+	}
+
+	async Task CloseErrorClick()
+	{
+		ErrorPopupVisible = false;
+	}
+
+	bool CheckIsRightWorkingOrderLength(string workingOrder)
+	{
+		if (workingOrder.Length == 15)
+			return true;
+		else
+			return false;
+	}
+
+	async Task ConfirmWorkOrderClick()
+	{
+		if (!string.IsNullOrEmpty(InputWorkOrder) && CheckIsRightWorkingOrderLength(InputWorkOrder))
+		{
+			InputWorkOrder = InputWorkOrder.ToUpper();
+
+			QuantityByWorkOrder_ERP quantity = await DataService.GetQuantityByWorkerOrder(InputWorkOrder);
+			List<WorkingOrderList> listWorkingOrder = await DataService.GetWorkingOrderListByWorkOrderAsync(InputWorkOrder);
+			TypeByWorkOrder type = await DataService.GetTypeByWorkOrder(InputWorkOrder);
+
+			if (quantity == null || listWorkingOrder == null)
+			{
+				ErrorPopupVisible = true;
+				_ErrorMsg = "ERP查無此工單資訊 / DB連線錯誤";
+				return;
+			}
+
+			if (type != null)
+				InputType = type.ProcessType;
+			else
+				InputType = "";
+
+			int incompleteQuantity = 0;
+			int completeQuantity = 0;
+			WorkOrderQuantity = quantity.Quantity;
+
+			foreach (WorkingOrderList order in listWorkingOrder.Where(x => x.IsResponse == true))
+			{
+				var module = Modules.FirstOrDefault(x => x.StationName == order.StationName);
+
+				bool _isFinal = true;
+
+				if (module != null)
+					_isFinal = module.IsFinal;
+
+				if (_isFinal)
+				{
+					completeQuantity += Convert.ToInt32(order.PassCount);
+					completeQuantity += Convert.ToInt32(order.FailCount);
+				}
+				else
+				{
+					completeQuantity += Convert.ToInt32(order.FailCount);
+				}
+			}
+
+			incompleteQuantity = WorkOrderQuantity - completeQuantity;
+
+			if (incompleteQuantity > 0)
+			{
+				InputStationNumber = "";
+				WorkOrderQuantityUpperLimitTip = false;
+				StationNotExistTip = false;
+				StationQuantityLimitTip = false;
+				StationNumberPopupVisible = true;
+				WorkOrderPopupVisible = false;
+			}
+			else
+			{
+				WorkOrderQuantityUpperLimitTip = true;
+			}
+		}
+		else
+		{
+			ErrorPopupVisible = true;
+			_ErrorMsg = "輸入工單需等於15碼";
+			return;
+		}
+	}
+
+	async Task CancelWorkOrderClick()
+	{
+		WorkOrderPopupVisible = false;
+	}
+
+	/// <summary>
+	/// 撈DB檢查編號是否有對應的工作站
+	/// </summary>
+	/// <returns></returns>
+	async Task ConfirmStationNumberClick()
+	{
+		JointModuleTables moduleTable = Modules.FirstOrDefault(x => x.StationNumber == InputStationNumber);
+
+		if (moduleTable != null && !string.IsNullOrEmpty(moduleTable.StationName))
+		{
+			StationNotExistTip = false;
+
+			var result = await checkStationQuantityLimitByProcessTypeFlow(InputWorkOrder, InputType, moduleTable.StationName, WorkOrderQuantity);
+
+			if (result.isMonitored)
+			{
+				if (result.passed)
+				{
+					InputStation = moduleTable.StationName;
+					StationQuantityLimitTip = false;
+					StationNamePopupVisible = true;
+				}
+				else
+				{
+					StationQuantityLimitTip = true;
+				}
+			}
+			else
+			{
+				InputStation = moduleTable.StationName;
+				StationNamePopupVisible = true;
+			}
+		}
+		else
+		{
+			StationNotExistTip = true;
+		}
+	}
+
+	async Task<(bool isMonitored, bool passed, int RemainQuantity)> checkStationQuantityLimitByProcessTypeFlow(string workOrder, string type,
+																														string stationName, int workOrderQuantity)
+	{
+		if (string.IsNullOrEmpty(type))
+		{
+			TypeByWorkOrder typeByWorkOrder = await DataService.GetTypeByWorkOrder(workOrder);
+
+			if (typeByWorkOrder != null)
+				type = typeByWorkOrder.ProcessType;
+			else
+				return (false, false, 0);
+		}
+
+		ProcessTypeTable currentStation = await DataService.getProcessTypeTableAsync(type.Substring(0, 3), stationName);
+
+		if (currentStation == null)
+			return (false, false, 0);
+
+		int currentStationCompletedQuantity = 0;
+		int lastStationSorting = (int)currentStation.Sorting - 1;
+		List<WorkingOrderList> listworkingOrders = await DataService.GetWorkingOrderListByWorkOrderAsync(workOrder);
+
+		foreach (WorkingOrderList workingOrder in listworkingOrders.Where(x => x.IsResponse == true
+																			&& x.StationName == currentStation.StationName))
+		{
+			currentStationCompletedQuantity += (int)workingOrder.PassCount;
+			currentStationCompletedQuantity += (int)workingOrder.FailCount;
+		}
+
+		if (lastStationSorting == 0) // 代表說currentStation是第一站
+		{
+			int incompleteQuantity = workOrderQuantity - currentStationCompletedQuantity;
+
+			bool isPassed = incompleteQuantity > 0 ? true : false;
+
+			return (true, isPassed, incompleteQuantity);
+		}
+		else
+		{
+			int lastStationPassQuantity = 0;
+			ProcessTypeTable lastStation = await DataService.getProcessTypeTableAsync_v2(type.Substring(0, 3), lastStationSorting);
+
+			foreach (WorkingOrderList workingOrder in listworkingOrders.Where(x => x.IsResponse == true
+																				&& x.StationName == lastStation.StationName))
+			{
+				lastStationPassQuantity += (int)workingOrder.PassCount;
+			}
+
+			int incompleteQuantity = lastStationPassQuantity - currentStationCompletedQuantity;
+
+			bool isPassed = incompleteQuantity > 0 ? true : false;
+
+			return (true, isPassed, incompleteQuantity);
+
+		}
+	}
+
+	async Task ConfirmStationNameClick()
+	{
+		SerialNumberPopupVisible = true;
+	}
+
+	async Task CancelStationNameClick()
+	{
+		WorkOrderPopupVisible = false;
+		StationNumberPopupVisible = false;
+		StationNamePopupVisible = false;
+	}
+
+	async Task CancelStationNumberClick()
+	{
+		StationNumberPopupVisible = false;
+	}
+
+	async Task ConfirmSerialNumberClick()
+	{
+		if (customAuth.user.role != Role.Guest)
+		{
+			if (string.IsNullOrEmpty(InputSerialNumber))
+			{
+				InputSerialNumber = "";
+			}
+
+			if (string.IsNullOrEmpty(InputType))
+			{
+				InputType = "";
+			}
+
+			if (string.IsNullOrEmpty(InputWorkOrder) || string.IsNullOrEmpty(InputStation))
+			{
+				ErrorPopupVisible = true;
+				_ErrorMsg = "請檢查工單或站別是否有輸入且輸入不可為空值";
+				return;
+			}
+			else
+			{
+				WorkingOrderList _WorkingOrderList = new WorkingOrderList();
+				_WorkingOrderList.WorkingTime = DateTime.Now;
+				_WorkingOrderList.WorkOrder = InputWorkOrder;
+				_WorkingOrderList.StationName = InputStation;
+				_WorkingOrderList.SerialNumber = InputSerialNumber;
+				_WorkingOrderList.WorkOrderCount = 0;
+				_WorkingOrderList.PassCount = 0;
+				_WorkingOrderList.FailCount = 0;
+				_WorkingOrderList.OPNO = customAuth.user.userName;
+				_WorkingOrderList.AddTime = DateTime.Now;
+				_WorkingOrderList.IsReceive = false;
+				_WorkingOrderList.ReceiveTime = null;
+				_WorkingOrderList.IsPause = false;
+				_WorkingOrderList.PauseTime = null;
+				_WorkingOrderList.IsResponse = false;
+				_WorkingOrderList.ResponseTime = null;
+				_WorkingOrderList.CreateUser = customAuth.user.userName;
+				_WorkingOrderList.ProcessType = InputType;
+
+				await DataService.UpdateWorkingOrderListAsync(_WorkingOrderList);
+				await DataService.UpdateWorkingOrderStepListAsync(_WorkingOrderList);
+
+				// _WorkingOrderLists = await DataService.GetWorkingOrderListAsync(OPID);
+
+				// if (_WorkingOrderLists.Where(x => x.IsReceive == true).Count() == 0)
+				// {
+				//     _WorkingOrderList.IsReceive = true;
+				//     _WorkingOrderList.ReceiveTime = _WorkingOrderList.AddTime;
+				//     await DataService.UpdateWorkingOrderListAsync(_WorkingOrderList);
+				//     await DataService.UpdateWorkingOrderStepListAsync(_WorkingOrderList);
+				// }
+			}
+
+			WorkOrderPopupVisible = false;
+			StationNumberPopupVisible = false;
+			StationNamePopupVisible = false;
+			SerialNumberPopupVisible = false;
+			InputWorkOrder = "";
+			InputStation = "";
+			InputStationNumber = "";
+			InputSerialNumber = "";
+			InputType = "";
+		}
+
+		await ReadPageData();
+
+		//先試試看移到上面的效果
+		// WorkOrderPopupVisible = false;
+		// StationNumberPopupVisible = false;
+		// StationNamePopupVisible = false;
+		// SerialNumberPopupVisible = false;
+		// InputWorkOrder = "";
+		// InputStation = "";
+		// InputStationNumber = "";
+		// InputSerialNumber = "";
+		// InputType = "";
+	}
+
+	async Task CancelSeriaNumberClick()
+	{
+
+	}
+
+	async Task SetWorkOrderStation(string item)
+	{
+		InputStation = item;
+	}
+
+	private void NavToLogin()
+	{
+		navigationManager.NavigateTo("/LoginPage");
+	}
+
+	async Task Delete(WorkingOrderList item)
+	{
+		await DataService.RemoveWorkingOrderListAsync(item);
+		ReadPageData();
+	}
+
+	bool GetDeleteResult(WorkingOrderList item)
+	{
+		bool Result = false;
+
+		if (CheckIsWrongStationName(item) || CheckIsWorkOrderQuantityUpperLimit(item))
+		{
+			Result = true;
+		}
+		else if (item.IsReceive == false && item.IsPause == false && item.IsResponse == false)
+		{
+			Result = true;
+		}
+
+		return Result;
+	}
+
+	bool CheckIsWrongStationName(WorkingOrderList item)
+	{
+		var module = Modules.FirstOrDefault(x => x.StationName == item.StationName);
+
+		if (module != null)
+			return false;
+		else
+			return true;
+	}
+
+	bool CheckIsWorkOrderQuantityUpperLimit(WorkingOrderList item)
+	{
+		if (!(dcWorkingOrderList.ContainsKey(item.WorkOrder) && dcWorkingOrderQuantity.ContainsKey(item.WorkOrder)))
+		{
+			return true;
+		}
+
+		int incompleteQuantity = 0;
+		int completeQuantity = 0;
+
+		foreach (WorkingOrderList order in dcWorkingOrderList[item.WorkOrder].Where(x => x.IsResponse == true))
+		{
+			var module = Modules.FirstOrDefault(x => x.StationName == order.StationName);
+
+			bool _isFinalStation = true;
+
+			if (module != null)
+				_isFinalStation = module.IsFinal;
+
+			if (_isFinalStation)
+			{
+				completeQuantity += Convert.ToInt32(order.PassCount);
+				completeQuantity += Convert.ToInt32(order.FailCount);
+			}
+			else
+			{
+				completeQuantity += Convert.ToInt32(order.FailCount);
+			}
+		}
+
+		incompleteQuantity = dcWorkingOrderQuantity[item.WorkOrder].Quantity - completeQuantity;
+
+		if (incompleteQuantity > 0)
+			return false;
+		else
+			return true;
+	}
+}
+
