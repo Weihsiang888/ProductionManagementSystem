@@ -23,7 +23,10 @@ namespace DxBlazorApplication7.Controllers
                     { 
                         Expires = DateTimeOffset.UtcNow.AddYears(1),
                         IsEssential = true,
-                        Path = "/"
+                        Path = "/",
+                        Secure = true,
+                        HttpOnly = true,
+                        SameSite = SameSiteMode.Lax
                     }
                 );
             }
