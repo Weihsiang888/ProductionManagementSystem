@@ -137,12 +137,12 @@ app.UseRouting();
 // Add Request Localization middleware
 app.UseRequestLocalization(requestLocalizationOptions);
 
+app.UseCookiePolicy();
+app.UseAuthentication();
+
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
 app.MapControllers();
-
-app.UseCookiePolicy();
-app.UseAuthentication();
 
 app.Run();
