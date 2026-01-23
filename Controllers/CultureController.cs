@@ -1,3 +1,4 @@
+using DxBlazorApplication7.Configuration;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,14 +8,6 @@ namespace DxBlazorApplication7.Controllers
     [ApiController]
     public class CultureController : ControllerBase
     {
-        // Supported cultures for validation
-        private static readonly HashSet<string> SupportedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            "zh-TW",
-            "en-US",
-            "zh-CN"
-        };
-
         /// <summary>
         /// Sets the culture cookie and redirects to the specified URI
         /// </summary>
@@ -24,8 +17,8 @@ namespace DxBlazorApplication7.Controllers
         [HttpGet("Set")]
         public IActionResult SetCulture(string culture, string? redirectUri)
         {
-            // Validate culture against supported list
-            if (!string.IsNullOrEmpty(culture) && SupportedCultures.Contains(culture))
+            // Validate culture against supported list using shared configuration
+            if (CultureConfiguration.IsCultureSupported(culture))
             {
                 // Set the culture cookie with security attributes
                 Response.Cookies.Append(
@@ -43,17 +36,22 @@ namespace DxBlazorApplication7.Controllers
                 );
             }
 
-            // Determine redirect URL with additional validation
+            // Determine redirect URL with comprehensive validation
             string redirectUrl = "/";
 
             if (!string.IsNullOrEmpty(redirectUri))
             {
-                // Validate that URL is local and doesn't contain suspicious patterns
-                if (Url.IsLocalUrl(redirectUri) && 
-                    !redirectUri.Contains("//", StringComparison.OrdinalIgnoreCase) &&
+                // Parse and validate the redirect URI structure
+                if (Uri.TryCreate(redirectUri, UriKind.Relative, out var parsedUri) &&
+                    Url.IsLocalUrl(redirectUri) && 
                     redirectUri.StartsWith("/", StringComparison.OrdinalIgnoreCase))
                 {
-                    redirectUrl = redirectUri;
+                    // Ensure no protocol-relative URLs or suspicious patterns
+                    if (!redirectUri.StartsWith("//", StringComparison.OrdinalIgnoreCase) &&
+                        !redirectUri.Contains("://", StringComparison.OrdinalIgnoreCase))
+                    {
+                        redirectUrl = redirectUri;
+                    }
                 }
             }
             else if (Request.Headers.ContainsKey("Referer"))

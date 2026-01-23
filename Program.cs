@@ -1,5 +1,6 @@
 using CommonLibrary.AuthPack;
 using DxBlazorApplication7;
+using DxBlazorApplication7.Configuration;
 using DxBlazorApplication7.Data;
 using DxBlazorApplication7.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -82,17 +83,12 @@ builder.Services.AddScoped<IAuthDataService, UserDataService>();
 
 var app = builder.Build();
 
-// Configure Request Localization
-var supportedCultures = new[]
-{
-    new CultureInfo("zh-TW"),
-    new CultureInfo("en-US"),
-    new CultureInfo("zh-CN")
-};
+// Configure Request Localization using shared configuration
+var supportedCultures = CultureConfiguration.GetSupportedCultures();
 
 var localizationOptions = new RequestLocalizationOptions
 {
-    DefaultRequestCulture = new RequestCulture("zh-TW"),
+    DefaultRequestCulture = new RequestCulture(CultureConfiguration.DefaultCultureName),
     SupportedCultures = supportedCultures,
     SupportedUICultures = supportedCultures
 };
