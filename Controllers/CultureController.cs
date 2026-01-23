@@ -7,6 +7,14 @@ namespace DxBlazorApplication7.Controllers
     [ApiController]
     public class CultureController : ControllerBase
     {
+        // Supported cultures for validation
+        private static readonly HashSet<string> SupportedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "zh-TW",
+            "en-US",
+            "zh-CN"
+        };
+
         /// <summary>
         /// Sets the culture cookie and redirects to the specified URI
         /// </summary>
@@ -16,9 +24,10 @@ namespace DxBlazorApplication7.Controllers
         [HttpGet("Set")]
         public IActionResult SetCulture(string culture, string? redirectUri)
         {
-            if (!string.IsNullOrEmpty(culture))
+            // Validate culture against supported list
+            if (!string.IsNullOrEmpty(culture) && SupportedCultures.Contains(culture))
             {
-                // Set the culture cookie
+                // Set the culture cookie with security attributes
                 Response.Cookies.Append(
                     CookieRequestCultureProvider.DefaultCookieName,
                     CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
@@ -26,7 +35,10 @@ namespace DxBlazorApplication7.Controllers
                     {
                         Expires = DateTimeOffset.UtcNow.AddYears(1),
                         IsEssential = true,
-                        Path = "/"
+                        Path = "/",
+                        SameSite = SameSiteMode.Lax,
+                        Secure = Request.IsHttps, // Only set Secure flag on HTTPS
+                        HttpOnly = false // Allow JavaScript access for client-side operations if needed
                     }
                 );
             }
