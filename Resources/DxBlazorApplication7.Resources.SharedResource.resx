@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <!-- Header Menu Items -->
+  <data name="Home" xml:space="preserve">
+    <value>首頁</value>
+  </data>
+  <data name="ESOP" xml:space="preserve">
+    <value>ESOP</value>
+  </data>
+  <data name="SelectLanguage" xml:space="preserve">
+    <value>選擇語言</value>
+  </data>
+  <data name="PleaseSelect" xml:space="preserve">
+    <value>請選擇 ...</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Login : Guest</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+  <!-- ESOP Selection Page -->
+  <data name="Station" xml:space="preserve">
+    <value>作業站:</value>
+  </data>
+  <data name="Procedure" xml:space="preserve">
+    <value>作業:</value>
+  </data>
+  <data name="Module" xml:space="preserve">
+    <value>模組:</value>
+  </data>
+  <data name="PleaseSelectStation" xml:space="preserve">
+    <value>請選擇作業站 ...</value>
+  </data>
+  <data name="PleaseSelectProcedure" xml:space="preserve">
+    <value>請選擇作業 ...</value>
+  </data>
+  <data name="PleaseSelectModule" xml:space="preserve">
+    <value>請選擇模組 ...</value>
+  </data>
+  <!-- ESOP Pages -->
+  <data name="OpenSOP" xml:space="preserve">
+    <value>開啟SOP</value>
+  </data>
+  <data name="TraditionalChinese" xml:space="preserve">
+    <value>繁體中文</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="SimplifiedChinese" xml:space="preserve">
+    <value>简体中文</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>關閉</value>
+  </data>
+  <data name="List" xml:space="preserve">
+    <value>清單</value>
+  </data>
+  <data name="ManualSelectSOP" xml:space="preserve">
+    <value>手動選取SOP</value>
+  </data>
+  <data name="ModifyESOPList" xml:space="preserve">
+    <value>修改ESOP清單</value>
+  </data>
+  <data name="WorkStation" xml:space="preserve">
+    <value>工作站別</value>
+  </data>
+  <data name="SystemTitle" xml:space="preserve">
+    <value>產線 ( 報工 - ESOP ) 系統</value>
+  </data>
+</root>

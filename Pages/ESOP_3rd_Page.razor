@@ -1,5 +1,6 @@
 ﻿@using DxBlazorApplication7.Data
 @inject DataService DataService
+@inject IStringLocalizer<SharedResource> L
 
 @foreach (var item in Param)
 {
@@ -45,7 +46,7 @@
                         <Template>
                             @* <DxButton Text="Success" RenderStyle="ButtonRenderStyle.Success" SizeMode="SizeMode.Medium"></DxButton> *@
                             <div class="cell">
-                                <DxButton Text="開啟SOP" CssClass="w-100" RenderStyle="ButtonRenderStyle.Success" SizeMode="SizeMode.Large" Click="@(()=>{Nav(item);})"></DxButton>
+                                <DxButton Text="@L["OpenSOP"]" CssClass="w-100" RenderStyle="ButtonRenderStyle.Success" SizeMode="SizeMode.Large" Click="@(()=>{Nav(item);})"></DxButton>
                             </div>
                         </Template>
                     </DxGridLayoutItem>
@@ -87,19 +88,19 @@
             <!-- 第一個靠左的按鈕 -->
             <DxButton CssClass="popup-button my-1 me-2"
                       RenderStyle="ButtonRenderStyle.Secondary"
-                      Text="繁體中文"
+                      Text="@L["TraditionalChinese"]"
                       Click="Selected_LanguageChanged" />
 
             <!-- 第二個靠左的按鈕 -->
             <DxButton CssClass="popup-button my-1 me-2"
                       RenderStyle="ButtonRenderStyle.Secondary"
-                      Text="English"
+                      Text="@L["English"]"
                       Click="Selected_LanguageChanged" />
 
             <!-- 第三個靠最右的按鈕 -->
             <DxButton CssClass="popup-button my-1 ms-auto"
                       RenderStyle="ButtonRenderStyle.Primary"
-                      Text="Close"
+                      Text="@L["Close"]"
                       Click="CloseEulaClick" />
         </div>
         @* <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="Close" Click="CloseEulaClick" /> *@

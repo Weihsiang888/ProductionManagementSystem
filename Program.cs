@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.OpenApi.Models;
+using System.Globalization;
 
 //var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +28,9 @@ builder.Services.AddDbContext<DSDBContext>
     (options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Add Localization services
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
 // Add services to the container.
 
 //builder.Services.AddScoped<DataService>();
@@ -39,7 +44,7 @@ builder.Services.AddDevExpressBlazor(options => {
     options.SizeMode = DevExpress.Blazor.SizeMode.Medium;
 });
 
-#region 加入使用 Cookie 認證需要的宣告
+#region 嚙稼嚙皚嚙誕伐蕭 Cookie 嚙緹嚙課需要嚙踝蕭嚙褐告
 //builder.Services.Configure<CookiePolicyOptions>(options =>
 //{
 //    options.CheckConsentNeeded = context => true;
@@ -76,6 +81,26 @@ builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthentication>();
 builder.Services.AddScoped<IAuthDataService, UserDataService>();
 
 var app = builder.Build();
+
+// Configure Request Localization
+var supportedCultures = new[]
+{
+    new CultureInfo("zh-TW"),
+    new CultureInfo("en-US"),
+    new CultureInfo("zh-CN")
+};
+
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("zh-TW"),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+};
+
+// Place CookieRequestCultureProvider at the beginning of the providers list
+localizationOptions.RequestCultureProviders.Insert(0, new CookieRequestCultureProvider());
+
+app.UseRequestLocalization(localizationOptions);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

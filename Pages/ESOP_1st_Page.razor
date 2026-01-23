@@ -2,6 +2,7 @@
 @using DxBlazorApplication7.Data
 @inject DataService DataService
 @inject AuthenticationStateProvider authenticationStateProvider
+@inject IStringLocalizer<SharedResource> L
 @inherits AuthComponentBase
 
 <DxTabs CssClass="tabs" SizeMode="SizeMode.Large" RenderMode="TabsRenderMode.AllTabs">
@@ -9,13 +10,13 @@
         <TabTemplate>
             <div style="padding:9px 27px; text-align:center;
                         color:dodgerblue">
-                <span class="tab-title-bold">ESOP</span>
+                <span class="tab-title-bold">@L["ESOP"]</span>
             </div>
         </TabTemplate>
         <ChildContent>
             <br />
             <h3 style="color:dodgerblue">
-                清單
+                @L["List"]
             </h3>
             @foreach (var item in _StationSelection.Select(x => x.StationID).Distinct())
             {
@@ -71,7 +72,7 @@
         <TabTemplate>
             <div style="padding:9px 27px; text-align:center;
                         color:dodgerblue">
-                <span class="tab-title-bold">手動選取SOP</span>
+                <span class="tab-title-bold">@L["ManualSelectSOP"]</span>
             </div>
         </TabTemplate>
         <ChildContent>
@@ -85,7 +86,7 @@
             <TabTemplate>
                 <div style="padding:9px 27px; text-align:center;
                                 color:dodgerblue">
-                    <span class="tab-title-bold">修改ESOP清單</span>
+                    <span class="tab-title-bold">@L["ModifyESOPList"]</span>
                 </div>
             </TabTemplate>
             <ChildContent>
@@ -97,7 +98,7 @@
             <TabTemplate>
                 <div style="padding:9px 27px; text-align:center;
                                     color:dodgerblue">
-                    <span class="tab-title-bold">工作站別</span>
+                    <span class="tab-title-bold">@L["WorkStation"]</span>
                 </div>
             </TabTemplate>
             <ChildContent>

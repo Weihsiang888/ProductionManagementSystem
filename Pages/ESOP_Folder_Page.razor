@@ -1,12 +1,13 @@
 ﻿@using DxBlazorApplication7.Data
 @inject DataService DataService
+@inject IStringLocalizer<SharedResource> L
 
 <DxGrid Data="_DirectoryStatus"
         PageSize="24">
     <Columns>
         <DxGridDataColumn Width="120">
             <CellDisplayTemplate>
-                <DxButton Text="開啟SOP" Click="@(() => OnRowAction((DirectoryStatus)context.DataItem))" />
+                <DxButton Text="@L["OpenSOP"]" Click="@(() => OnRowAction((DirectoryStatus)context.DataItem))" />
             </CellDisplayTemplate>
         </DxGridDataColumn>
 
@@ -47,19 +48,19 @@
             <!-- 第一個靠左的按鈕 -->
             <DxButton CssClass="popup-button my-1 me-2"
                       RenderStyle="ButtonRenderStyle.Secondary"
-                      Text="繁體中文"
+                      Text="@L["TraditionalChinese"]"
                       Click="Selected_LanguageChanged" />
 
             <!-- 第二個靠左的按鈕 -->
             <DxButton CssClass="popup-button my-1 me-2"
                       RenderStyle="ButtonRenderStyle.Secondary"
-                      Text="English"
+                      Text="@L["English"]"
                       Click="Selected_LanguageChanged" />
 
             <!-- 第三個靠最右的按鈕 -->
             <DxButton CssClass="popup-button my-1 ms-auto"
                       RenderStyle="ButtonRenderStyle.Primary"
-                      Text="Close"
+                      Text="@L["Close"]"
                       Click="CloseEulaClick" />
         </div>
 

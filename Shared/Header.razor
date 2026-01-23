@@ -3,6 +3,7 @@
 @inherits AuthComponentBase
 @inject NavigationManager nav
 @inject DataService DataService
+@inject IStringLocalizer<SharedResource> L
 
 @*<nav class="navbar header-navbar p-0">
     <button class="navbar-toggler bg-primary d-block" @onclick="OnToggleClick">
@@ -169,12 +170,12 @@
        @* <DxMenu Title="產線 - 線上派工系統" ItemsPosition="ItemPosition.End" CollapseItemsToHamburgerMenu="true" >*@
             <TitleTemplate>
                 @* <div class="icon-logo" role="img" aria-label="@context">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;產線 - 線上派工系統</div> *@
-                <div class="icon-logo font-style" role="img" aria-label="@context">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;產線 ( 報工 - ESOP ) 系統</div>
+                <div class="icon-logo font-style" role="img" aria-label="@context">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;@L["SystemTitle"]</div>
             </TitleTemplate>
             <Items>
                 <DxMenuItem IconCssClass="menu-icon-home menu-icon" NavigateUrl="./">
                     <TextTemplate>
-                        <div class="font-style">首頁</div>
+                        <div class="font-style">@L["Home"]</div>
                     </TextTemplate>
                 </DxMenuItem>
                 @* <DxMenuItem IconCssClass="menu-icon-products menu-icon">
@@ -240,7 +241,7 @@
                 {*@
                     <DxMenuItem IconCssClass="menu-icon-info menu-icon" NavigateUrl="ESOPPage">
                         <TextTemplate>
-                            <div class="font-style">ESOP</div>
+                            <div class="font-style">@L["ESOP"]</div>
                         </TextTemplate>
                         @* <Items>
                             <DxMenuItem CssClass="font-style" Text="作業站別" NavigateUrl="StationStatus" />
@@ -253,6 +254,18 @@
                         </Items> *@
                     </DxMenuItem>
                 @* } *@
+                <DxMenuItem Position="ItemPosition.End" CssClass="notoggle">
+                    <Template>
+                        <div style="padding:9px 15px;">
+                            <select class="form-select form-select-sm" @onchange="OnLanguageChanged" style="color:dodgerblue; border-color:dodgerblue;">
+                                <option value="" disabled selected>@L["SelectLanguage"]</option>
+                                <option value="zh-TW">繁體中文</option>
+                                <option value="en-US">English</option>
+                                <option value="zh-CN">简体中文</option>
+                            </select>
+                        </div>
+                    </Template>
+                </DxMenuItem>
                 @if (customAuth.user.role != Role.Guest)
                 {
                     <DxMenuItem title="Logout" Click="@NavToLogout" CssClass="notoggle font-style" IconCssClass="menu-icon-user-profile menu-icon" Name="Logout" Position="ItemPosition.End">
@@ -392,5 +405,16 @@
             Result = "Login : Guest";
         }
         return Result;
+    }
+
+    void OnLanguageChanged(ChangeEventArgs e)
+    {
+        var culture = e.Value?.ToString();
+        if (!string.IsNullOrEmpty(culture))
+        {
+            var currentUri = new Uri(nav.Uri);
+            var redirectUri = currentUri.PathAndQuery;
+            nav.NavigateTo($"Culture/Set?culture={culture}&redirectUri={Uri.EscapeDataString(redirectUri)}", forceLoad: true);
+        }
     }
 }
