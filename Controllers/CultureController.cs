@@ -31,19 +31,29 @@ namespace DxBlazorApplication7.Controllers
                 );
             }
 
-            // Determine redirect URL
+            // Determine redirect URL with additional validation
             string redirectUrl = "/";
 
-            if (!string.IsNullOrEmpty(redirectUri) && Url.IsLocalUrl(redirectUri))
+            if (!string.IsNullOrEmpty(redirectUri))
             {
-                redirectUrl = redirectUri;
+                // Validate that URL is local and doesn't contain suspicious patterns
+                if (Url.IsLocalUrl(redirectUri) && 
+                    !redirectUri.Contains("//", StringComparison.OrdinalIgnoreCase) &&
+                    redirectUri.StartsWith("/", StringComparison.OrdinalIgnoreCase))
+                {
+                    redirectUrl = redirectUri;
+                }
             }
             else if (Request.Headers.ContainsKey("Referer"))
             {
                 var referer = Request.Headers["Referer"].ToString();
                 if (!string.IsNullOrEmpty(referer) && Uri.TryCreate(referer, UriKind.Absolute, out var refererUri))
                 {
-                    redirectUrl = refererUri.PathAndQuery;
+                    // Only use referer if it's from the same host
+                    if (string.Equals(refererUri.Host, Request.Host.Host, StringComparison.OrdinalIgnoreCase))
+                    {
+                        redirectUrl = refererUri.PathAndQuery;
+                    }
                 }
             }
 

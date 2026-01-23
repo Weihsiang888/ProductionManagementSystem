@@ -1,4 +1,5 @@
 ﻿@using DxBlazorApplication7.Data
+@using System.Globalization
 @inject AuthenticationStateProvider authenticationStateProvider
 @inherits AuthComponentBase
 @inject NavigationManager nav
@@ -257,8 +258,7 @@
                 <DxMenuItem Position="ItemPosition.End" CssClass="notoggle">
                     <Template>
                         <div style="padding:9px 15px;">
-                            <select class="form-select form-select-sm" @onchange="OnLanguageChanged" style="color:dodgerblue; border-color:dodgerblue;">
-                                <option value="" disabled selected>@L["SelectLanguage"]</option>
+                            <select class="form-select form-select-sm" @onchange="OnLanguageChanged" value="@CultureInfo.CurrentCulture.Name" style="color:dodgerblue; border-color:dodgerblue;">
                                 <option value="zh-TW">繁體中文</option>
                                 <option value="en-US">English</option>
                                 <option value="zh-CN">简体中文</option>
