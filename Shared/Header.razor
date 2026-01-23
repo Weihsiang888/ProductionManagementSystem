@@ -149,7 +149,7 @@
 
 <div class="card">
     <div class="card-body p-0">
-        <DxMenu Title="產線 - 線上派工系統" ItemsPosition="ItemPosition.End" CollapseItemsToHamburgerMenu="true" ItemClick="@((args) => { 
+        <DxMenu Title="@L["SystemTitle"]" ItemsPosition="ItemPosition.End" CollapseItemsToHamburgerMenu="true" ItemClick="@((args) => { 
             if (args.ItemInfo.Name == "LogIn")
             {
                 if(args.ItemInfo.Text == "Login")
@@ -169,12 +169,12 @@
        @* <DxMenu Title="產線 - 線上派工系統" ItemsPosition="ItemPosition.End" CollapseItemsToHamburgerMenu="true" >*@
             <TitleTemplate>
                 @* <div class="icon-logo" role="img" aria-label="@context">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;產線 - 線上派工系統</div> *@
-                <div class="icon-logo font-style" role="img" aria-label="@context">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;產線 ( 報工 - ESOP ) 系統</div>
+                <div class="icon-logo font-style" role="img" aria-label="@context">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;@L["SystemTitle"]</div>
             </TitleTemplate>
             <Items>
                 <DxMenuItem IconCssClass="menu-icon-home menu-icon" NavigateUrl="./">
                     <TextTemplate>
-                        <div class="font-style">首頁</div>
+                        <div class="font-style">@L["Home"]</div>
                     </TextTemplate>
                 </DxMenuItem>
                 @* <DxMenuItem IconCssClass="menu-icon-products menu-icon">
@@ -240,7 +240,7 @@
                 {*@
                     <DxMenuItem IconCssClass="menu-icon-info menu-icon" NavigateUrl="ESOPPage">
                         <TextTemplate>
-                            <div class="font-style">ESOP</div>
+                            <div class="font-style">@L["ESOP"]</div>
                         </TextTemplate>
                         @* <Items>
                             <DxMenuItem CssClass="font-style" Text="作業站別" NavigateUrl="StationStatus" />
@@ -253,6 +253,19 @@
                         </Items> *@
                     </DxMenuItem>
                 @* } *@
+                
+                @* Language Selector *@
+                <DxMenuItem IconCssClass="menu-icon-setting menu-icon" Position="ItemPosition.End">
+                    <TextTemplate>
+                        <div class="font-style">@L["SelectLanguage"]</div>
+                    </TextTemplate>
+                    <Items>
+                        <DxMenuItem CssClass="font-style" Text="@L["TraditionalChinese"]" Click="@(() => ChangeLanguage("zh-TW"))" />
+                        <DxMenuItem CssClass="font-style" Text="@L["SimplifiedChinese"]" Click="@(() => ChangeLanguage("zh-CN"))" />
+                        <DxMenuItem CssClass="font-style" Text="@L["English"]" Click="@(() => ChangeLanguage("en-US"))" />
+                    </Items>
+                </DxMenuItem>
+                
                 @if (customAuth.user.role != Role.Guest)
                 {
                     <DxMenuItem title="Logout" Click="@NavToLogout" CssClass="notoggle font-style" IconCssClass="menu-icon-user-profile menu-icon" Name="Logout" Position="ItemPosition.End">
@@ -370,27 +383,33 @@
 
     string GetLogInValue()
     {
-        string Result = "Login : Guest";
+        string Result = L["LoginGuest"];
         if (customAuth.user.role == Role.Guest)
         {
-            Result = "Login : Guest";
+            Result = L["LoginGuest"];
         }
         else if (customAuth.user.role != Role.Guest)
         {
             var item = _OperatorInformations.SingleOrDefault(x => x.OPNO == customAuth.user.userName);
             if (item != null)
             {
-                Result = "Logout【 " + item.OperatorName + " 】";
+                Result = L["Logout"] + "【 " + item.OperatorName + " 】";
             }
             else
             {
-                Result = "Logout【 " + customAuth.user.userName + " 】";
+                Result = L["Logout"] + "【 " + customAuth.user.userName + " 】";
             }
         }
         else if (customAuth.user == null)
         {
-            Result = "Login : Guest";
+            Result = L["LoginGuest"];
         }
         return Result;
+    }
+
+    void ChangeLanguage(string culture)
+    {
+        var redirectUri = Uri.EscapeDataString(nav.Uri.Replace(nav.BaseUri.TrimEnd('/'), ""));
+        nav.NavigateTo($"/Culture/Set?culture={culture}&redirectUri={redirectUri}", forceLoad: true);
     }
 }

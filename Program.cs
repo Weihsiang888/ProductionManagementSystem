@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
 
 //var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +34,9 @@ builder.Services.AddDbContext<DSDBContext>
 builder.Services.AddHostedService<DataTimeService>();
 builder.Services.AddTransient<DataLogService>();
 builder.Services.AddScoped<AuthorizeUserService, AuthorizeService>();
+// Add Localization support
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddDevExpressBlazor(options => {
@@ -39,7 +44,7 @@ builder.Services.AddDevExpressBlazor(options => {
     options.SizeMode = DevExpress.Blazor.SizeMode.Medium;
 });
 
-#region 加入使用 Cookie 認證需要的宣告
+#region 嚙稼嚙皚嚙誕伐蕭 Cookie 嚙緹嚙課需要嚙踝蕭嚙褐告
 //builder.Services.Configure<CookiePolicyOptions>(options =>
 //{
 //    options.CheckConsentNeeded = context => true;
@@ -74,6 +79,24 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthentication>();
 builder.Services.AddScoped<IAuthDataService, UserDataService>();
+
+// Configure Request Localization
+var supportedCultures = new[]
+{
+    new CultureInfo("zh-TW"),
+    new CultureInfo("zh-CN"),
+    new CultureInfo("en-US")
+};
+
+var requestLocalizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("zh-TW"),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+};
+
+// Prioritize Cookie for culture selection
+requestLocalizationOptions.RequestCultureProviders.Insert(0, new CookieRequestCultureProvider());
 
 var app = builder.Build();
 
@@ -110,6 +133,9 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseStaticFiles();
 
 app.UseRouting();
+
+// Add Request Localization middleware
+app.UseRequestLocalization(requestLocalizationOptions);
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
