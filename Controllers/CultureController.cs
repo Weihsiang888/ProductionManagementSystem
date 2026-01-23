@@ -36,38 +36,67 @@ namespace DxBlazorApplication7.Controllers
                 );
             }
 
-            // Determine redirect URL with comprehensive validation
-            string redirectUrl = "/";
+            // Determine safe redirect URL
+            string redirectUrl = GetSafeRedirectUrl(redirectUri);
+            return LocalRedirect(redirectUrl);
+        }
 
-            if (!string.IsNullOrEmpty(redirectUri))
+        /// <summary>
+        /// Validates and returns a safe redirect URL
+        /// </summary>
+        /// <param name="redirectUri">The requested redirect URI</param>
+        /// <returns>A validated safe redirect URL</returns>
+        private string GetSafeRedirectUrl(string? redirectUri)
+        {
+            // Try to use the provided redirect URI if valid
+            if (!string.IsNullOrEmpty(redirectUri) && IsValidLocalUrl(redirectUri))
             {
-                // Parse and validate the redirect URI structure
-                if (Uri.TryCreate(redirectUri, UriKind.Relative, out var parsedUri) &&
-                    Url.IsLocalUrl(redirectUri) && 
-                    redirectUri.StartsWith("/", StringComparison.OrdinalIgnoreCase))
-                {
-                    // Ensure no protocol-relative URLs or suspicious patterns
-                    if (!redirectUri.StartsWith("//", StringComparison.OrdinalIgnoreCase) &&
-                        !redirectUri.Contains("://", StringComparison.OrdinalIgnoreCase))
-                    {
-                        redirectUrl = redirectUri;
-                    }
-                }
+                return redirectUri;
             }
-            else if (Request.Headers.ContainsKey("Referer"))
+
+            // Try to use referer if valid
+            if (Request.Headers.ContainsKey("Referer"))
             {
                 var referer = Request.Headers["Referer"].ToString();
-                if (!string.IsNullOrEmpty(referer) && Uri.TryCreate(referer, UriKind.Absolute, out var refererUri))
+                if (!string.IsNullOrEmpty(referer) && 
+                    Uri.TryCreate(referer, UriKind.Absolute, out var refererUri) &&
+                    string.Equals(refererUri.Host, Request.Host.Host, StringComparison.OrdinalIgnoreCase))
                 {
-                    // Only use referer if it's from the same host
-                    if (string.Equals(refererUri.Host, Request.Host.Host, StringComparison.OrdinalIgnoreCase))
-                    {
-                        redirectUrl = refererUri.PathAndQuery;
-                    }
+                    return refererUri.PathAndQuery;
                 }
             }
 
-            return LocalRedirect(redirectUrl);
+            // Default to root
+            return "/";
+        }
+
+        /// <summary>
+        /// Validates that a URL is safe for local redirect
+        /// </summary>
+        /// <param name="url">URL to validate</param>
+        /// <returns>True if URL is safe for redirect, false otherwise</returns>
+        private bool IsValidLocalUrl(string url)
+        {
+            // Parse and validate the redirect URI structure
+            if (!Uri.TryCreate(url, UriKind.Relative, out _))
+            {
+                return false;
+            }
+
+            // Check basic requirements
+            if (!Url.IsLocalUrl(url) || !url.StartsWith("/", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            // Ensure no protocol-relative URLs or suspicious patterns
+            if (url.StartsWith("//", StringComparison.OrdinalIgnoreCase) ||
+                url.Contains("://", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

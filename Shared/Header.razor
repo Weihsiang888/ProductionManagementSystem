@@ -1,4 +1,5 @@
 ﻿@using DxBlazorApplication7.Data
+@using DxBlazorApplication7.Configuration
 @using System.Globalization
 @inject AuthenticationStateProvider authenticationStateProvider
 @inherits AuthComponentBase
@@ -414,7 +415,9 @@
     void OnLanguageChanged(ChangeEventArgs e)
     {
         var culture = e.Value?.ToString();
-        if (!string.IsNullOrEmpty(culture))
+        
+        // Validate culture is supported before proceeding
+        if (!string.IsNullOrEmpty(culture) && CultureConfiguration.IsCultureSupported(culture))
         {
             var currentUri = new Uri(nav.Uri);
             var redirectUri = currentUri.PathAndQuery;
