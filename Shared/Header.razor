@@ -418,7 +418,13 @@
         {
             var currentUri = new Uri(nav.Uri);
             var redirectUri = currentUri.PathAndQuery;
-            nav.NavigateTo($"Culture/Set?culture={culture}&redirectUri={Uri.EscapeDataString(redirectUri)}", forceLoad: true);
+            
+            // Build URL with proper encoding
+            var cultureParam = Uri.EscapeDataString(culture);
+            var redirectParam = Uri.EscapeDataString(redirectUri);
+            var url = $"/Culture/Set?culture={cultureParam}&redirectUri={redirectParam}";
+            
+            nav.NavigateTo(url, forceLoad: true);
         }
     }
 }

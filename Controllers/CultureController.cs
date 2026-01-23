@@ -38,7 +38,7 @@ namespace DxBlazorApplication7.Controllers
                         Path = "/",
                         SameSite = SameSiteMode.Lax,
                         Secure = Request.IsHttps, // Only set Secure flag on HTTPS
-                        HttpOnly = false // Allow JavaScript access for client-side operations if needed
+                        HttpOnly = true // Prevent JavaScript access to protect against XSS
                     }
                 );
             }
