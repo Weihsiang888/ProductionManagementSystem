@@ -133,4 +133,28 @@
   <data name="SimplifiedChinese" xml:space="preserve">
     <value>Simplified Chinese</value>
   </data>
+  <data name="CreateESOP" xml:space="preserve">
+    <value>Create ESOP</value>
+  </data>
+  <data name="StationName" xml:space="preserve">
+    <value>Station Name</value>
+  </data>
+  <data name="ProcedureName" xml:space="preserve">
+    <value>Procedure Name</value>
+  </data>
+  <data name="ModelName" xml:space="preserve">
+    <value>Model/Part Number</value>
+  </data>
+  <data name="FileLocation" xml:space="preserve">
+    <value>File Location</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
 </root>

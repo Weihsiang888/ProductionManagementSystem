@@ -6,7 +6,7 @@
 @inject NavigationManager NavigationManager
 
 <br />
-<h3 style="color:dodgerblue">建立 ESOP</h3>
+<h3 style="color:dodgerblue">@L["CreateESOP"]</h3>
 <br />
 
 <DxGrid Data="_ESOPStatus"
@@ -28,23 +28,23 @@
                 </CellDisplayTemplate>
             </DxGridCommandColumn>
         }
-        <DxGridDataColumn FieldName=@nameof(ESOPStatus.StationID) TextAlignment="GridTextAlignment.Left" Caption="作業站名稱" Width="120" >
+        <DxGridDataColumn FieldName=@nameof(ESOPStatus.StationID) TextAlignment="GridTextAlignment.Left" Caption="@L["StationName"]" Width="120" >
             <CellDisplayTemplate>
                 <span>@GetStationName((ESOPStatus)context.DataItem)</span>
             </CellDisplayTemplate>
         </DxGridDataColumn>
-        <DxGridDataColumn FieldName=@nameof(ESOPStatus.ProcedureID) Caption="程序名稱" Width="180" >
+        <DxGridDataColumn FieldName=@nameof(ESOPStatus.ProcedureID) Caption="@L["ProcedureName"]" Width="180" >
         <CellDisplayTemplate>
                 <span>@GetProcedureName((ESOPStatus)context.DataItem)</span>
             </CellDisplayTemplate>
         </DxGridDataColumn>
-        <DxGridDataColumn FieldName=@nameof(ESOPStatus.ModelID) Caption="機種/料號名稱" Width="210" >
+        <DxGridDataColumn FieldName=@nameof(ESOPStatus.ModelID) Caption="@L["ModelName"]" Width="210" >
         <CellDisplayTemplate>
                 <span>@GetModelName((ESOPStatus)context.DataItem)</span>
             </CellDisplayTemplate>
         </DxGridDataColumn>
-        <DxGridDataColumn FieldName=@nameof(ESOPStatus.ESOPCode) Caption="ESOP" Width="165" />
-        <DxGridDataColumn FieldName=@nameof(ESOPStatus.FileSite) Caption="檔案位置" MinWidth="300" />
+        <DxGridDataColumn FieldName=@nameof(ESOPStatus.ESOPCode) Caption="@L["ESOP"]" Width="165" />
+        <DxGridDataColumn FieldName=@nameof(ESOPStatus.FileSite) Caption="@L["FileLocation"]" MinWidth="300" />
     </Columns>
     <EditFormTemplate Context="EditFormContext">
         @{

@@ -133,4 +133,28 @@
   <data name="SimplifiedChinese" xml:space="preserve">
     <value>簡體中文</value>
   </data>
+  <data name="CreateESOP" xml:space="preserve">
+    <value>建立 ESOP</value>
+  </data>
+  <data name="StationName" xml:space="preserve">
+    <value>作業站名稱</value>
+  </data>
+  <data name="ProcedureName" xml:space="preserve">
+    <value>程序名稱</value>
+  </data>
+  <data name="ModelName" xml:space="preserve">
+    <value>機種/料號名稱</value>
+  </data>
+  <data name="FileLocation" xml:space="preserve">
+    <value>檔案位置</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>刪除</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>新增</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>編輯</value>
+  </data>
 </root>
