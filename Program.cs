@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
 
 //var builder = WebApplication.CreateBuilder(args);
 
@@ -32,14 +34,35 @@ builder.Services.AddDbContext<DSDBContext>
 builder.Services.AddHostedService<DataTimeService>();
 builder.Services.AddTransient<DataLogService>();
 builder.Services.AddScoped<AuthorizeUserService, AuthorizeService>();
-builder.Services.AddRazorPages();
+
+// Add localization services
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+builder.Services.AddRazorPages()
+    .AddViewLocalization();
+    
 builder.Services.AddServerSideBlazor();
 builder.Services.AddDevExpressBlazor(options => {
     options.BootstrapVersion = DevExpress.Blazor.BootstrapVersion.v5;
     options.SizeMode = DevExpress.Blazor.SizeMode.Medium;
 });
 
-#region 加入使用 Cookie 認證需要的宣告
+// Configure supported cultures
+var supportedCultures = new[]
+{
+    new CultureInfo("zh-TW"),  // Traditional Chinese
+    new CultureInfo("en")       // English
+};
+
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.DefaultRequestCulture = new RequestCulture("zh-TW");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+    options.RequestCultureProviders.Insert(0, new CookieRequestCultureProvider());
+});
+
+#region 嚙稼嚙皚嚙誕伐蕭 Cookie 嚙緹嚙課需要嚙踝蕭嚙褐告
 //builder.Services.Configure<CookiePolicyOptions>(options =>
 //{
 //    options.CheckConsentNeeded = context => true;
@@ -108,6 +131,9 @@ app.UseStaticFiles(new StaticFileOptions
 //app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+
+// Use request localization (must be before UseRouting)
+app.UseRequestLocalization();
 
 app.UseRouting();
 
