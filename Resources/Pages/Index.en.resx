@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="OnlineWorkReport" xml:space="preserve">
+    <value>Online Work Report</value>
+  </data>
+  <data name="Intro1" xml:space="preserve">
+    <value>Manage human resources in manufacturing plants and ensure effective assignment and arrangement of production line workers.</value>
+  </data>
+  <data name="Intro2" xml:space="preserve">
+    <value>This system typically includes the following functions:</value>
+  </data>
+  <data name="Feature1" xml:space="preserve">
+    <value>1. Personnel Data Management: Record employee basic information, skills, and experience.</value>
+  </data>
+  <data name="Feature2" xml:space="preserve">
+    <value>2. Production Scheduling: Assign employees to appropriate workstations based on production plans and line requirements, ensuring adequate human resources at each station.</value>
+  </data>
+  <data name="Feature3" xml:space="preserve">
+    <value>3. Work Progress Tracking: Track employee work progress and product flow on the production line, and adjust assignments in real-time to address any production line issues.</value>
+  </data>
+  <data name="Feature4" xml:space="preserve">
+    <value>4. Data Analysis and Reporting: Analyze employee performance and production line efficiency, providing reports and data to help management make better decisions.</value>
+  </data>
+  <data name="Feature5" xml:space="preserve">
+    <value>5. Safety and Monitoring: Monitor the working environment and employee safety on the production line to ensure all operations comply with safety standards.</value>
+  </data>
+  <data name="Benefit" xml:space="preserve">
+    <value>Using an online production line work assignment system can improve production line efficiency and product quality while reducing errors and work delays in the production process.</value>
+  </data>
+  <data name="OnlineSOP" xml:space="preserve">
+    <value>Online SOP (Standard Operating Procedure)</value>
+  </data>
+  <data name="SOPIntro" xml:space="preserve">
+    <value>Standard operating procedure documents compiled and managed on digital platforms. These procedure documents describe in detail how to execute tasks to ensure consistency and efficiency.</value>
+  </data>
+  <data name="SOPBenefit1" xml:space="preserve">
+    <value>Unified Standards: Ensure all employees follow the same operating standards, reducing errors and rework.</value>
+  </data>
+  <data name="SOPBenefit2" xml:space="preserve">
+    <value>Simplified Training: New employees can learn through online SOPs, speeding up their onboarding process.</value>
+  </data>
+  <data name="SOPBenefit3" xml:space="preserve">
+    <value>Consistency: Ensure consistency in operational processes, improving work quality and result consistency.</value>
+  </data>
+  <data name="SOPBenefit4" xml:space="preserve">
+    <value>Continuous Improvement: Continuously improve business processes and operating standards through real-time updates and feedback mechanisms.</value>
+  </data>
+  <data name="SOPBenefit5" xml:space="preserve">
+    <value>Reduce Paper and Printing Costs: Digital documents reduce the need for physical storage and printing.</value>
+  </data>
+  <data name="SOPBenefit6" xml:space="preserve">
+    <value>Save Time: Improve work efficiency and reduce time wasted due to unclear processes or errors.</value>
+  </data>
+  <data name="SOPBenefit7" xml:space="preserve">
+    <value>Real-time Updates and Audits: Ensure SOPs are consistent with the latest laws and company policies, reducing compliance risks.</value>
+  </data>
+  <data name="SOPBenefit8" xml:space="preserve">
+    <value>Clear Operating Procedures: All employees can easily access operating procedures to understand company processes and requirements.</value>
+  </data>
+</root>
