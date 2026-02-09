@@ -36,7 +36,20 @@ function updateAllTranslations() {
             if (attr) {
                 element.setAttribute(attr, translatedText);
             } else {
-                element.textContent = translatedText;
+                // Preserve leading spacing characters (emsp, nbsp, etc)
+                const currentHTML = element.innerHTML;
+                const leadingSpaces = currentHTML.match(/^(&emsp;|&nbsp;|\s)*/);
+                const trailingTags = currentHTML.match(/<br\s*\/?>$/i);
+                
+                let newHTML = translatedText;
+                if (leadingSpaces) {
+                    newHTML = leadingSpaces[0] + newHTML;
+                }
+                if (trailingTags) {
+                    newHTML = newHTML + trailingTags[0];
+                }
+                
+                element.innerHTML = newHTML;
             }
         }
     });
