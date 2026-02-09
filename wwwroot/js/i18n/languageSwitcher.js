@@ -19,44 +19,15 @@ function renderLanguageSwitcher(containerId) {
     const currentLangObj = languages.find(lang => lang.code === currentLang);
     
     const html = `
-        <div class="language-switcher" style="position: relative; display: inline-block;">
-            <button id="lang-switcher-btn" class="lang-switcher-btn" style="
-                background: transparent;
-                border: 2px solid dodgerblue;
-                color: dodgerblue;
-                padding: 8px 16px;
-                border-radius: 4px;
-                cursor: pointer;
-                font-weight: bold;
-                font-size: 0.9em;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            ">
+        <div class="language-switcher">
+            <button id="lang-switcher-btn" class="lang-switcher-btn">
                 <span>🌐</span>
                 <span>${currentLangObj ? currentLangObj.nativeName : currentLang}</span>
-                <span style="font-size: 0.7em;">▼</span>
+                <span class="lang-switcher-arrow">▼</span>
             </button>
-            <div id="lang-dropdown" class="lang-dropdown" style="
-                display: none;
-                position: absolute;
-                top: 100%;
-                right: 0;
-                background: white;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-                margin-top: 4px;
-                min-width: 150px;
-                z-index: 1000;
-            ">
+            <div id="lang-dropdown" class="lang-dropdown">
                 ${languages.map(lang => `
-                    <div class="lang-option" data-lang="${lang.code}" style="
-                        padding: 10px 16px;
-                        cursor: pointer;
-                        border-bottom: 1px solid #f0f0f0;
-                        ${currentLang === lang.code ? 'background: #f0f8ff; font-weight: bold;' : ''}
-                    ">
+                    <div class="lang-option ${currentLang === lang.code ? 'active' : ''}" data-lang="${lang.code}">
                         ${lang.nativeName} ${currentLang === lang.code ? '✓' : ''}
                     </div>
                 `).join('')}
@@ -72,12 +43,12 @@ function renderLanguageSwitcher(containerId) {
     
     btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        dropdown.classList.toggle('visible');
     });
     
     // Close dropdown when clicking outside
     document.addEventListener('click', () => {
-        dropdown.style.display = 'none';
+        dropdown.classList.remove('visible');
     });
     
     // Language option click handlers
@@ -87,19 +58,6 @@ function renderLanguageSwitcher(containerId) {
             const lang = option.getAttribute('data-lang');
             if (lang && lang !== currentLang) {
                 window.i18n.setLanguage(lang);
-            }
-        });
-        
-        // Hover effect
-        option.addEventListener('mouseenter', (e) => {
-            if (e.target.getAttribute('data-lang') !== currentLang) {
-                e.target.style.background = '#f5f5f5';
-            }
-        });
-        
-        option.addEventListener('mouseleave', (e) => {
-            if (e.target.getAttribute('data-lang') !== currentLang) {
-                e.target.style.background = 'white';
             }
         });
     });

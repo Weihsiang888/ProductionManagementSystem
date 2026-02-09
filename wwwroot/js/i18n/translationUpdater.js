@@ -58,39 +58,65 @@ function updateAllTranslations() {
 /**
  * Update Blazor menu items with translations
  * This is a helper function specific to the DevExpress Blazor menu
+ * Uses Promise-based approach to wait for menu to be rendered
  */
 function updateBlazorMenuTranslations() {
     if (!window.i18n) return;
     
-    // Wait for DOM to be ready
-    setTimeout(() => {
+    // Function to attempt menu translation
+    const attemptMenuTranslation = () => {
         // Update title
         const titleElement = document.querySelector('.icon-logo.font-style');
         if (titleElement) {
             const titleText = window.i18n.t('app.title');
-            // Preserve the spacing structure
-            titleElement.innerHTML = '&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;' + titleText;
+            // Use CSS class instead of multiple &emsp; for spacing
+            titleElement.textContent = titleText;
+            titleElement.style.paddingLeft = '12em'; // Equivalent to 12 &emsp;
         }
         
         // Update menu items by their text content
         const menuItems = document.querySelectorAll('.dxbl-menu-item .font-style, .dxbl-menu-item-content .font-style');
-        menuItems.forEach(item => {
-            const currentText = item.textContent.trim();
+        if (menuItems.length > 0) {
+            menuItems.forEach(item => {
+                const currentText = item.textContent.trim();
+                
+                // Map Chinese text to translation keys
+                const textKeyMap = {
+                    '首頁': 'nav.home',
+                    'ESOP': 'nav.esop'
+                };
+                
+                if (textKeyMap[currentText]) {
+                    item.textContent = window.i18n.t(textKeyMap[currentText]);
+                }
+            });
             
-            // Map Chinese text to translation keys
-            const textKeyMap = {
-                '首頁': 'nav.home',
-                'ESOP': 'nav.esop'
-            };
-            
-            if (textKeyMap[currentText]) {
-                item.textContent = window.i18n.t(textKeyMap[currentText]);
-            }
-        });
-        
-        // Update login/logout text
-        updateLoginLogoutText();
-    }, 100);
+            // Update login/logout text
+            updateLoginLogoutText();
+            return true;
+        }
+        return false;
+    };
+    
+    // Try immediately
+    if (attemptMenuTranslation()) {
+        return;
+    }
+    
+    // If not available, use MutationObserver to wait for menu
+    const observer = new MutationObserver((mutations, obs) => {
+        if (attemptMenuTranslation()) {
+            obs.disconnect();
+        }
+    });
+    
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+    
+    // Timeout to stop observing after 5 seconds
+    setTimeout(() => observer.disconnect(), 5000);
 }
 
 /**
@@ -146,11 +172,41 @@ window.addEventListener('i18nReady', () => {
     initTranslationUpdates();
 });
 
-// Also try to initialize on Blazor connection
+// Handle language changes
+window.addEventListener('languageChanged', () => {
+    initTranslationUpdates();
+});
+
+// Initialize when Blazor is ready (if available)
 if (window.Blazor) {
+    // Blazor provides a promise when it starts
     window.Blazor.start().then(() => {
-        setTimeout(initTranslationUpdates, 500);
+        // Use MutationObserver to wait for initial render
+        const observer = new MutationObserver(() => {
+            if (document.querySelector('.content')) {
+                initTranslationUpdates();
+                observer.disconnect();
+            }
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        
+        // Timeout to stop observing after 5 seconds
+        setTimeout(() => observer.disconnect(), 5000);
+    }).catch(() => {
+        // Fallback if Blazor is not available
+        initTranslationUpdates();
     });
+} else {
+    // Fallback for non-Blazor pages
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initTranslationUpdates);
+    } else {
+        initTranslationUpdates();
+    }
 }
 
 // Export functions

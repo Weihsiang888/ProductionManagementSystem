@@ -54,7 +54,7 @@ function getCurrentLanguage() {
 }
 
 /**
- * Set the current language and reload the page
+ * Set the current language and update translations dynamically
  * @param {string} lang - Language code to set
  */
 function setLanguage(lang) {
@@ -64,10 +64,30 @@ function setLanguage(lang) {
     }
     
     localStorage.setItem('preferredLanguage', lang);
+    const oldLanguage = currentLanguage;
     currentLanguage = lang;
     
-    // Reload the page to apply translations
-    window.location.reload();
+    // Reload translations and update DOM without page reload
+    loadTranslations().then(() => {
+        // Trigger translation updates
+        window.dispatchEvent(new CustomEvent('languageChanged', { 
+            detail: { oldLanguage, newLanguage: lang } 
+        }));
+        
+        // Update all elements with translations
+        if (window.translationUpdater) {
+            window.translationUpdater.updateAll();
+            window.translationUpdater.updateMenu();
+        }
+        
+        // Update language switcher if present
+        if (window.languageSwitcher) {
+            const container = document.getElementById('language-switcher-container');
+            if (container) {
+                window.languageSwitcher.render('language-switcher-container');
+            }
+        }
+    });
 }
 
 /**
@@ -98,6 +118,11 @@ async function loadTranslations() {
  * @returns {*} Value at path or undefined
  */
 function getNestedProperty(obj, path) {
+    // Validate input
+    if (!path || typeof path !== 'string') {
+        return undefined;
+    }
+    
     return path.split('.').reduce((current, key) => current?.[key], obj);
 }
 
