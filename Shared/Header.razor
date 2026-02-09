@@ -1,4 +1,6 @@
 ﻿@using DxBlazorApplication7.Data
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<Header> Localizer
 @inject AuthenticationStateProvider authenticationStateProvider
 @inherits AuthComponentBase
 @inject NavigationManager nav
@@ -149,10 +151,10 @@
 
 <div class="card">
     <div class="card-body p-0">
-        <DxMenu Title="產線 - 線上派工系統" ItemsPosition="ItemPosition.End" CollapseItemsToHamburgerMenu="true" ItemClick="@((args) => { 
+        <DxMenu Title="@Localizer["Title"]" ItemsPosition="ItemPosition.End" CollapseItemsToHamburgerMenu="true" ItemClick="@((args) => { 
             if (args.ItemInfo.Name == "LogIn")
             {
-                if(args.ItemInfo.Text == "Login")
+                if(args.ItemInfo.Text == Localizer["Login"])
                 { 
                     PopupVisible = true;
                 } 
@@ -160,7 +162,7 @@
                 { 
                     PopupVisible = false;
                     IsLogIn = false;
-                    LogInValue = "Login";
+                    LogInValue = Localizer["Login"];
                     UserData.Username = null;
                     UserData.Password = null;
                     UserData.Group = null;
@@ -169,12 +171,12 @@
        @* <DxMenu Title="產線 - 線上派工系統" ItemsPosition="ItemPosition.End" CollapseItemsToHamburgerMenu="true" >*@
             <TitleTemplate>
                 @* <div class="icon-logo" role="img" aria-label="@context">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;產線 - 線上派工系統</div> *@
-                <div class="icon-logo font-style" role="img" aria-label="@context">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;產線 ( 報工 - ESOP ) 系統</div>
+                <div class="icon-logo font-style" role="img" aria-label="@context">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;@Localizer["Title"]</div>
             </TitleTemplate>
             <Items>
                 <DxMenuItem IconCssClass="menu-icon-home menu-icon" NavigateUrl="./">
                     <TextTemplate>
-                        <div class="font-style">首頁</div>
+                        <div class="font-style">@Localizer["Home"]</div>
                     </TextTemplate>
                 </DxMenuItem>
                 @* <DxMenuItem IconCssClass="menu-icon-products menu-icon">
@@ -240,7 +242,7 @@
                 {*@
                     <DxMenuItem IconCssClass="menu-icon-info menu-icon" NavigateUrl="ESOPPage">
                         <TextTemplate>
-                            <div class="font-style">ESOP</div>
+                            <div class="font-style">@Localizer["ESOP"]</div>
                         </TextTemplate>
                         @* <Items>
                             <DxMenuItem CssClass="font-style" Text="作業站別" NavigateUrl="StationStatus" />
@@ -260,7 +262,7 @@
                 </DxMenuItem>
                 @if (customAuth.user.role != Role.Guest)
                 {
-                    <DxMenuItem title="Logout" Click="@NavToLogout" CssClass="notoggle font-style" IconCssClass="menu-icon-user-profile menu-icon" Name="Logout" Position="ItemPosition.End">
+                    <DxMenuItem title="@Localizer["Logout"]" Click="@NavToLogout" CssClass="notoggle font-style" IconCssClass="menu-icon-user-profile menu-icon" Name="Logout" Position="ItemPosition.End">
                         <Template>
                             <div style="padding:9px 27px; text-align:center;
                                     color:dodgerblue">
@@ -271,7 +273,7 @@
                 }
                 else
                 {
-                    <DxMenuItem title="Login" Click="@NavToLogin" CssClass="notoggle font-style" IconCssClass="menu-icon-user-profile menu-icon" Name="Login" Position="ItemPosition.End">
+                    <DxMenuItem title="@Localizer["Login"]" Click="@NavToLogin" CssClass="notoggle font-style" IconCssClass="menu-icon-user-profile menu-icon" Name="Login" Position="ItemPosition.End">
                         <Template>
                             <div style="padding:9px 27px; text-align:center;
                                     color:dodgerblue">
@@ -333,7 +335,7 @@
     public bool PopupVisible { get; set; }
     public bool IsLogIn { get; set; }
     UserDataBase UserData { get; set; } = new UserDataBase();
-    string LogInValue = "Login";
+    string LogInValue => Localizer["Login"];
 
     bool IsManager = false;
     private List<OperatorInformation>? _OperatorInformations;
@@ -375,26 +377,26 @@
 
     string GetLogInValue()
     {
-        string Result = "Login : Guest";
+        string Result = Localizer["LoginGuest"];
         if (customAuth.user.role == Role.Guest)
         {
-            Result = "Login : Guest";
+            Result = Localizer["LoginGuest"];
         }
         else if (customAuth.user.role != Role.Guest)
         {
             var item = _OperatorInformations.SingleOrDefault(x => x.OPNO == customAuth.user.userName);
             if (item != null)
             {
-                Result = "Logout【 " + item.OperatorName + " 】";
+                Result = string.Format(Localizer["LogoutUser"], item.OperatorName);
             }
             else
             {
-                Result = "Logout【 " + customAuth.user.userName + " 】";
+                Result = string.Format(Localizer["LogoutUser"], customAuth.user.userName);
             }
         }
         else if (customAuth.user == null)
         {
-            Result = "Login : Guest";
+            Result = Localizer["LoginGuest"];
         }
         return Result;
     }
