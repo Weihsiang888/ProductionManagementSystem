@@ -23,10 +23,9 @@
         var culture = e.Value?.ToString();
         if (!string.IsNullOrEmpty(culture))
         {
-            // Set cookie using JavaScript
+            // Set cookie using dedicated JavaScript helper function
             var cookieValue = $"c={culture}|uic={culture}";
-            await JSRuntime.InvokeVoidAsync("eval", 
-                $"document.cookie = '.AspNetCore.Culture={cookieValue}; path=/; max-age=31536000; SameSite=Lax'");
+            await JSRuntime.InvokeVoidAsync("CultureHelper.setCookie", ".AspNetCore.Culture", cookieValue, 365);
 
             // Reload the page to apply the new culture
             Navigation.NavigateTo(Navigation.Uri, forceLoad: true);

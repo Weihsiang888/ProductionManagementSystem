@@ -16,7 +16,7 @@
     <value>首頁</value>
   </data>
   <data name="OperatorInformation" xml:space="preserve">
-    <value>產線人員資本資料</value>
+    <value>產線人員基本資料</value>
   </data>
   <data name="OperatorAbility" xml:space="preserve">
     <value>作業人員技能配置</value>
