@@ -6,7 +6,7 @@
     <Columns>
         <DxGridDataColumn Width="120">
             <CellDisplayTemplate>
-                <DxButton Text="開啟SOP" Click="@(() => OnRowAction((DirectoryStatus)context.DataItem))" />
+                <DxButton Text="開啟文件" Click="@(() => OnRowAction((DirectoryStatus)context.DataItem))" />
             </CellDisplayTemplate>
         </DxGridDataColumn>
 
@@ -45,16 +45,16 @@
     <FooterContentTemplate Context="Context">
         <div class="d-flex align-items-center w-100">
             <!-- 第一個靠左的按鈕 -->
-            <DxButton CssClass="popup-button my-1 me-2"
+            @* <DxButton CssClass="popup-button my-1 me-2"
                       RenderStyle="ButtonRenderStyle.Secondary"
                       Text="繁體中文"
-                      Click="Selected_LanguageChanged" />
+                      Click="Selected_LanguageChanged" /> *@
 
             <!-- 第二個靠左的按鈕 -->
-            <DxButton CssClass="popup-button my-1 me-2"
+            @* <DxButton CssClass="popup-button my-1 me-2"
                       RenderStyle="ButtonRenderStyle.Secondary"
                       Text="English"
-                      Click="Selected_LanguageChanged" />
+                      Click="Selected_LanguageChanged" /> *@
 
             <!-- 第三個靠最右的按鈕 -->
             <DxButton CssClass="popup-button my-1 ms-auto"

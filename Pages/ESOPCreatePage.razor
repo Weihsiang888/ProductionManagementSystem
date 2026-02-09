@@ -14,7 +14,7 @@
         EditModelSaving="OnEditModelSaving"
         CustomizeEditModel="Grid_CustomizeEditModel">
     <Columns>
-        @if (!(customAuth.user.role != Role.Guest && customAuth.user.department == "Manager"))
+        @if ((customAuth.user.role != Role.Guest && customAuth.user.department == "Manager"))
         {
             <DxGridCommandColumn Width="90">
                 <HeaderTemplate>
