@@ -1,0 +1,193 @@
+@page "/language-test"
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@inject IStringLocalizer<DxBlazorApplication7.Resources.SharedResources> SharedLocalizer
+@inject IStringLocalizer<NavMenu> NavMenuLocalizer
+
+<PageTitle>Language Test - 語系測試</PageTitle>
+
+<div class="container-fluid p-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-3">🌐 多語系功能診斷測試頁面</h1>
+            <h2 class="text-muted">Multi-Language Feature Diagnostic Test Page</h2>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h4>📊 當前狀態 / Current Status</h4>
+                <ul class="mb-0">
+                    <li><strong>當前語系 / Current Culture:</strong> @CultureInfo.CurrentCulture.Name</li>
+                    <li><strong>當前 UI 語系 / Current UI Culture:</strong> @CultureInfo.CurrentUICulture.Name</li>
+                    <li><strong>顯示名稱 / Display Name:</strong> @CultureInfo.CurrentUICulture.DisplayName</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">✅ SharedResources 通用翻譯測試</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 30%">資源鍵 / Resource Key</th>
+                                    <th style="width: 35%">翻譯結果 / Translation</th>
+                                    <th style="width: 35%">狀態 / Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var key in sharedResourceKeys)
+                                {
+                                    var translation = SharedLocalizer[key].Value;
+                                    var isSuccess = !string.IsNullOrEmpty(translation) && translation != key;
+                                    <tr class="@(isSuccess ? "table-success" : "table-danger")">
+                                        <td><code>@key</code></td>
+                                        <td><strong>@translation</strong></td>
+                                        <td>@(isSuccess ? "✅ 成功 / Success" : "❌ 失敗 / Failed")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">✅ NavMenu 導覽選單翻譯測試</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 30%">資源鍵 / Resource Key</th>
+                                    <th style="width: 35%">翻譯結果 / Translation</th>
+                                    <th style="width: 35%">狀態 / Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var key in navMenuResourceKeys)
+                                {
+                                    var translation = NavMenuLocalizer[key].Value;
+                                    var isSuccess = !string.IsNullOrEmpty(translation) && translation != key;
+                                    <tr class="@(isSuccess ? "table-success" : "table-danger")">
+                                        <td><code>@key</code></td>
+                                        <td><strong>@translation</strong></td>
+                                        <td>@(isSuccess ? "✅ 成功 / Success" : "❌ 失敗 / Failed")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">🔍 語系切換測試說明</h4>
+                </div>
+                <div class="card-body">
+                    <h5>測試步驟 / Test Steps:</h5>
+                    <ol>
+                        <li>使用頁面右上角的語系切換器切換至英文 (English 🇺🇸) / Use the language switcher in the top-right corner to switch to English</li>
+                        <li>確認所有翻譯顯示為英文 / Verify all translations are displayed in English</li>
+                        <li>切換回繁體中文 (繁體中文 🇹🇼) / Switch back to Traditional Chinese</li>
+                        <li>確認所有翻譯顯示為繁體中文 / Verify all translations are displayed in Traditional Chinese</li>
+                        <li>重新整理頁面，確認語系設定被保存 / Refresh the page to verify language preference is persisted</li>
+                    </ol>
+                    
+                    <h5 class="mt-4">預期結果 / Expected Results:</h5>
+                    <ul>
+                        <li>所有資源鍵應該顯示 ✅ 成功狀態 / All resource keys should show ✅ Success status</li>
+                        <li>翻譯應該根據選擇的語系正確顯示 / Translations should display correctly based on selected language</li>
+                        <li>語系切換應該立即生效 / Language switching should take effect immediately</li>
+                        <li>語系設定應該在頁面重新整理後保持 / Language preference should persist after page reload</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-success">
+                <h4>📝 摘要 / Summary</h4>
+                <p class="mb-2">
+                    <strong>SharedResources 測試:</strong> 
+                    @sharedSuccessCount / @sharedResourceKeys.Count 成功
+                    (@(sharedResourceKeys.Count > 0 ? Math.Round((double)sharedSuccessCount / sharedResourceKeys.Count * 100, 1) : 0)%)
+                </p>
+                <p class="mb-0">
+                    <strong>NavMenu 測試:</strong> 
+                    @navSuccessCount / @navMenuResourceKeys.Count 成功
+                    (@(navMenuResourceKeys.Count > 0 ? Math.Round((double)navSuccessCount / navMenuResourceKeys.Count * 100, 1) : 0)%)
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<string> sharedResourceKeys = new()
+    {
+        "Home",
+        "Save",
+        "Delete",
+        "Edit",
+        "Add",
+        "Cancel",
+        "OK",
+        "Close",
+        "Search",
+        "Refresh",
+        "Export",
+        "Loading"
+    };
+
+    private List<string> navMenuResourceKeys = new()
+    {
+        "Home",
+        "OperatorInformation",
+        "OperatorAbility",
+        "TimePeriod",
+        "OvertimeSchedule",
+        "WorkingStation",
+        "WorkingProcedure",
+        "WorkingAssignment",
+        "RobotAssembly",
+        "OnlineReport",
+        "WorkingDetail",
+        "Report",
+        "StatisticReport",
+        "OperatorReport"
+    };
+
+    private int sharedSuccessCount => sharedResourceKeys.Count(key => 
+    {
+        var translation = SharedLocalizer[key].Value;
+        return !string.IsNullOrEmpty(translation) && translation != key;
+    });
+
+    private int navSuccessCount => navMenuResourceKeys.Count(key => 
+    {
+        var translation = NavMenuLocalizer[key].Value;
+        return !string.IsNullOrEmpty(translation) && translation != key;
+    });
+}
