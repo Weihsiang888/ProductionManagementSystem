@@ -1,0 +1,66 @@
+@using Microsoft.AspNetCore.Localization
+@using System.Globalization
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<div class="language-switcher">
+    <DxComboBox Data="@languages"
+                Value="@currentLanguage"
+                ValueChanged="@OnLanguageChanged"
+                TextFieldName="@nameof(LanguageOption.DisplayName)"
+                ValueFieldName="@nameof(LanguageOption.Code)"
+                CssClass="language-selector"
+                SizeMode="SizeMode.Small">
+        <DxListEditorColumn FieldName="@nameof(LanguageOption.DisplayName)" />
+    </DxComboBox>
+</div>
+
+@code {
+    private List<LanguageOption> languages = new()
+    {
+        new LanguageOption { Code = "zh-TW", DisplayName = "繁體中文 🇹🇼" },
+        new LanguageOption { Code = "en", DisplayName = "English 🇺🇸" }
+    };
+
+    private string currentLanguage = "zh-TW";
+
+    protected override void OnInitialized()
+    {
+        currentLanguage = CultureInfo.CurrentUICulture.Name;
+    }
+
+    private async Task OnLanguageChanged(string newLanguage)
+    {
+        if (string.IsNullOrEmpty(newLanguage) || currentLanguage == newLanguage)
+            return;
+
+        currentLanguage = newLanguage;
+        
+        // Use standard Cookie API
+        var cookieName = CookieRequestCultureProvider.DefaultCookieName;
+        var cookieValue = CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(newLanguage));
+        
+        await JS.InvokeVoidAsync("eval", 
+            $"document.cookie = '{cookieName}={cookieValue}; path=/; max-age=31536000; SameSite=Lax';");
+        
+        await Task.Delay(100);
+        Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+    }
+
+    public class LanguageOption
+    {
+        public string? Code { get; set; }
+        public string? DisplayName { get; set; }
+    }
+}
+
+<style>
+    .language-switcher {
+        display: inline-block;
+        min-width: 150px;
+    }
+    
+    .language-selector {
+        width: 100%;
+    }
+</style>

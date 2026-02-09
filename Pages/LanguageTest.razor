@@ -1,0 +1,131 @@
+@page "/language-test"
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@inject IStringLocalizer<DxBlazorApplication7.Resources.SharedResources> SharedLocalizer
+@inject IStringLocalizer<NavMenu> NavMenuLocalizer
+
+<PageTitle>語系測試 / Language Test</PageTitle>
+
+<h3>🌐 多語系診斷頁面 / Multilingual Diagnostic Page</h3>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">📊 當前語系資訊</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr>
+                        <th>Culture:</th>
+                        <td><code>@CultureInfo.CurrentCulture.Name</code></td>
+                    </tr>
+                    <tr>
+                        <th>UI Culture:</th>
+                        <td><code>@CultureInfo.CurrentUICulture.Name</code></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">🔄 語系切換器</h5>
+            </div>
+            <div class="card-body">
+                <LanguageSwitcher />
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">✅ SharedResources 測試</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Translation</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var key in sharedKeys)
+                        {
+                            var translation = SharedLocalizer[key];
+                            <tr>
+                                <td><code>@key</code></td>
+                                <td><strong>@translation</strong></td>
+                                <td>
+                                    @if (!translation.ResourceNotFound)
+                                    {
+                                        <span class="badge bg-success">✅</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">❌</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">🗂️ NavMenu 測試</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Translation</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var key in navKeys)
+                        {
+                            var translation = NavMenuLocalizer[key];
+                            <tr>
+                                <td><code>@key</code></td>
+                                <td><strong>@translation</strong></td>
+                                <td>
+                                    @if (!translation.ResourceNotFound)
+                                    {
+                                        <span class="badge bg-success">✅</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">❌</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string[] sharedKeys = new[]
+    {
+        "Home", "Save", "Delete", "Edit", "Add", "Cancel", 
+        "OK", "Close", "Search", "Refresh", "Export", "Loading"
+    };
+
+    private string[] navKeys = new[]
+    {
+        "Home", "OperatorInformation", "OperatorAbility", 
+        "TimePeriod", "OvertimeSchedule", "WorkingStation"
+    };
+}
