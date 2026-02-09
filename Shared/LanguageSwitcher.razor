@@ -6,7 +6,7 @@
 <div class="language-switcher">
     <DxComboBox Data="@languages"
                 Value="@currentLanguage"
-                ValueChanged="@OnLanguageChanged"
+                ValueChanged="@((string value) => OnLanguageChanged(value))"
                 TextFieldName="@nameof(LanguageOption.DisplayName)"
                 ValueFieldName="@nameof(LanguageOption.Code)"
                 CssClass="language-selector"
@@ -34,8 +34,10 @@
         if (currentLanguage != newLanguage)
         {
             currentLanguage = newLanguage;
+            
             await JS.InvokeVoidAsync("eval", 
                 $@"document.cookie = '.AspNetCore.Culture=c={newLanguage}|uic={newLanguage}; path=/; max-age=31536000';");
+            
             Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
         }
     }
