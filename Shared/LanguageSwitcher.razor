@@ -31,15 +31,20 @@
 
     private async Task OnLanguageChanged(string newLanguage)
     {
-        if (currentLanguage != newLanguage)
-        {
-            currentLanguage = newLanguage;
-            
-            await JS.InvokeVoidAsync("eval", 
-                $@"document.cookie = '.AspNetCore.Culture=c={newLanguage}|uic={newLanguage}; path=/; max-age=31536000';");
-            
-            Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
-        }
+        if (string.IsNullOrEmpty(newLanguage) || currentLanguage == newLanguage)
+            return;
+
+        currentLanguage = newLanguage;
+        
+        // Use standard API
+        var cookieName = CookieRequestCultureProvider.DefaultCookieName;
+        var cookieValue = CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(newLanguage));
+        
+        await JS.InvokeVoidAsync("eval", 
+            $"document.cookie = '{cookieName}={cookieValue}; path=/; max-age=31536000; SameSite=Lax';");
+        
+        await Task.Delay(100);
+        Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
     }
 
     public class LanguageOption

@@ -1,0 +1,177 @@
+@page "/language-test"
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@inject IStringLocalizer<DxBlazorApplication7.Resources.SharedResources> SharedLocalizer
+@inject IStringLocalizer<DxBlazorApplication7.Shared.NavMenu> NavMenuLocalizer
+
+<h1>Language Test / 語言測試</h1>
+
+<div class="mb-3">
+    <h3>Current Culture Information</h3>
+    <table class="table table-bordered">
+        <tr>
+            <td><strong>Current Culture:</strong></td>
+            <td>@CultureInfo.CurrentCulture.Name</td>
+        </tr>
+        <tr>
+            <td><strong>Current UI Culture:</strong></td>
+            <td>@CultureInfo.CurrentUICulture.Name</td>
+        </tr>
+    </table>
+</div>
+
+<div class="mb-3">
+    <h3>SharedResources Translations</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Key</th>
+                <th>Localized Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Home</td>
+                <td>@SharedLocalizer["Home"]</td>
+            </tr>
+            <tr>
+                <td>Save</td>
+                <td>@SharedLocalizer["Save"]</td>
+            </tr>
+            <tr>
+                <td>Delete</td>
+                <td>@SharedLocalizer["Delete"]</td>
+            </tr>
+            <tr>
+                <td>Edit</td>
+                <td>@SharedLocalizer["Edit"]</td>
+            </tr>
+            <tr>
+                <td>Add</td>
+                <td>@SharedLocalizer["Add"]</td>
+            </tr>
+            <tr>
+                <td>Cancel</td>
+                <td>@SharedLocalizer["Cancel"]</td>
+            </tr>
+            <tr>
+                <td>OK</td>
+                <td>@SharedLocalizer["OK"]</td>
+            </tr>
+            <tr>
+                <td>Close</td>
+                <td>@SharedLocalizer["Close"]</td>
+            </tr>
+            <tr>
+                <td>Search</td>
+                <td>@SharedLocalizer["Search"]</td>
+            </tr>
+            <tr>
+                <td>Refresh</td>
+                <td>@SharedLocalizer["Refresh"]</td>
+            </tr>
+            <tr>
+                <td>Export</td>
+                <td>@SharedLocalizer["Export"]</td>
+            </tr>
+            <tr>
+                <td>Loading</td>
+                <td>@SharedLocalizer["Loading"]</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="mb-3">
+    <h3>NavMenu Translations</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Key</th>
+                <th>Localized Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Home</td>
+                <td>@NavMenuLocalizer["Home"]</td>
+            </tr>
+            <tr>
+                <td>OperatorInformation</td>
+                <td>@NavMenuLocalizer["OperatorInformation"]</td>
+            </tr>
+            <tr>
+                <td>OperatorAbility</td>
+                <td>@NavMenuLocalizer["OperatorAbility"]</td>
+            </tr>
+            <tr>
+                <td>TimePeriod</td>
+                <td>@NavMenuLocalizer["TimePeriod"]</td>
+            </tr>
+            <tr>
+                <td>OvertimeSchedule</td>
+                <td>@NavMenuLocalizer["OvertimeSchedule"]</td>
+            </tr>
+            <tr>
+                <td>WorkingStation</td>
+                <td>@NavMenuLocalizer["WorkingStation"]</td>
+            </tr>
+            <tr>
+                <td>WorkingProcedure</td>
+                <td>@NavMenuLocalizer["WorkingProcedure"]</td>
+            </tr>
+            <tr>
+                <td>WorkingAssignment</td>
+                <td>@NavMenuLocalizer["WorkingAssignment"]</td>
+            </tr>
+            <tr>
+                <td>RobotAssembly</td>
+                <td>@NavMenuLocalizer["RobotAssembly"]</td>
+            </tr>
+            <tr>
+                <td>OnlineReport</td>
+                <td>@NavMenuLocalizer["OnlineReport"]</td>
+            </tr>
+            <tr>
+                <td>WorkingDetail</td>
+                <td>@NavMenuLocalizer["WorkingDetail"]</td>
+            </tr>
+            <tr>
+                <td>Report</td>
+                <td>@NavMenuLocalizer["Report"]</td>
+            </tr>
+            <tr>
+                <td>StatisticReport</td>
+                <td>@NavMenuLocalizer["StatisticReport"]</td>
+            </tr>
+            <tr>
+                <td>OperatorReport</td>
+                <td>@NavMenuLocalizer["OperatorReport"]</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="alert alert-info">
+    <h4>Expected Behavior:</h4>
+    <ul>
+        <li>When culture is <code>zh-TW</code>, values should be in Traditional Chinese (繁體中文)</li>
+        <li>When culture is <code>en</code>, values should be in English</li>
+        <li>If you see the key names instead of translations, the localization is not working correctly</li>
+        <li>Use the language switcher at the top to change languages and verify translations update</li>
+    </ul>
+</div>
+
+<style>
+    .table {
+        margin-top: 1rem;
+    }
+    
+    .table th {
+        background-color: #f8f9fa;
+    }
+    
+    .alert {
+        margin-top: 2rem;
+    }
+</style>
