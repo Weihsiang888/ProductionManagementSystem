@@ -1,5 +1,6 @@
 ﻿@using DxBlazorApplication7.Data
 @inject DataService DataService
+@inject IStringLocalizer<SharedResources> Localizer
 
 @foreach (var item in Param)
 {
@@ -45,7 +46,7 @@
                         <Template>
                             @* <DxButton Text="Success" RenderStyle="ButtonRenderStyle.Success" SizeMode="SizeMode.Medium"></DxButton> *@
                             <div class="cell">
-                                <DxButton Text="開啟SOP" CssClass="w-100" RenderStyle="ButtonRenderStyle.Success" SizeMode="SizeMode.Large" Click="@(()=>{Nav(item);})"></DxButton>
+                                <DxButton Text="@Localizer["OpenSOP"]" CssClass="w-100" RenderStyle="ButtonRenderStyle.Success" SizeMode="SizeMode.Large" Click="@(()=>{Nav(item);})"></DxButton>
                             </div>
                         </Template>
                     </DxGridLayoutItem>

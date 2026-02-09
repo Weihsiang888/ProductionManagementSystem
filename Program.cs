@@ -39,7 +39,7 @@ builder.Services.AddDevExpressBlazor(options => {
     options.SizeMode = DevExpress.Blazor.SizeMode.Medium;
 });
 
-#region 加入使用 Cookie 認證需要的宣告
+#region 嚙稼嚙皚嚙誕伐蕭 Cookie 嚙緹嚙課需要嚙踝蕭嚙褐告
 //builder.Services.Configure<CookiePolicyOptions>(options =>
 //{
 //    options.CheckConsentNeeded = context => true;
@@ -58,7 +58,11 @@ builder.Services.AddHostedService<DataBackgroundService>();
 builder.WebHost.UseWebRoot("wwwroot");
 builder.WebHost.UseStaticWebAssets();
 
-builder.Services.AddControllers();
+// Add localization services
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+builder.Services.AddControllers()
+    .AddViewLocalization()
+    .AddDataAnnotationsLocalization();
 builder.Services.AddEndpointsApiExplorer();
 //builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerGen(options =>
@@ -75,7 +79,17 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthentication>();
 builder.Services.AddScoped<IAuthDataService, UserDataService>();
 
+// Register CultureService
+builder.Services.AddScoped<CultureService>();
+
 var app = builder.Build();
+
+// Configure supported cultures
+var supportedCultures = new[] { "zh-TW", "en" };
+var localizationOptions = new RequestLocalizationOptions()
+    .SetDefaultCulture("zh-TW")
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -91,6 +105,9 @@ app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "Web API");
 });
+
+// Use request localization
+app.UseRequestLocalization(localizationOptions);
 
 app.UseStaticFiles(new StaticFileOptions
 {

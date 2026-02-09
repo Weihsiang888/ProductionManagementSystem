@@ -1,12 +1,14 @@
-﻿<AuthorizeView>
+﻿@inject IStringLocalizer<SharedResources> Localizer
+
+<AuthorizeView>
     <Authorized>
         <span>
-            <b>你好, @context.User.Identity.Name! </b>
-            <a class="ml-md-auto btn btn-primary" href="/Logout" target="_top"> 登出 </a>
+            <b>@Localizer["Hello"], @context.User.Identity.Name! </b>
+            <a class="ml-md-auto btn btn-primary" href="/Logout" target="_top"> @Localizer["Logout"] </a>
         </span>
     </Authorized>
     <NotAuthorized>
-        <a class="ml-md-auto btn btn-primary" href="/Login" target="_top"> 登入 </a>
+        <a class="ml-md-auto btn btn-primary" href="/Login" target="_top"> @Localizer["Login"] </a>
     </NotAuthorized>
 </AuthorizeView>
 

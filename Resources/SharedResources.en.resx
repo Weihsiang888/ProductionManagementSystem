@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" msdata:Ordinal="5" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="OnlineWorkReporting" xml:space="preserve">
+    <value>Online Work Reporting</value>
+  </data>
+  <data name="SystemDescription" xml:space="preserve">
+    <value>Used to manage human resources in manufacturing plants and ensure effective assignment and arrangement of production line workers.</value>
+  </data>
+  <data name="SystemFeatures" xml:space="preserve">
+    <value>This system typically includes the following features:</value>
+  </data>
+  <data name="Feature1" xml:space="preserve">
+    <value>1. Personnel data management: Record basic employee information, skills and experience.</value>
+  </data>
+  <data name="Feature2" xml:space="preserve">
+    <value>2. Production scheduling: Assign employees to appropriate workstations based on production plans and production line needs.</value>
+  </data>
+  <data name="Feature3" xml:space="preserve">
+    <value>3. Work progress tracking: Track employee work progress and product flow on production lines.</value>
+  </data>
+  <data name="Feature4" xml:space="preserve">
+    <value>4. Data analysis and reporting: Analyze employee performance and production line efficiency.</value>
+  </data>
+  <data name="Feature5" xml:space="preserve">
+    <value>5. Safety and monitoring: Monitor the work environment and employee safety on production lines.</value>
+  </data>
+  <data name="SystemBenefits" xml:space="preserve">
+    <value>Using the production line dispatch system can improve efficiency and product quality while reducing errors and delays.</value>
+  </data>
+  <data name="OnlineSOP" xml:space="preserve">
+    <value>Online SOP (Standard Operating Procedure)</value>
+  </data>
+  <data name="SelectLanguage" xml:space="preserve">
+    <value>Select Language</value>
+  </data>
+  <data name="TraditionalChinese" xml:space="preserve">
+    <value>繁體中文</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="OperatorInfo" xml:space="preserve">
+    <value>Operator Information</value>
+  </data>
+  <data name="OperatorAbility" xml:space="preserve">
+    <value>Operator Ability</value>
+  </data>
+  <data name="TimePeriod" xml:space="preserve">
+    <value>Work Time Period</value>
+  </data>
+  <data name="OvertimeSchedule" xml:space="preserve">
+    <value>Overtime Schedule</value>
+  </data>
+  <data name="WorkingTypeGroup" xml:space="preserve">
+    <value>Workstation</value>
+  </data>
+  <data name="WorkingType" xml:space="preserve">
+    <value>Workstation Procedures</value>
+  </data>
+  <data name="WorkingList" xml:space="preserve">
+    <value>Work Assignment</value>
+  </data>
+  <data name="WorkingResponse" xml:space="preserve">
+    <value>Online Work Reporting</value>
+  </data>
+  <data name="WorkingReport" xml:space="preserve">
+    <value>Work Assignment Details</value>
+  </data>
+  <data name="StatisticReport" xml:space="preserve">
+    <value>Work Order Statistics Report</value>
+  </data>
+  <data name="OperatorReport" xml:space="preserve">
+    <value>Operator Statistics Report</value>
+  </data>
+  <data name="Hello" xml:space="preserve">
+    <value>Hello</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="OpenSOP" xml:space="preserve">
+    <value>Open SOP</value>
+  </data>
+</root>

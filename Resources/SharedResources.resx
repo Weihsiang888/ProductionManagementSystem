@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" msdata:Ordinal="5" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="OnlineWorkReporting" xml:space="preserve">
+    <value>線上報工</value>
+  </data>
+  <data name="SystemDescription" xml:space="preserve">
+    <value>用於管理製造工廠的人力資源，並確保生產線上的工作人員得到有效的指派和安排。</value>
+  </data>
+  <data name="SystemFeatures" xml:space="preserve">
+    <value>這種系統通常包含以下功能：</value>
+  </data>
+  <data name="Feature1" xml:space="preserve">
+    <value>1.人員資料管理：記錄員工的基本資料、技能和經驗等信息。</value>
+  </data>
+  <data name="Feature2" xml:space="preserve">
+    <value>2.生產排程：根據生產計劃和產線需求，將員工指派到合適的工作站，並確保每個工作站都有足夠的人力資源。</value>
+  </data>
+  <data name="Feature3" xml:space="preserve">
+    <value>3.工作進度跟踪：跟踪員工的工作進度和生產線上的產品流程，並及時調整指派以應對任何生產線上的問題。</value>
+  </data>
+  <data name="Feature4" xml:space="preserve">
+    <value>4.數據分析和報告：分析員工的表現和生產線上的效率，提供報告和數據以幫助管理層作出更好的決策。</value>
+  </data>
+  <data name="Feature5" xml:space="preserve">
+    <value>5.安全和監控：監控生產線上的工作環境和員工的安全，以確保所有操作都符合安全標準。</value>
+  </data>
+  <data name="SystemBenefits" xml:space="preserve">
+    <value>使用產線線上派工系統可以提高生產線上的效率和產品質量，同時減少生產過程中的錯誤和工作延誤。</value>
+  </data>
+  <data name="OnlineSOP" xml:space="preserve">
+    <value>線上SOP（Standard Operating Procedure，標準作業程序）</value>
+  </data>
+  <data name="SelectLanguage" xml:space="preserve">
+    <value>選擇語言</value>
+  </data>
+  <data name="TraditionalChinese" xml:space="preserve">
+    <value>繁體中文</value>
+  </data>
+  <data name="English" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>首頁</value>
+  </data>
+  <data name="OperatorInfo" xml:space="preserve">
+    <value>產線人員資本資料</value>
+  </data>
+  <data name="OperatorAbility" xml:space="preserve">
+    <value>作業人員技能配置</value>
+  </data>
+  <data name="TimePeriod" xml:space="preserve">
+    <value>產線工作時段</value>
+  </data>
+  <data name="OvertimeSchedule" xml:space="preserve">
+    <value>產線加班時段</value>
+  </data>
+  <data name="WorkingTypeGroup" xml:space="preserve">
+    <value>產線工站</value>
+  </data>
+  <data name="WorkingType" xml:space="preserve">
+    <value>產線工站作業程序</value>
+  </data>
+  <data name="WorkingList" xml:space="preserve">
+    <value>產線人員派工作業</value>
+  </data>
+  <data name="WorkingResponse" xml:space="preserve">
+    <value>線上報工作業</value>
+  </data>
+  <data name="WorkingReport" xml:space="preserve">
+    <value>產線人員派工細節</value>
+  </data>
+  <data name="StatisticReport" xml:space="preserve">
+    <value>工單統計(工時)報表</value>
+  </data>
+  <data name="OperatorReport" xml:space="preserve">
+    <value>人員統計(工時)報表</value>
+  </data>
+  <data name="Hello" xml:space="preserve">
+    <value>你好</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>登出</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>登入</value>
+  </data>
+  <data name="OpenSOP" xml:space="preserve">
+    <value>開啟SOP</value>
+  </data>
+</root>
