@@ -253,6 +253,11 @@
                         </Items> *@
                     </DxMenuItem>
                 @* } *@
+                <DxMenuItem CssClass="notoggle" Position="ItemPosition.End">
+                    <Template>
+                        <div id="language-switcher-container" style="padding:9px 15px;"></div>
+                    </Template>
+                </DxMenuItem>
                 @if (customAuth.user.role != Role.Guest)
                 {
                     <DxMenuItem title="Logout" Click="@NavToLogout" CssClass="notoggle font-style" IconCssClass="menu-icon-user-profile menu-icon" Name="Logout" Position="ItemPosition.End">
