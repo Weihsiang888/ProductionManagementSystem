@@ -1,0 +1,108 @@
+@page "/language-test"
+@using System.Globalization
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<DxBlazorApplication7.Resources.SharedResources> SharedLocalizer
+@inject IStringLocalizer<Shared.NavMenu> NavMenuLocalizer
+
+<h3>語系測試頁面 / Language Test Page</h3>
+
+<div class="alert alert-info">
+    <h4>當前語系 / Current Language</h4>
+    <p><strong>Culture:</strong> @CultureInfo.CurrentCulture.Name</p>
+    <p><strong>UI Culture:</strong> @CultureInfo.CurrentUICulture.Name</p>
+</div>
+
+<div class="alert alert-success">
+    <h4>SharedResources 翻譯測試 / SharedResources Translation Test</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Key</th>
+                <th>Translation</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Home</td>
+                <td>@SharedLocalizer["Home"]</td>
+                <td>@(SharedLocalizer["Home"].ResourceNotFound ? "❌" : "✅")</td>
+            </tr>
+            <tr>
+                <td>Save</td>
+                <td>@SharedLocalizer["Save"]</td>
+                <td>@(SharedLocalizer["Save"].ResourceNotFound ? "❌" : "✅")</td>
+            </tr>
+            <tr>
+                <td>Delete</td>
+                <td>@SharedLocalizer["Delete"]</td>
+                <td>@(SharedLocalizer["Delete"].ResourceNotFound ? "❌" : "✅")</td>
+            </tr>
+            <tr>
+                <td>Edit</td>
+                <td>@SharedLocalizer["Edit"]</td>
+                <td>@(SharedLocalizer["Edit"].ResourceNotFound ? "❌" : "✅")</td>
+            </tr>
+            <tr>
+                <td>Add</td>
+                <td>@SharedLocalizer["Add"]</td>
+                <td>@(SharedLocalizer["Add"].ResourceNotFound ? "❌" : "✅")</td>
+            </tr>
+            <tr>
+                <td>Cancel</td>
+                <td>@SharedLocalizer["Cancel"]</td>
+                <td>@(SharedLocalizer["Cancel"].ResourceNotFound ? "❌" : "✅")</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="alert alert-primary">
+    <h4>NavMenu 翻譯測試 / NavMenu Translation Test</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Key</th>
+                <th>Translation</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Home</td>
+                <td>@NavMenuLocalizer["Home"]</td>
+                <td>@(NavMenuLocalizer["Home"].ResourceNotFound ? "❌" : "✅")</td>
+            </tr>
+            <tr>
+                <td>OperatorInformation</td>
+                <td>@NavMenuLocalizer["OperatorInformation"]</td>
+                <td>@(NavMenuLocalizer["OperatorInformation"].ResourceNotFound ? "❌" : "✅")</td>
+            </tr>
+            <tr>
+                <td>OperatorAbility</td>
+                <td>@NavMenuLocalizer["OperatorAbility"]</td>
+                <td>@(NavMenuLocalizer["OperatorAbility"].ResourceNotFound ? "❌" : "✅")</td>
+            </tr>
+            <tr>
+                <td>WorkingAssignment</td>
+                <td>@NavMenuLocalizer["WorkingAssignment"]</td>
+                <td>@(NavMenuLocalizer["WorkingAssignment"].ResourceNotFound ? "❌" : "✅")</td>
+            </tr>
+            <tr>
+                <td>RobotAssembly</td>
+                <td>@NavMenuLocalizer["RobotAssembly"]</td>
+                <td>@(NavMenuLocalizer["RobotAssembly"].ResourceNotFound ? "❌" : "✅")</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="alert alert-warning">
+    <h4>測試說明 / Testing Instructions</h4>
+    <ol>
+        <li>使用頁面上方的語系切換器切換語言 / Use the language switcher at the top to change language</li>
+        <li>確認所有翻譯都顯示為 ✅ / Confirm all translations show ✅</li>
+        <li>切換到英文並確認翻譯正確 / Switch to English and confirm translations are correct</li>
+        <li>切換回繁中並確認翻譯正確 / Switch back to Traditional Chinese and confirm translations are correct</li>
+    </ol>
+</div>

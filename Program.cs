@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
+using Microsoft.Extensions.Options;
 
 //var builder = WebApplication.CreateBuilder(args);
 
@@ -59,7 +60,12 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.DefaultRequestCulture = new RequestCulture("zh-TW");
     options.SupportedCultures = supportedCultures;
     options.SupportedUICultures = supportedCultures;
-    options.RequestCultureProviders.Insert(0, new CookieRequestCultureProvider());
+    
+    // Clear and reorder RequestCultureProviders for proper priority
+    options.RequestCultureProviders.Clear();
+    options.RequestCultureProviders.Add(new CookieRequestCultureProvider());
+    options.RequestCultureProviders.Add(new QueryStringRequestCultureProvider());
+    options.RequestCultureProviders.Add(new AcceptLanguageHeaderRequestCultureProvider());
 });
 
 #region �[�J�ϥ� Cookie �{�һݭn���ŧi
@@ -132,8 +138,9 @@ app.UseStaticFiles(new StaticFileOptions
 
 app.UseStaticFiles();
 
-// Use request localization (must be before UseRouting)
-app.UseRequestLocalization();
+// Use request localization with proper configuration
+var localizationOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value;
+app.UseRequestLocalization(localizationOptions);
 
 app.UseRouting();
 
