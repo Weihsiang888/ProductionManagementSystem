@@ -1,0 +1,189 @@
+@page "/language-test"
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@inject IStringLocalizer<DxBlazorApplication7.Resources.SharedResources> SharedLocalizer
+@inject IStringLocalizer<NavMenu> NavMenuLocalizer
+
+<h1>🌐 Multilingual System Diagnostic Page</h1>
+
+<div class="container-fluid">
+    <!-- Language Switcher -->
+    <div class="card mb-3">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Language Switcher</h5>
+        </div>
+        <div class="card-body">
+            <LanguageSwitcher />
+        </div>
+    </div>
+
+    <!-- Current Culture Information -->
+    <div class="card mb-3">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">Current Culture Information</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th style="width: 30%;">Current Culture</th>
+                        <td>@CultureInfo.CurrentCulture.Name</td>
+                    </tr>
+                    <tr>
+                        <th>Current UI Culture</th>
+                        <td>@CultureInfo.CurrentUICulture.Name</td>
+                    </tr>
+                    <tr>
+                        <th>Display Name</th>
+                        <td>@CultureInfo.CurrentCulture.DisplayName</td>
+                    </tr>
+                    <tr>
+                        <th>Native Name</th>
+                        <td>@CultureInfo.CurrentCulture.NativeName</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SharedResources Test -->
+    <div class="card mb-3">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">SharedResources Translations (20 keys)</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">Status</th>
+                        <th style="width: 30%;">Key</th>
+                        <th style="width: 60%;">Translation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var key in sharedResourceKeys)
+                    {
+                        var translation = SharedLocalizer[key];
+                        var isValid = !translation.ResourceNotFound;
+                        <tr>
+                            <td class="text-center">
+                                @if (isValid)
+                                {
+                                    <span class="text-success">✅</span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger">❌</span>
+                                }
+                            </td>
+                            <td><code>@key</code></td>
+                            <td>@translation</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- NavMenu Resources Test -->
+    <div class="card mb-3">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">NavMenu Translations (14 keys)</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">Status</th>
+                        <th style="width: 30%;">Key</th>
+                        <th style="width: 60%;">Translation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var key in navMenuKeys)
+                    {
+                        var translation = NavMenuLocalizer[key];
+                        var isValid = !translation.ResourceNotFound;
+                        <tr>
+                            <td class="text-center">
+                                @if (isValid)
+                                {
+                                    <span class="text-success">✅</span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger">❌</span>
+                                }
+                            </td>
+                            <td><code>@key</code></td>
+                            <td>@translation</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="card mb-3">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Summary</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert @(allValid ? "alert-success" : "alert-danger")" role="alert">
+                @if (allValid)
+                {
+                    <h4 class="alert-heading">✅ All translations are working correctly!</h4>
+                    <p class="mb-0">The multilingual system is fully functional.</p>
+                }
+                else
+                {
+                    <h4 class="alert-heading">❌ Some translations are missing</h4>
+                    <p class="mb-0">Please check the resource files for missing translations.</p>
+                }
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>SharedResources Status:</strong> 
+                    @sharedValidCount / @sharedResourceKeys.Length ✅
+                </div>
+                <div class="col-md-6">
+                    <strong>NavMenu Status:</strong> 
+                    @navMenuValidCount / @navMenuKeys.Length ✅
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string[] sharedResourceKeys = new[]
+    {
+        "Home", "Save", "Delete", "Edit", "Add", "Cancel", "OK", "Close",
+        "Search", "Refresh", "Export", "Loading", "Error", "Success",
+        "Warning", "Info", "Confirm", "Yes", "No", "Back"
+    };
+
+    private string[] navMenuKeys = new[]
+    {
+        "Home", "OperatorInformation", "OperatorAbility", "TimePeriod",
+        "OvertimeSchedule", "WorkingStation", "WorkingProcedure",
+        "WorkingAssignment", "RobotAssembly", "OnlineReport",
+        "WorkingDetail", "Report", "StatisticReport", "OperatorReport"
+    };
+
+    private int sharedValidCount = 0;
+    private int navMenuValidCount = 0;
+    private bool allValid = false;
+
+    protected override void OnInitialized()
+    {
+        // Count valid translations
+        sharedValidCount = sharedResourceKeys.Count(key => !SharedLocalizer[key].ResourceNotFound);
+        navMenuValidCount = navMenuKeys.Count(key => !NavMenuLocalizer[key].ResourceNotFound);
+        
+        // Check if all are valid
+        allValid = (sharedValidCount == sharedResourceKeys.Length) && 
+                   (navMenuValidCount == navMenuKeys.Length);
+    }
+}
