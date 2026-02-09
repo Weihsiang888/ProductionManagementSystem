@@ -10,11 +10,6 @@
     <Content Remove="Pages\Report\ReportPage7.razor" />
   </ItemGroup>
   <ItemGroup>
-    <Content Update="wwwroot\js\AuthCookie.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Update="Resources\**\*.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>

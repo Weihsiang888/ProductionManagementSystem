@@ -36,14 +36,13 @@
 
         currentLanguage = newLanguage;
         
-        // Use standard API
+        // Use standard API to set culture cookie
         var cookieName = CookieRequestCultureProvider.DefaultCookieName;
         var cookieValue = CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(newLanguage));
         
         await JS.InvokeVoidAsync("eval", 
             $"document.cookie = '{cookieName}={cookieValue}; path=/; max-age=31536000; SameSite=Lax';");
         
-        await Task.Delay(100);
         Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
     }
 

@@ -61,7 +61,10 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.SupportedCultures = supportedCultures;
     options.SupportedUICultures = supportedCultures;
     
-    // Clear and re-set the order
+    // Clear default providers and set priority order:
+    // 1. Cookie (user preference) - highest priority
+    // 2. Query string (explicit override) - for testing/debugging
+    // 3. Accept-Language header (browser preference) - fallback
     options.RequestCultureProviders.Clear();
     options.RequestCultureProviders.Add(new CookieRequestCultureProvider());
     options.RequestCultureProviders.Add(new QueryStringRequestCultureProvider());
