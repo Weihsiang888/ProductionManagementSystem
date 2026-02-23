@@ -3,6 +3,7 @@
 @inject DataService DataService
 @inject AuthenticationStateProvider authenticationStateProvider
 @inherits AuthComponentBase
+@inject IStringLocalizer<SharedResources> L
 
 <DxTabs CssClass="tabs" SizeMode="SizeMode.Large" RenderMode="TabsRenderMode.AllTabs">
     <DxTabPage Text="ESOP">
@@ -67,11 +68,11 @@
         }
     }
 
-    <DxTabPage Text="手動選取SOP">
+    <DxTabPage Text='@L["ESOP_ManualSelectSOP"]'>
         <TabTemplate>
             <div style="padding:9px 27px; text-align:center;
                         color:dodgerblue">
-                <span class="tab-title-bold">手動選取SOP (Manual SOP Selection)</span>
+                <span class="tab-title-bold">@L["ESOP_ManualSelectSOP"]</span>
             </div>
         </TabTemplate>
         <ChildContent>
@@ -81,11 +82,11 @@
 
     @if ((customAuth.user.role != Role.Guest && customAuth.user.department == "Manager"))
     {
-        <DxTabPage Text="修改ESOP清單">
+        <DxTabPage Text='@L["ESOP_EditESOPList"]'>
             <TabTemplate>
                 <div style="padding:9px 27px; text-align:center;
                                 color:dodgerblue">
-                    <span class="tab-title-bold">修改ESOP清單</span>
+                    <span class="tab-title-bold">@L["ESOP_EditESOPList"]</span>
                 </div>
             </TabTemplate>
             <ChildContent>

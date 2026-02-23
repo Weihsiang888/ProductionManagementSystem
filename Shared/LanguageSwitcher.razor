@@ -1,21 +1,19 @@
-@inject NavigationManager NavigationManager
-@using Microsoft.AspNetCore.WebUtilities
+@inject NavigationManager nav
+@inject IStringLocalizer<SharedResources> L
 
 <div class="language-switcher">
-    <button class="btn btn-sm btn-outline-secondary me-1" @onclick='() => SwitchLanguage("zh-TW")'>繁體中文</button>
-    <button class="btn btn-sm btn-outline-secondary" @onclick='() => SwitchLanguage("en")'>English</button>
+    <button class="btn btn-sm btn-outline-secondary me-1" @onclick='() => SwitchLanguage("zh-TW")'>@L["LanguageSwitcher_ZhTW"]</button>
+    <button class="btn btn-sm btn-outline-secondary" @onclick='() => SwitchLanguage("en")'>@L["LanguageSwitcher_En"]</button>
 </div>
 
 @code {
     private void SwitchLanguage(string culture)
     {
-        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-        var queryParams = QueryHelpers.ParseQuery(uri.Query);
-        queryParams["culture"] = culture;
-        queryParams["ui-culture"] = culture;
-        var newQuery = string.Join("&", queryParams.Select(kvp =>
-            $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value.FirstOrDefault() ?? string.Empty)}"));
-        var newUrl = uri.GetLeftPart(UriPartial.Path) + "?" + newQuery;
-        NavigationManager.NavigateTo(newUrl, forceLoad: true);
+        var uri = nav.ToAbsoluteUri(nav.Uri);
+        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+        query["culture"] = culture;
+        query["ui-culture"] = culture;
+        var newUrl = uri.GetLeftPart(UriPartial.Path) + "?" + query.ToString();
+        nav.NavigateTo(newUrl, forceLoad: true);
     }
 }
