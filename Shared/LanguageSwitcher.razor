@@ -14,7 +14,7 @@
         queryParams["culture"] = culture;
         queryParams["ui-culture"] = culture;
         var newQuery = string.Join("&", queryParams.Select(kvp =>
-            $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value.ToString())}"));
+            $"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value.FirstOrDefault() ?? string.Empty)}"));
         var newUrl = uri.GetLeftPart(UriPartial.Path) + "?" + newQuery;
         NavigationManager.NavigateTo(newUrl, forceLoad: true);
     }
