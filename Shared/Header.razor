@@ -3,6 +3,7 @@
 @inherits AuthComponentBase
 @inject NavigationManager nav
 @inject DataService DataService
+@inject IStringLocalizer<SharedResources> Localizer
 
 @*<nav class="navbar header-navbar p-0">
     <button class="navbar-toggler bg-primary d-block" @onclick="OnToggleClick">
@@ -149,7 +150,7 @@
 
 <div class="card">
     <div class="card-body p-0">
-        <DxMenu Title="產線 - 線上派工系統" ItemsPosition="ItemPosition.End" CollapseItemsToHamburgerMenu="true" ItemClick="@((args) => { 
+        <DxMenu Title="@Localizer["SystemTitle"]" ItemsPosition="ItemPosition.End" CollapseItemsToHamburgerMenu="true" ItemClick="@((args) => { 
             if (args.ItemInfo.Name == "LogIn")
             {
                 if(args.ItemInfo.Text == "Login")
@@ -169,12 +170,12 @@
        @* <DxMenu Title="產線 - 線上派工系統" ItemsPosition="ItemPosition.End" CollapseItemsToHamburgerMenu="true" >*@
             <TitleTemplate>
                 @* <div class="icon-logo" role="img" aria-label="@context">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;產線 - 線上派工系統</div> *@
-                <div class="icon-logo font-style" role="img" aria-label="@context">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;產線 ( 報工 - ESOP ) 系統</div>
+                <div class="icon-logo font-style" role="img" aria-label="@context">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;@Localizer["SystemTitle"]</div>
             </TitleTemplate>
             <Items>
                 <DxMenuItem IconCssClass="menu-icon-home menu-icon" NavigateUrl="./">
                     <TextTemplate>
-                        <div class="font-style">首頁</div>
+                        <div class="font-style">@Localizer["Home"]</div>
                     </TextTemplate>
                 </DxMenuItem>
                 @* <DxMenuItem IconCssClass="menu-icon-products menu-icon">
@@ -275,6 +276,11 @@
                         </Template>
                     </DxMenuItem>
                 }
+                <DxMenuItem CssClass="notoggle" Position="ItemPosition.End">
+                    <Template>
+                        <LanguageSwitcher />
+                    </Template>
+                </DxMenuItem>
                 @*<DxMenuItem>
                     <TextTemplate>
                         <SigninView />
@@ -370,26 +376,26 @@
 
     string GetLogInValue()
     {
-        string Result = "Login : Guest";
+        string Result = Localizer["LoginGuest"];
         if (customAuth.user.role == Role.Guest)
         {
-            Result = "Login : Guest";
+            Result = Localizer["LoginGuest"];
         }
         else if (customAuth.user.role != Role.Guest)
         {
             var item = _OperatorInformations.SingleOrDefault(x => x.OPNO == customAuth.user.userName);
             if (item != null)
             {
-                Result = "Logout【 " + item.OperatorName + " 】";
+                Result = Localizer["LogoutUser"] + "【 " + item.OperatorName + " 】";
             }
             else
             {
-                Result = "Logout【 " + customAuth.user.userName + " 】";
+                Result = Localizer["LogoutUser"] + "【 " + customAuth.user.userName + " 】";
             }
         }
         else if (customAuth.user == null)
         {
-            Result = "Login : Guest";
+            Result = Localizer["LoginGuest"];
         }
         return Result;
     }

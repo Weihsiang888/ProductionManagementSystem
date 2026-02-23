@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.OpenApi.Models;
+using System.Globalization;
 
 //var builder = WebApplication.CreateBuilder(args);
 
@@ -39,7 +41,7 @@ builder.Services.AddDevExpressBlazor(options => {
     options.SizeMode = DevExpress.Blazor.SizeMode.Medium;
 });
 
-#region 加入使用 Cookie 認證需要的宣告
+#region 嚙稼嚙皚嚙誕伐蕭 Cookie 嚙緹嚙課需要嚙踝蕭嚙褐告
 //builder.Services.Configure<CookiePolicyOptions>(options =>
 //{
 //    options.CheckConsentNeeded = context => true;
@@ -57,6 +59,20 @@ builder.Services.AddSingleton<DataService>();
 builder.Services.AddHostedService<DataBackgroundService>();
 builder.WebHost.UseWebRoot("wwwroot");
 builder.WebHost.UseStaticWebAssets();
+
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+var supportedCultures = new[] { "zh-TW", "en" };
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.DefaultRequestCulture = new RequestCulture("zh-TW");
+    options.SupportedCultures = supportedCultures.Select(c => new CultureInfo(c)).ToList();
+    options.SupportedUICultures = supportedCultures.Select(c => new CultureInfo(c)).ToList();
+    options.RequestCultureProviders = new List<IRequestCultureProvider>
+    {
+        new QueryStringRequestCultureProvider { QueryStringKey = "culture", UIQueryStringKey = "ui-culture" },
+    };
+});
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -108,6 +124,8 @@ app.UseStaticFiles(new StaticFileOptions
 //app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+
+app.UseRequestLocalization();
 
 app.UseRouting();
 

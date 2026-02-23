@@ -1,27 +1,29 @@
-﻿<div class="sidebar @StateCssClass">
+@inject IStringLocalizer<SharedResources> Localizer
+
+<div class="sidebar @StateCssClass">
     <DxTreeView AllowSelectNodes="true" CssClass="app-sidebar">
     <Nodes>
-        <DxTreeViewNode NavigateUrl="./" Text="首頁"></DxTreeViewNode>
-        <DxTreeViewNode NavigateUrl="OperatorInformation" Text="產線人員資本資料"></DxTreeViewNode>
-        <DxTreeViewNode NavigateUrl="OperatorAbilityPage" Text="作業人員技能配置"></DxTreeViewNode>
-        <DxTreeViewNode NavigateUrl="TimePeriod" Text="產線工作時段"></DxTreeViewNode>
-        <DxTreeViewNode NavigateUrl="OvertimeSchedule" Text="產線加班時段"></DxTreeViewNode>
-        <DxTreeViewNode NavigateUrl="WorkingTypeGroup" Text="產線工站"></DxTreeViewNode>
-        <DxTreeViewNode NavigateUrl="WorkingType" Text="產線工站作業程序"></DxTreeViewNode>
+        <DxTreeViewNode NavigateUrl="./" Text="@Localizer["Nav_Home"]"></DxTreeViewNode>
+        <DxTreeViewNode NavigateUrl="OperatorInformation" Text="@Localizer["Nav_OperatorInformation"]"></DxTreeViewNode>
+        <DxTreeViewNode NavigateUrl="OperatorAbilityPage" Text="@Localizer["Nav_OperatorAbility"]"></DxTreeViewNode>
+        <DxTreeViewNode NavigateUrl="TimePeriod" Text="@Localizer["Nav_TimePeriod"]"></DxTreeViewNode>
+        <DxTreeViewNode NavigateUrl="OvertimeSchedule" Text="@Localizer["Nav_OvertimeSchedule"]"></DxTreeViewNode>
+        <DxTreeViewNode NavigateUrl="WorkingTypeGroup" Text="@Localizer["Nav_WorkingTypeGroup"]"></DxTreeViewNode>
+        <DxTreeViewNode NavigateUrl="WorkingType" Text="@Localizer["Nav_WorkingType"]"></DxTreeViewNode>
         @*<DxTreeViewNode NavigateUrl="WorkingList" Text="產線人員派工作業"></DxTreeViewNode>*@
         <DxTreeViewNode NavigateUrl="WorkingListRobotAssembly">
                 <TextTemplate>
-                    <b>產線人員派工作業<br />RobotAssembly</b>
+                    <b>@Localizer["Nav_WorkingListRobotAssembly"]<br />RobotAssembly</b>
                 </TextTemplate>
         </DxTreeViewNode>
-        <DxTreeViewNode NavigateUrl="WorkingResponsePage/Detail" Text="線上報工作業"></DxTreeViewNode>
+        <DxTreeViewNode NavigateUrl="WorkingResponsePage/Detail" Text="@Localizer["Nav_WorkingResponse"]"></DxTreeViewNode>
         <DxTreeViewNode NavigateUrl="WorkingReportPage">
                 <TextTemplate>
-                    <b>產線人員派工細節<br />Report</b>
+                    <b>@Localizer["Nav_WorkingReport"]<br />Report</b>
                 </TextTemplate>
         </DxTreeViewNode>
-        <DxTreeViewNode NavigateUrl="StatisticReport" Text="工單統計(工時)報表"></DxTreeViewNode>
-        <DxTreeViewNode NavigateUrl="OperatorReport" Text="人員統計(工時)報表"></DxTreeViewNode>
+        <DxTreeViewNode NavigateUrl="StatisticReport" Text="@Localizer["Nav_StatisticReport"]"></DxTreeViewNode>
+        <DxTreeViewNode NavigateUrl="OperatorReport" Text="@Localizer["Nav_OperatorReport"]"></DxTreeViewNode>
     </Nodes>
 </DxTreeView>
 </div>

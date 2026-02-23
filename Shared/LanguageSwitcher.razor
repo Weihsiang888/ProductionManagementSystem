@@ -1,0 +1,44 @@
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<SharedResources> Localizer
+
+<div class="language-switcher d-flex align-items-center gap-1">
+    <span class="font-style me-1">@Localizer["Language"]:</span>
+    <button class="btn btn-sm @(CurrentCulture == "zh-TW" ? "btn-primary" : "btn-outline-secondary")"
+            @onclick='() => SwitchLanguage("zh-TW")'>繁中</button>
+    <button class="btn btn-sm @(CurrentCulture == "en" ? "btn-primary" : "btn-outline-secondary")"
+            @onclick='() => SwitchLanguage("en")'>EN</button>
+</div>
+
+@code {
+    private string CurrentCulture { get; set; } = "zh-TW";
+
+    protected override void OnInitialized()
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+        if (query.TryGetValue("culture", out var culture))
+        {
+            CurrentCulture = culture.ToString();
+        }
+    }
+
+    private void SwitchLanguage(string culture)
+    {
+        var uri = new Uri(NavigationManager.Uri);
+        var parsed = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+
+        // Build a mutable string dictionary from parsed query
+        var queryDict = parsed.ToDictionary(
+            kv => kv.Key,
+            kv => kv.Value.ToString());
+
+        queryDict["culture"] = culture;
+        queryDict["ui-culture"] = culture;
+
+        var newQuery = string.Join("&", queryDict.Select(
+            kv => $"{Uri.EscapeDataString(kv.Key)}={Uri.EscapeDataString(kv.Value)}"));
+        var newUri = $"{uri.GetLeftPart(UriPartial.Path)}?{newQuery}";
+
+        NavigationManager.NavigateTo(newUri, forceLoad: true);
+    }
+}

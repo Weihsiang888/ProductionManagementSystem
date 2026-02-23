@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="xml:space" msdata:IsReadOnly="true" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <!-- Common -->
+  <data name="Home" xml:space="preserve"><value>Home</value></data>
+  <data name="Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Search" xml:space="preserve"><value>Search</value></data>
+  <data name="Export" xml:space="preserve"><value>Export</value></data>
+  <data name="Refresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Confirm" xml:space="preserve"><value>Confirm</value></data>
+  <data name="Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Add" xml:space="preserve"><value>Add</value></data>
+  <data name="Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Login" xml:space="preserve"><value>Login</value></data>
+  <data name="Logout" xml:space="preserve"><value>Logout</value></data>
+  <data name="Username" xml:space="preserve"><value>Username</value></data>
+  <data name="Password" xml:space="preserve"><value>Password</value></data>
+  <data name="Language" xml:space="preserve"><value>Language</value></data>
+  <!-- Header -->
+  <data name="SystemTitle" xml:space="preserve"><value>Production Line ( Work Report - ESOP ) System</value></data>
+  <data name="LoginGuest" xml:space="preserve"><value>Login : Guest</value></data>
+  <data name="LogoutUser" xml:space="preserve"><value>Logout</value></data>
+  <!-- App -->
+  <data name="NotAuthorized" xml:space="preserve"><value>You are not authorized to access this service</value></data>
+  <data name="PageNotFound" xml:space="preserve"><value>Page Not Found</value></data>
+  <data name="PageNotFoundDesc1" xml:space="preserve"><value>Sorry, the page you are looking for does not exist.</value></data>
+  <data name="PageNotFoundDesc2" xml:space="preserve"><value>The page may have been removed or moved to a different URL.</value></data>
+  <!-- NavMenu -->
+  <data name="Nav_Home" xml:space="preserve"><value>Home</value></data>
+  <data name="Nav_OperatorInformation" xml:space="preserve"><value>Operator Information</value></data>
+  <data name="Nav_OperatorAbility" xml:space="preserve"><value>Operator Ability</value></data>
+  <data name="Nav_TimePeriod" xml:space="preserve"><value>Time Period</value></data>
+  <data name="Nav_OvertimeSchedule" xml:space="preserve"><value>Overtime Schedule</value></data>
+  <data name="Nav_WorkingTypeGroup" xml:space="preserve"><value>Working Type Group</value></data>
+  <data name="Nav_WorkingType" xml:space="preserve"><value>Working Type</value></data>
+  <data name="Nav_WorkingListRobotAssembly" xml:space="preserve"><value>Working List</value></data>
+  <data name="Nav_WorkingResponse" xml:space="preserve"><value>Working Response</value></data>
+  <data name="Nav_WorkingReport" xml:space="preserve"><value>Working Report</value></data>
+  <data name="Nav_StatisticReport" xml:space="preserve"><value>Statistic Report</value></data>
+  <data name="Nav_OperatorReport" xml:space="preserve"><value>Operator Report</value></data>
+  <!-- Index Page -->
+  <data name="Index_Title1" xml:space="preserve"><value>Online Work Reporting</value></data>
+  <data name="Index_Desc1" xml:space="preserve"><value>Used to manage human resources in manufacturing factories and ensure that workers on the production line are effectively assigned and arranged.</value></data>
+  <data name="Index_Desc2" xml:space="preserve"><value>This system typically includes the following features:</value></data>
+  <data name="Index_Feature1" xml:space="preserve"><value>1. Personnel Data Management: Record employee basic information, skills, and experience.</value></data>
+  <data name="Index_Feature2" xml:space="preserve"><value>2. Production Scheduling: Assign employees to appropriate workstations based on production plans and line requirements, ensuring adequate staffing at each station.</value></data>
+  <data name="Index_Feature3" xml:space="preserve"><value>3. Work Progress Tracking: Track employee work progress and product flow on the production line, adjusting assignments promptly to address any issues.</value></data>
+  <data name="Index_Feature4" xml:space="preserve"><value>4. Data Analysis and Reporting: Analyze employee performance and production line efficiency, providing reports and data to help management make better decisions.</value></data>
+  <data name="Index_Feature5" xml:space="preserve"><value>5. Safety and Monitoring: Monitor the working environment and employee safety on the production line to ensure all operations comply with safety standards.</value></data>
+  <data name="Index_Summary" xml:space="preserve"><value>Using the production line dispatch system can improve efficiency and product quality on the production line, while reducing errors and work delays during the production process.</value></data>
+  <data name="Index_Title2" xml:space="preserve"><value>Online SOP (Standard Operating Procedure)</value></data>
+  <data name="Index_SOP1" xml:space="preserve"><value>Standard operating procedure documents compiled and managed on a digital platform. These documents describe in detail the process of how to perform tasks to ensure consistency and efficiency.</value></data>
+  <data name="Index_SOP2" xml:space="preserve"><value>Unified Standards: Ensure all employees follow the same operational standards, reducing errors and rework.</value></data>
+  <data name="Index_SOP3" xml:space="preserve"><value>Simplified Training: New employees can self-learn through online SOP, accelerating onboarding speed.</value></data>
+  <data name="Index_SOP4" xml:space="preserve"><value>Consistency: Ensure consistency in the operation process, improving work quality and result consistency.</value></data>
+  <data name="Index_SOP5" xml:space="preserve"><value>Continuous Improvement: Continuously improve business processes and operational standards through real-time updates and feedback mechanisms.</value></data>
+  <data name="Index_SOP6" xml:space="preserve"><value>Reduced Paper and Printing Costs: Digital documents reduce the need for physical storage and printing.</value></data>
+  <data name="Index_SOP7" xml:space="preserve"><value>Time Saving: Improve work efficiency and reduce time waste caused by unclear processes or errors.</value></data>
+  <data name="Index_SOP8" xml:space="preserve"><value>Real-time Updates and Review: Ensure SOP is consistent with the latest laws, regulations, and company policies, reducing compliance risks.</value></data>
+  <data name="Index_SOP9" xml:space="preserve"><value>Clear Operating Procedures: All employees can easily access operating procedures and understand company processes and requirements.</value></data>
+</root>

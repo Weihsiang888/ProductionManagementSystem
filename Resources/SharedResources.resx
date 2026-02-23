@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="xml:space" msdata:IsReadOnly="true" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <!-- Common -->
+  <data name="Home" xml:space="preserve"><value>首頁</value></data>
+  <data name="Save" xml:space="preserve"><value>儲存</value></data>
+  <data name="Delete" xml:space="preserve"><value>刪除</value></data>
+  <data name="Search" xml:space="preserve"><value>搜尋</value></data>
+  <data name="Export" xml:space="preserve"><value>匯出</value></data>
+  <data name="Refresh" xml:space="preserve"><value>重新整理</value></data>
+  <data name="Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="Confirm" xml:space="preserve"><value>確認</value></data>
+  <data name="Edit" xml:space="preserve"><value>編輯</value></data>
+  <data name="Add" xml:space="preserve"><value>新增</value></data>
+  <data name="Close" xml:space="preserve"><value>關閉</value></data>
+  <data name="Login" xml:space="preserve"><value>登入</value></data>
+  <data name="Logout" xml:space="preserve"><value>登出</value></data>
+  <data name="Username" xml:space="preserve"><value>使用者名稱</value></data>
+  <data name="Password" xml:space="preserve"><value>密碼</value></data>
+  <data name="Language" xml:space="preserve"><value>語言</value></data>
+  <!-- Header -->
+  <data name="SystemTitle" xml:space="preserve"><value>產線 ( 報工 - ESOP ) 系統</value></data>
+  <data name="LoginGuest" xml:space="preserve"><value>Login : Guest</value></data>
+  <data name="LogoutUser" xml:space="preserve"><value>登出</value></data>
+  <!-- App -->
+  <data name="NotAuthorized" xml:space="preserve"><value>你沒有授權可以存取該服務</value></data>
+  <data name="PageNotFound" xml:space="preserve"><value>找不到此頁面</value></data>
+  <data name="PageNotFoundDesc1" xml:space="preserve"><value>對不起，未能找到您要的網頁。</value></data>
+  <data name="PageNotFoundDesc2" xml:space="preserve"><value>可能該網頁已被移除或被移到其他的網址。</value></data>
+  <!-- NavMenu -->
+  <data name="Nav_Home" xml:space="preserve"><value>首頁</value></data>
+  <data name="Nav_OperatorInformation" xml:space="preserve"><value>產線人員資本資料</value></data>
+  <data name="Nav_OperatorAbility" xml:space="preserve"><value>作業人員技能配置</value></data>
+  <data name="Nav_TimePeriod" xml:space="preserve"><value>產線工作時段</value></data>
+  <data name="Nav_OvertimeSchedule" xml:space="preserve"><value>產線加班時段</value></data>
+  <data name="Nav_WorkingTypeGroup" xml:space="preserve"><value>產線工站</value></data>
+  <data name="Nav_WorkingType" xml:space="preserve"><value>產線工站作業程序</value></data>
+  <data name="Nav_WorkingListRobotAssembly" xml:space="preserve"><value>產線人員派工作業</value></data>
+  <data name="Nav_WorkingResponse" xml:space="preserve"><value>線上報工作業</value></data>
+  <data name="Nav_WorkingReport" xml:space="preserve"><value>產線人員派工細節</value></data>
+  <data name="Nav_StatisticReport" xml:space="preserve"><value>工單統計(工時)報表</value></data>
+  <data name="Nav_OperatorReport" xml:space="preserve"><value>人員統計(工時)報表</value></data>
+  <!-- Index Page -->
+  <data name="Index_Title1" xml:space="preserve"><value>線上報工</value></data>
+  <data name="Index_Desc1" xml:space="preserve"><value>用於管理製造工廠的人力資源，並確保生產線上的工作人員得到有效的指派和安排。</value></data>
+  <data name="Index_Desc2" xml:space="preserve"><value>這種系統通常包含以下功能：</value></data>
+  <data name="Index_Feature1" xml:space="preserve"><value>1.人員資料管理：記錄員工的基本資料、技能和經驗等信息。</value></data>
+  <data name="Index_Feature2" xml:space="preserve"><value>2.生產排程：根據生產計劃和產線需求，將員工指派到合適的工作站，並確保每個工作站都有足夠的人力資源。</value></data>
+  <data name="Index_Feature3" xml:space="preserve"><value>3.工作進度跟踪：跟踪員工的工作進度和生產線上的產品流程，並及時調整指派以應對任何生產線上的問題。</value></data>
+  <data name="Index_Feature4" xml:space="preserve"><value>4.數據分析和報告：分析員工的表現和生產線上的效率，提供報告和數據以幫助管理層作出更好的決策。</value></data>
+  <data name="Index_Feature5" xml:space="preserve"><value>5.安全和監控：監控生產線上的工作環境和員工的安全，以確保所有操作都符合安全標準。</value></data>
+  <data name="Index_Summary" xml:space="preserve"><value>使用產線線上派工系統可以提高生產線上的效率和產品質量，同時減少生產過程中的錯誤和工作延誤。</value></data>
+  <data name="Index_Title2" xml:space="preserve"><value>線上SOP（Standard Operating Procedure，標準作業程序）</value></data>
+  <data name="Index_SOP1" xml:space="preserve"><value>在數位平台上編制和管理的標準作業程序文件。這些程序文件詳細描述了如何執行任務的流程，以確保一致性和效率。</value></data>
+  <data name="Index_SOP2" xml:space="preserve"><value>統一標準：確保所有員工遵循相同的操作標準，減少錯誤和重工。</value></data>
+  <data name="Index_SOP3" xml:space="preserve"><value>簡化培訓：新員工可以通過線上SOP進行自學，加快上手速度。</value></data>
+  <data name="Index_SOP4" xml:space="preserve"><value>一致性：確保操作過程中的一致性，提升工作質量和結果的一致性。</value></data>
+  <data name="Index_SOP5" xml:space="preserve"><value>持續改進：通過實時更新和反饋機制，持續改進業務流程和操作標準。</value></data>
+  <data name="Index_SOP6" xml:space="preserve"><value>減少紙張和印刷成本：數位化文檔降低了物理存儲和印刷的需求。</value></data>
+  <data name="Index_SOP7" xml:space="preserve"><value>節省時間：提高工作效率，減少因流程不清或錯誤導致的時間浪費。</value></data>
+  <data name="Index_SOP8" xml:space="preserve"><value>實時更新和審核：確保SOP與最新的法律法規和公司政策一致，降低違規風險。</value></data>
+  <data name="Index_SOP9" xml:space="preserve"><value>清晰的操作流程：所有員工可以輕鬆查閱操作程序，了解公司流程和要求。</value></data>
+</root>
