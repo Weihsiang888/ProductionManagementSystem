@@ -3,7 +3,7 @@
 @using System.Globalization
 @inject DataService DataService
 @inject IStringLocalizer<SharedResources> L
-@*@attribute [Authorize(Roles = "Administrator")]*@
+@using Microsoft.AspNetCore.Authentication.Cookies
 
 <style>
     .dx-form-layout-width {
