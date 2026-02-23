@@ -3,9 +3,7 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inherits AuthComponentBase
 @inject DataService DataService
-
-<br />
-<h3 style="color:dodgerblue">作業站別</h3>
+@inject IStringLocalizer<SharedResources> L
 <br />
 
 <DxGrid Data="_StationStatus"
@@ -28,7 +26,7 @@
             </DxGridCommandColumn>
         }
         @* <DxGridDataColumn FieldName=@nameof(StationStatus.StationID) TextAlignment="GridTextAlignment.Left" Caption="作業站編號" MinWidth="90" /> *@
-        <DxGridDataColumn FieldName=@nameof(StationStatus.StationName) Caption="作業站名稱" MinWidth="120" />
+        <DxGridDataColumn FieldName=@nameof(StationStatus.StationName) Caption='@L["StationStatus_Name"]' MinWidth="120" />
         <DxGridDataColumn FieldName=@nameof(StationStatus.Manufacturing) Caption="SFC製程名稱" MinWidth="90" />
     </Columns>
     <EditFormTemplate Context="EditFormContext">
@@ -58,7 +56,7 @@
          CloseOnEscape="false"
          CloseOnOutsideClick="false"
          ShowFooter="true"
-         HeaderText="錯誤提示"
+         HeaderText='@L["Msg_ErrorTitle"]'
          BodyText="@_ErrorMsg">
     <FooterContentTemplate Context="Context">
         <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="OK" Click="OkEulaClick" />
@@ -70,7 +68,7 @@
          CloseOnEscape="false"
          CloseOnOutsideClick="false"
          ShowFooter="true"
-         HeaderText="是否確認要刪除"
+         HeaderText='@L["Msg_DeleteConfirm"]'
          BodyText="@_DelMsg">
     <FooterContentTemplate Context="Context">
         <DxButton CssClass="popup-button my-1 ms-2" RenderStyle="ButtonRenderStyle.Primary" Text="OK" Click="ConfirmEulaClick" />

@@ -3,9 +3,10 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inherits AuthComponentBase
 @inject DataService DataService
+@inject IStringLocalizer<SharedResources> L
 
 <br />
-<h3>工時調整原因</h3>
+<h3>@L["ReasonType_Title"]</h3>
 <br />
 
 <DxGrid Data="_ReasonTypes"
@@ -26,8 +27,8 @@
                 </CellDisplayTemplate>
             </DxGridCommandColumn>
         }
-        <DxGridDataColumn FieldName=@nameof(ReasonType.ReasonCode) Caption="代碼" MinWidth="90" />
-        <DxGridDataColumn FieldName=@nameof(ReasonType.ReasonName) Caption="名稱" MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(ReasonType.ReasonCode) Caption='@L["ReasonType_Code"]' MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(ReasonType.ReasonName) Caption='@L["ReasonType_Name"]' MinWidth="90" />
         <DxGridDataColumn FieldName=@nameof(ReasonType.Description) Caption="敘述" MinWidth="90" />
     </Columns>
     <EditFormTemplate Context="EditFormContext">

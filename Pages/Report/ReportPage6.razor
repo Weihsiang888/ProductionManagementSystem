@@ -2,6 +2,7 @@
 @using DxBlazorApplication7.Data
 @using Microsoft.Build.Framework
 @inject DataService DataService
+@inject IStringLocalizer<SharedResources> L
 
 <DxGrid Data="_DetailTimeList"
         @ref="DetailGrid"

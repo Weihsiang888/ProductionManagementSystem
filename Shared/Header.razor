@@ -3,6 +3,7 @@
 @inherits AuthComponentBase
 @inject NavigationManager nav
 @inject DataService DataService
+@inject IStringLocalizer<SharedResources> L
 
 @*<nav class="navbar header-navbar p-0">
     <button class="navbar-toggler bg-primary d-block" @onclick="OnToggleClick">
@@ -169,12 +170,12 @@
        @* <DxMenu Title="產線 - 線上派工系統" ItemsPosition="ItemPosition.End" CollapseItemsToHamburgerMenu="true" >*@
             <TitleTemplate>
                 @* <div class="icon-logo" role="img" aria-label="@context">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;產線 - 線上派工系統</div> *@
-                <div class="icon-logo font-style" role="img" aria-label="@context">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;產線 ( 報工 - ESOP ) 系統</div>
+                <div class="icon-logo font-style" role="img" aria-label="@context">&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;@L["SystemTitle"]</div>
             </TitleTemplate>
             <Items>
                 <DxMenuItem IconCssClass="menu-icon-home menu-icon" NavigateUrl="./">
                     <TextTemplate>
-                        <div class="font-style">首頁</div>
+                        <div class="font-style">@L["NavHome"]</div>
                     </TextTemplate>
                 </DxMenuItem>
                 @* <DxMenuItem IconCssClass="menu-icon-products menu-icon">
@@ -240,7 +241,7 @@
                 {*@
                     <DxMenuItem IconCssClass="menu-icon-info menu-icon" NavigateUrl="ESOPPage">
                         <TextTemplate>
-                            <div class="font-style">ESOP</div>
+                            <div class="font-style">@L["NavESOP"]</div>
                         </TextTemplate>
                         @* <Items>
                             <DxMenuItem CssClass="font-style" Text="作業站別" NavigateUrl="StationStatus" />
@@ -255,6 +256,11 @@
                 @* } *@
                 @if (customAuth.user.role != Role.Guest)
                 {
+                    <DxMenuItem CssClass="notoggle" Position="ItemPosition.End">
+                        <TextTemplate>
+                            <LanguageSwitcher />
+                        </TextTemplate>
+                    </DxMenuItem>
                     <DxMenuItem title="Logout" Click="@NavToLogout" CssClass="notoggle font-style" IconCssClass="menu-icon-user-profile menu-icon" Name="Logout" Position="ItemPosition.End">
                         <Template>
                             <div style="padding:9px 27px; text-align:center;
@@ -266,6 +272,11 @@
                 }
                 else
                 {
+                    <DxMenuItem CssClass="notoggle" Position="ItemPosition.End">
+                        <TextTemplate>
+                            <LanguageSwitcher />
+                        </TextTemplate>
+                    </DxMenuItem>
                     <DxMenuItem title="Login" Click="@NavToLogin" CssClass="notoggle font-style" IconCssClass="menu-icon-user-profile menu-icon" Name="Login" Position="ItemPosition.End">
                         <Template>
                             <div style="padding:9px 27px; text-align:center;
@@ -370,26 +381,26 @@
 
     string GetLogInValue()
     {
-        string Result = "Login : Guest";
+        string Result = L["LoginGuest"].Value;
         if (customAuth.user.role == Role.Guest)
         {
-            Result = "Login : Guest";
+            Result = L["LoginGuest"].Value;
         }
         else if (customAuth.user.role != Role.Guest)
         {
             var item = _OperatorInformations.SingleOrDefault(x => x.OPNO == customAuth.user.userName);
             if (item != null)
             {
-                Result = "Logout【 " + item.OperatorName + " 】";
+                Result = L["BtnLogout"].Value + "【 " + item.OperatorName + " 】";
             }
             else
             {
-                Result = "Logout【 " + customAuth.user.userName + " 】";
+                Result = L["BtnLogout"].Value + "【 " + customAuth.user.userName + " 】";
             }
         }
         else if (customAuth.user == null)
         {
-            Result = "Login : Guest";
+            Result = L["LoginGuest"].Value;
         }
         return Result;
     }

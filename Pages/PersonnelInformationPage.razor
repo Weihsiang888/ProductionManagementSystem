@@ -3,9 +3,7 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inherits AuthComponentBase
 @inject DataService DataService
-
-<br />
-<h3>產線人員資本資料</h3>
+@inject IStringLocalizer<SharedResources> L
 <br />
 
 <DxGrid Data="_OperatorInformations"
@@ -26,12 +24,12 @@
                 </CellDisplayTemplate>
             </DxGridCommandColumn>
         }
-        <DxGridDataColumn FieldName=@nameof(OperatorInformation.Department) Caption="部門" MinWidth="90" />
-        <DxGridDataColumn FieldName=@nameof(OperatorInformation.OperatorName) Caption="姓名" MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(OperatorInformation.Department) Caption='@L["OperatorInfo_Department"]' MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(OperatorInformation.OperatorName) Caption='@L["OperatorInfo_Name"]' MinWidth="90" />
 @*         <DxGridDataColumn FieldName=@nameof(OperatorInformation.OperatorEnName) Caption="英文姓名" MinWidth="90" /> *@
 @*         <DxGridDataColumn FieldName=@nameof(OperatorInformation.Mail) Caption="郵件" MinWidth="300" /> *@
 @*         <DxGridDataColumn FieldName=@nameof(OperatorInformation.Phone) Caption="連絡電話" MinWidth="150" /> *@
-        <DxGridDataColumn FieldName=@nameof(OperatorInformation.OPNO) Caption="工號" MinWidth="120" />
+        <DxGridDataColumn FieldName=@nameof(OperatorInformation.OPNO) Caption='@L["OperatorInfo_EmployeeNo"]' MinWidth="120" />
 @*        <DxGridDataColumn FieldName=@nameof(OperatorInformation.CARDNO) Caption="卡號" MinWidth="180" />*@
 @*        <DxGridDataColumn FieldName=@nameof(OperatorInformation.IsDel) Caption="是否被刪除" MinWidth="210" />*@
 @*        <DxGridDataColumn FieldName=@nameof(OperatorInformation.IsSPDGroup) Caption="SPD" MinWidth="60" />*@

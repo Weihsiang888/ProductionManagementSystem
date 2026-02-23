@@ -3,9 +3,10 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inherits AuthComponentBase
 @inject DataService DataService
+@inject IStringLocalizer<SharedResources> L
 
 <br />
-<h3>產線工站作業程序</h3>
+<h3>@L["WorkingType_Title"]</h3>
 <br />
 
 <DxGrid Data="_WorkingTypes"

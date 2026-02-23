@@ -1,0 +1,636 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="SystemTitle" xml:space="preserve">
+    <value>產線 ( 報工 - ESOP ) 系統</value>
+  </data>
+  <data name="NavHome" xml:space="preserve">
+    <value>首頁</value>
+  </data>
+  <data name="NavOperatorInfo" xml:space="preserve">
+    <value>產線人員資本資料</value>
+  </data>
+  <data name="NavOperatorAbility" xml:space="preserve">
+    <value>作業人員技能配置</value>
+  </data>
+  <data name="NavTimePeriod" xml:space="preserve">
+    <value>產線工作時段</value>
+  </data>
+  <data name="NavOvertimeSchedule" xml:space="preserve">
+    <value>產線加班時段</value>
+  </data>
+  <data name="NavWorkingTypeGroup" xml:space="preserve">
+    <value>產線工站</value>
+  </data>
+  <data name="NavWorkingType" xml:space="preserve">
+    <value>產線工站作業程序</value>
+  </data>
+  <data name="NavWorkingListRobotAssembly" xml:space="preserve">
+    <value>產線人員派工作業 RobotAssembly</value>
+  </data>
+  <data name="NavWorkingResponse" xml:space="preserve">
+    <value>線上報工作業</value>
+  </data>
+  <data name="NavWorkingReport" xml:space="preserve">
+    <value>產線人員派工細節 Report</value>
+  </data>
+  <data name="NavStatisticReport" xml:space="preserve">
+    <value>工單統計(工時)報表</value>
+  </data>
+  <data name="NavOperatorReport" xml:space="preserve">
+    <value>人員統計(工時)報表</value>
+  </data>
+  <data name="NavESOP" xml:space="preserve">
+    <value>ESOP</value>
+  </data>
+  <data name="BtnLogin" xml:space="preserve">
+    <value>登入</value>
+  </data>
+  <data name="BtnLogout" xml:space="preserve">
+    <value>登出</value>
+  </data>
+  <data name="LoginGuest" xml:space="preserve">
+    <value>訪客登入</value>
+  </data>
+  <data name="LanguageSwitcher_ZhTW" xml:space="preserve">
+    <value>繁體中文</value>
+  </data>
+  <data name="LanguageSwitcher_En" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="Col_Date" xml:space="preserve">
+    <value>日期</value>
+  </data>
+  <data name="Col_Description" xml:space="preserve">
+    <value>描述</value>
+  </data>
+  <data name="Col_Operator" xml:space="preserve">
+    <value>作業人員</value>
+  </data>
+  <data name="Col_WorkOrder" xml:space="preserve">
+    <value>工單</value>
+  </data>
+  <data name="Col_Station" xml:space="preserve">
+    <value>作業站</value>
+  </data>
+  <data name="Col_WorkTime" xml:space="preserve">
+    <value>工時</value>
+  </data>
+  <data name="Col_Quantity" xml:space="preserve">
+    <value>數量</value>
+  </data>
+  <data name="Col_Department" xml:space="preserve">
+    <value>部門</value>
+  </data>
+  <data name="Col_Name" xml:space="preserve">
+    <value>姓名</value>
+  </data>
+  <data name="Col_EnName" xml:space="preserve">
+    <value>英文姓名</value>
+  </data>
+  <data name="Col_Email" xml:space="preserve">
+    <value>郵件</value>
+  </data>
+  <data name="Col_Phone" xml:space="preserve">
+    <value>連絡電話</value>
+  </data>
+  <data name="Col_EmployeeNo" xml:space="preserve">
+    <value>工號</value>
+  </data>
+  <data name="Btn_Query" xml:space="preserve">
+    <value>查詢</value>
+  </data>
+  <data name="Btn_ExportXlsx" xml:space="preserve">
+    <value>Export to XLSX</value>
+  </data>
+  <data name="Btn_Refresh" xml:space="preserve">
+    <value>重新整理</value>
+  </data>
+  <data name="Btn_Close" xml:space="preserve">
+    <value>關閉</value>
+  </data>
+  <data name="Btn_OK" xml:space="preserve">
+    <value>確認</value>
+  </data>
+  <data name="Btn_Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="Btn_Save" xml:space="preserve">
+    <value>儲存</value>
+  </data>
+  <data name="Lbl_StartDate" xml:space="preserve">
+    <value>開始日期</value>
+  </data>
+  <data name="Lbl_EndDate" xml:space="preserve">
+    <value>結束日期</value>
+  </data>
+  <data name="Lbl_SelectPlaceholder" xml:space="preserve">
+    <value>請選擇...</value>
+  </data>
+  <data name="Msg_ErrorTitle" xml:space="preserve">
+    <value>錯誤提示</value>
+  </data>
+  <data name="Msg_DeleteConfirm" xml:space="preserve">
+    <value>是否確認要刪除</value>
+  </data>
+  <data name="AdditionalTime_Title" xml:space="preserve">
+    <value>工時調整</value>
+  </data>
+  <data name="AdditionalTime_Date" xml:space="preserve">
+    <value>調整日期</value>
+  </data>
+  <data name="AdditionalTime_ReasonType" xml:space="preserve">
+    <value>調整原因</value>
+  </data>
+  <data name="AdditionalTime_Description" xml:space="preserve">
+    <value>敘述</value>
+  </data>
+  <data name="AdditionalTime_Operator" xml:space="preserve">
+    <value>產線人員</value>
+  </data>
+  <data name="AdditionalTime_StartTime" xml:space="preserve">
+    <value>開始時間</value>
+  </data>
+  <data name="AdditionalTime_EndTime" xml:space="preserve">
+    <value>結束時間</value>
+  </data>
+  <data name="Comparison_Title" xml:space="preserve">
+    <value>工站對照表</value>
+  </data>
+  <data name="Comparison_Process" xml:space="preserve">
+    <value>作業</value>
+  </data>
+  <data name="Comparison_Station" xml:space="preserve">
+    <value>工站</value>
+  </data>
+  <data name="Comparison_SelectProcess" xml:space="preserve">
+    <value>作業選擇...</value>
+  </data>
+  <data name="ESOPCreate_Title" xml:space="preserve">
+    <value>ESOP清單建立</value>
+  </data>
+  <data name="ESOPCreate_Directory" xml:space="preserve">
+    <value>SOP目錄</value>
+  </data>
+  <data name="ESOPCreate_DisplayName" xml:space="preserve">
+    <value>顯示名稱</value>
+  </data>
+  <data name="ESOPStatus_Title" xml:space="preserve">
+    <value>建立 ESOP</value>
+  </data>
+  <data name="ESOPStatus_StationName" xml:space="preserve">
+    <value>作業站名稱</value>
+  </data>
+  <data name="ESOPStatus_ProcedureName" xml:space="preserve">
+    <value>程序名稱</value>
+  </data>
+  <data name="ESOPStatus_ModelName" xml:space="preserve">
+    <value>機種/料號名稱</value>
+  </data>
+  <data name="ESOPStatus_ESOP" xml:space="preserve">
+    <value>ESOP</value>
+  </data>
+  <data name="ESOPStatus_FileSite" xml:space="preserve">
+    <value>檔案位置</value>
+  </data>
+  <data name="ESOPSelection_Workstation" xml:space="preserve">
+    <value>Workstation</value>
+  </data>
+  <data name="ESOPSelection_WorkItem" xml:space="preserve">
+    <value>Work Item</value>
+  </data>
+  <data name="ESOPSelection_Module" xml:space="preserve">
+    <value>Module</value>
+  </data>
+  <data name="ESOPSelection_SelectStation" xml:space="preserve">
+    <value>請選擇作業站 ...</value>
+  </data>
+  <data name="ESOPSelection_SelectProcedure" xml:space="preserve">
+    <value>請選擇作業 ...</value>
+  </data>
+  <data name="ESOPSelection_SelectModel" xml:space="preserve">
+    <value>請選擇模組 ...</value>
+  </data>
+  <data name="ModelStatus_Title" xml:space="preserve">
+    <value>機種設定</value>
+  </data>
+  <data name="ModelStatus_ModelName" xml:space="preserve">
+    <value>機種名稱</value>
+  </data>
+  <data name="ModelStatus_Description" xml:space="preserve">
+    <value>描述</value>
+  </data>
+  <data name="ModifyWorkOrder_Title" xml:space="preserve">
+    <value>更新工單</value>
+  </data>
+  <data name="ModifyWorkOrder_WorkOrder" xml:space="preserve">
+    <value>工單(點擊修改)</value>
+  </data>
+  <data name="ModifyWorkOrder_CountTitle" xml:space="preserve">
+    <value>更新工單數量</value>
+  </data>
+  <data name="ModifyWorkOrder_Station" xml:space="preserve">
+    <value>站號</value>
+  </data>
+  <data name="ModifyWorkOrder_PassCount" xml:space="preserve">
+    <value>良數量(點擊修改)</value>
+  </data>
+  <data name="ModifyWorkOrder_FailCount" xml:space="preserve">
+    <value>不良數量(點擊修改)</value>
+  </data>
+  <data name="ModifyWorkOrder_Search" xml:space="preserve">
+    <value>搜尋</value>
+  </data>
+  <data name="ModifyWorkOrder_InputWO" xml:space="preserve">
+    <value>輸入工單號碼</value>
+  </data>
+  <data name="OperatorAbility_Title" xml:space="preserve">
+    <value>產線人員技能配置</value>
+  </data>
+  <data name="OperatorAbility_NotSelected" xml:space="preserve">
+    <value>未選取</value>
+  </data>
+  <data name="OperatorAbility_Selected" xml:space="preserve">
+    <value>已選取</value>
+  </data>
+  <data name="OperatorAbility_SaveSkill" xml:space="preserve">
+    <value>儲存技能配置</value>
+  </data>
+  <data name="OperatorInfo_Title" xml:space="preserve">
+    <value>產線人員資本資料</value>
+  </data>
+  <data name="OperatorInfo_Department" xml:space="preserve">
+    <value>部門</value>
+  </data>
+  <data name="OperatorInfo_Name" xml:space="preserve">
+    <value>姓名</value>
+  </data>
+  <data name="OperatorInfo_EnName" xml:space="preserve">
+    <value>英文姓名</value>
+  </data>
+  <data name="OperatorInfo_Email" xml:space="preserve">
+    <value>郵件</value>
+  </data>
+  <data name="OperatorInfo_Phone" xml:space="preserve">
+    <value>連絡電話</value>
+  </data>
+  <data name="OperatorInfo_EmployeeNo" xml:space="preserve">
+    <value>工號</value>
+  </data>
+  <data name="OperatorInfo_SPD" xml:space="preserve">
+    <value>SPD</value>
+  </data>
+  <data name="OperatorInfo_SelectDept" xml:space="preserve">
+    <value>部門選擇...</value>
+  </data>
+  <data name="Overtime_Title" xml:space="preserve">
+    <value>產線加班時段</value>
+  </data>
+  <data name="Overtime_Date" xml:space="preserve">
+    <value>加班日期</value>
+  </data>
+  <data name="Overtime_Period" xml:space="preserve">
+    <value>加班時段</value>
+  </data>
+  <data name="Overtime_Operator" xml:space="preserve">
+    <value>作業人員</value>
+  </data>
+  <data name="ProcedureStatus_Title" xml:space="preserve">
+    <value>處理程序</value>
+  </data>
+  <data name="ProcedureStatus_ID" xml:space="preserve">
+    <value>程序編號</value>
+  </data>
+  <data name="ProcedureStatus_Name" xml:space="preserve">
+    <value>程序名稱</value>
+  </data>
+  <data name="ReasonType_Title" xml:space="preserve">
+    <value>工時調整原因</value>
+  </data>
+  <data name="ReasonType_Code" xml:space="preserve">
+    <value>代碼</value>
+  </data>
+  <data name="ReasonType_Name" xml:space="preserve">
+    <value>名稱</value>
+  </data>
+  <data name="StationStatus_Title" xml:space="preserve">
+    <value>作業站別</value>
+  </data>
+  <data name="StationStatus_ID" xml:space="preserve">
+    <value>作業站編號</value>
+  </data>
+  <data name="StationStatus_Name" xml:space="preserve">
+    <value>作業站名稱</value>
+  </data>
+  <data name="TimePeriod_Title" xml:space="preserve">
+    <value>產線工作時段</value>
+  </data>
+  <data name="TimePeriod_ID" xml:space="preserve">
+    <value>編號</value>
+  </data>
+  <data name="TimePeriod_Name" xml:space="preserve">
+    <value>時段</value>
+  </data>
+  <data name="WorkingTypeGroup_Title" xml:space="preserve">
+    <value>產線工站</value>
+  </data>
+  <data name="WorkingTypeGroup_ID" xml:space="preserve">
+    <value>工站編號</value>
+  </data>
+  <data name="WorkingTypeGroup_Name" xml:space="preserve">
+    <value>工站名稱</value>
+  </data>
+  <data name="WorkingType_Title" xml:space="preserve">
+    <value>產線工站作業程序</value>
+  </data>
+  <data name="WorkingData_Title" xml:space="preserve">
+    <value>產線人員工作狀況</value>
+  </data>
+  <data name="WorkingData_WorkDate" xml:space="preserve">
+    <value>工作日</value>
+  </data>
+  <data name="WorkingData_WorkType" xml:space="preserve">
+    <value>工作時段</value>
+  </data>
+  <data name="WorkingData_WorkID" xml:space="preserve">
+    <value>作業程序</value>
+  </data>
+  <data name="WorkingData_WorkDesc" xml:space="preserve">
+    <value>作業程序描述</value>
+  </data>
+  <data name="WorkingData_WorkGroup" xml:space="preserve">
+    <value>作業站</value>
+  </data>
+  <data name="WorkingData_OperatorNo" xml:space="preserve">
+    <value>作業人員</value>
+  </data>
+  <data name="WorkingData_Quantity" xml:space="preserve">
+    <value>數量(產出)</value>
+  </data>
+  <data name="WorkingList_Title" xml:space="preserve">
+    <value>產線人員派工作業</value>
+  </data>
+  <data name="WorkingList_WorkDate" xml:space="preserve">
+    <value>工作日</value>
+  </data>
+  <data name="WorkingList_WorkDesc" xml:space="preserve">
+    <value>作業程序</value>
+  </data>
+  <data name="WorkingList_Operator" xml:space="preserve">
+    <value>作業人員</value>
+  </data>
+  <data name="WorkingList_IsAssign" xml:space="preserve">
+    <value>工作分配</value>
+  </data>
+  <data name="WorkOrderResponse_Title" xml:space="preserve">
+    <value>線上報工作業</value>
+  </data>
+  <data name="WorkOrderResponse_Station" xml:space="preserve">
+    <value>站別</value>
+  </data>
+  <data name="WorkOrderResponse_WorkOrder" xml:space="preserve">
+    <value>工單</value>
+  </data>
+  <data name="WorkOrderResponse_SerialNo" xml:space="preserve">
+    <value>序號</value>
+  </data>
+  <data name="WorkOrderResponse_ReceiveTime" xml:space="preserve">
+    <value>接收時間</value>
+  </data>
+  <data name="WorkOrderResponse_ReportTime" xml:space="preserve">
+    <value>回報時間</value>
+  </data>
+  <data name="WorkOrderResponse_Operator" xml:space="preserve">
+    <value>作業人員</value>
+  </data>
+  <data name="WorkOrderResponse_Received" xml:space="preserve">
+    <value>已接收未報工</value>
+  </data>
+  <data name="WorkOrderResponse_NotReceived" xml:space="preserve">
+    <value>未接收</value>
+  </data>
+  <data name="WorkingReport_Title" xml:space="preserve">
+    <value>產線人員派工細節</value>
+  </data>
+  <data name="StatisticReport_Title" xml:space="preserve">
+    <value>工單統計(工時)報表</value>
+  </data>
+  <data name="StatisticReport_WO" xml:space="preserve">
+    <value>工單號碼</value>
+  </data>
+  <data name="StatisticReport_SN" xml:space="preserve">
+    <value>手臂序號</value>
+  </data>
+  <data name="StatisticReport_FirstReceive" xml:space="preserve">
+    <value>工單接收日期(最早)</value>
+  </data>
+  <data name="StatisticReport_LastResponse" xml:space="preserve">
+    <value>工單報工日期(最後)</value>
+  </data>
+  <data name="StatisticReport_TotalTime" xml:space="preserve">
+    <value>總工時</value>
+  </data>
+  <data name="StatisticReport_MaxTime" xml:space="preserve">
+    <value>最大工時</value>
+  </data>
+  <data name="StatisticReport_MinTime" xml:space="preserve">
+    <value>最小工時</value>
+  </data>
+  <data name="StatisticReport_AvgTime" xml:space="preserve">
+    <value>平均工時</value>
+  </data>
+  <data name="StatisticReport_OperatorGroup" xml:space="preserve">
+    <value>作業人員</value>
+  </data>
+  <data name="StatisticReport_OperatorCount" xml:space="preserve">
+    <value>作業人數</value>
+  </data>
+  <data name="OperatorReport_Title" xml:space="preserve">
+    <value>人員統計(工時)報表</value>
+  </data>
+  <data name="OperatorReport_StartDate" xml:space="preserve">
+    <value>開始日期</value>
+  </data>
+  <data name="OperatorReport_EndDate" xml:space="preserve">
+    <value>結束日期</value>
+  </data>
+  <data name="OperatorReport_TotalTime" xml:space="preserve">
+    <value>總工時</value>
+  </data>
+  <data name="OperatorReport_WorkDate" xml:space="preserve">
+    <value>工作日</value>
+  </data>
+  <data name="Report_ActualWork" xml:space="preserve">
+    <value>【實際工作】</value>
+  </data>
+  <data name="Report_NotReceived" xml:space="preserve">
+    <value>報表【未接收】</value>
+  </data>
+  <data name="Report_NotReported" xml:space="preserve">
+    <value>報表【未報工】</value>
+  </data>
+  <data name="Report_WorkHours" xml:space="preserve">
+    <value>報表【工時】</value>
+  </data>
+  <data name="Report_DetailHoursWO" xml:space="preserve">
+    <value>詳細報表【工時-工單】</value>
+  </data>
+  <data name="Report_StationHours" xml:space="preserve">
+    <value>工時統計【工站】</value>
+  </data>
+  <data name="Report_WOHours" xml:space="preserve">
+    <value>工時統計【工單】</value>
+  </data>
+  <data name="Report_StationName" xml:space="preserve">
+    <value>作業站</value>
+  </data>
+  <data name="Report_WorkTime" xml:space="preserve">
+    <value>工時</value>
+  </data>
+  <data name="Report_StartTime" xml:space="preserve">
+    <value>開始時間</value>
+  </data>
+  <data name="Report_EndTime" xml:space="preserve">
+    <value>結束時間</value>
+  </data>
+  <data name="Report_PassCount" xml:space="preserve">
+    <value>良數量</value>
+  </data>
+  <data name="Report_FailCount" xml:space="preserve">
+    <value>不良數量</value>
+  </data>
+  <data name="Report_Index" xml:space="preserve">
+    <value>索引</value>
+  </data>
+  <data name="Report_FilterWork" xml:space="preserve">
+    <value>作業篩選</value>
+  </data>
+  <data name="Report_Confirm" xml:space="preserve">
+    <value>確認</value>
+  </data>
+  <data name="ESOP_OpenSOP" xml:space="preserve">
+    <value>開啟SOP</value>
+  </data>
+  <data name="ESOP_ManualSelectSOP" xml:space="preserve">
+    <value>手動選取SOP (Manual SOP Selection)</value>
+  </data>
+  <data name="ESOP_EditESOPList" xml:space="preserve">
+    <value>修改ESOP清單</value>
+  </data>
+  <data name="ESOPMap_Title" xml:space="preserve">
+    <value>ESOP Map</value>
+  </data>
+  <data name="Index_OnlineReporting" xml:space="preserve">
+    <value>線上報工</value>
+  </data>
+  <data name="Index_Description" xml:space="preserve">
+    <value>用於管理製造工廠的人力資源，並確保生產線上的工作人員得到有效的指派和安排。</value>
+  </data>
+  <data name="Index_Features" xml:space="preserve">
+    <value>這種系統通常包含以下功能：</value>
+  </data>
+  <data name="Index_Feature1" xml:space="preserve">
+    <value>1.人員資料管理：記錄員工的基本資料、技能和經驗等信息。</value>
+  </data>
+  <data name="Index_Feature2" xml:space="preserve">
+    <value>2.生產排程：根據生產計劃和產線需求，將員工指派到合適的工作站，並確保每個工作站都有足夠的人力資源。</value>
+  </data>
+  <data name="Index_Feature3" xml:space="preserve">
+    <value>3.工作進度跟踪：跟踪員工的工作進度和生產線上的產品流程，並及時調整指派以應對任何生產線上的問題。</value>
+  </data>
+  <data name="Index_Feature4" xml:space="preserve">
+    <value>4.數據分析和報告：分析員工的表現和生產線上的效率，提供報告和數據以幫助管理層作出更好的決策。</value>
+  </data>
+  <data name="Index_Feature5" xml:space="preserve">
+    <value>5.安全和監控：監控生產線上的工作環境和員工的安全，以確保所有操作都符合安全標準。</value>
+  </data>
+  <data name="Index_Conclusion" xml:space="preserve">
+    <value>使用產線線上派工系統可以提高生產線上的效率和產品質量，同時減少生產過程中的錯誤和工作延誤。</value>
+  </data>
+  <data name="Index_SOPTitle" xml:space="preserve">
+    <value>線上SOP（Standard Operating Procedure，標準作業程序）</value>
+  </data>
+  <data name="Index_SOPDescription" xml:space="preserve">
+    <value>在數位平台上編制和管理的標準作業程序文件。這些程序文件詳細描述了如何執行任務的流程，以確保一致性和效率。</value>
+  </data>
+  <data name="Index_SOPFeature1" xml:space="preserve">
+    <value>統一標準：確保所有員工遵循相同的操作標準，減少錯誤和重工。</value>
+  </data>
+  <data name="Index_SOPFeature2" xml:space="preserve">
+    <value>簡化培訓：新員工可以通過線上SOP進行自學，加快上手速度。</value>
+  </data>
+  <data name="Index_SOPFeature3" xml:space="preserve">
+    <value>一致性：確保操作過程中的一致性，提升工作質量和結果的一致性。</value>
+  </data>
+  <data name="Index_SOPFeature4" xml:space="preserve">
+    <value>持續改進：通過實時更新和反饋機制，持續改進業務流程和操作標準。</value>
+  </data>
+  <data name="Index_SOPFeature5" xml:space="preserve">
+    <value>減少紙張和印刷成本：數位化文檔降低了物理存儲和印刷的需求。</value>
+  </data>
+  <data name="Index_SOPFeature6" xml:space="preserve">
+    <value>節省時間：提高工作效率，減少因流程不清或錯誤導致的時間浪費。</value>
+  </data>
+  <data name="Index_SOPFeature7" xml:space="preserve">
+    <value>實時更新和審核：確保SOP與最新的法律法規和公司政策一致，降低違規風險。</value>
+  </data>
+  <data name="Index_SOPFeature8" xml:space="preserve">
+    <value>清晰的操作流程：所有員工可以輕鬆查閱操作程序，了解公司流程和要求。</value>
+  </data>
+</root>

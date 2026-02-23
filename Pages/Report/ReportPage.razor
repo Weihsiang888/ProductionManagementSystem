@@ -4,6 +4,7 @@
 @inherits AuthComponentBase
 @inject DataService DataService
 @inject NavigationManager navigationManager
+@inject IStringLocalizer<SharedResources> L
 
 <DxTabs @bind-ActiveTabIndex="@ActiveTabIndex" SizeMode="SizeMode.Large" RenderMode="TabsRenderMode.OnDemand">
     <DxTabPage Text="【實際工作】">

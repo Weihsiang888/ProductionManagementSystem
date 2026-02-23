@@ -2,7 +2,7 @@
 @using DxBlazorApplication7.Data
 @using System.Globalization
 @inject DataService DataService
-@using Microsoft.AspNetCore.Authentication.Cookies
+@inject IStringLocalizer<SharedResources> L
 @*@attribute [Authorize(Roles = "Administrator")]*@
 
 <style>
@@ -39,7 +39,7 @@
 
 </style>
 
-<h3>工時調整</h3>
+<h3>@L["AdditionalTime_Title"]</h3>
 
 <DxFormLayout>
     <DxFormLayoutItem ColSpanMd="12" ColSpanLg="12">
@@ -67,18 +67,18 @@
                 }
             </CellDisplayTemplate>
             </DxGridCommandColumn>
-            <DxGridDataColumn FieldName=@nameof(AdditionalTime.AddTimeDate) Caption="調整日期" Width="180" />
-            <DxGridDataColumn FieldName=@nameof(AdditionalTime.ReasonType) Caption="調整原因" MinWidth="90" />
-            <DxGridDataColumn FieldName=@nameof(AdditionalTime.Description) Caption="敘述" MinWidth="300" />
-            <DxGridDataColumn FieldName=@nameof(AdditionalTime.OPNO) Caption="產線人員" Width="108" />
-            <DxGridDataColumn FieldName=@nameof(AdditionalTime.AddStartTime) Caption="開始時間" Width="180" >
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.AddTimeDate) Caption='@L["AdditionalTime_Date"]' Width="180" />
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.ReasonType) Caption='@L["AdditionalTime_ReasonType"]' MinWidth="90" />
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.Description) Caption='@L["AdditionalTime_Description"]' MinWidth="300" />
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.OPNO) Caption='@L["AdditionalTime_Operator"]' Width="108" />
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.AddStartTime) Caption='@L["AdditionalTime_StartTime"]' Width="180" >
                 <CellDisplayTemplate>
                     <div class="d-flex flex-row flex-wrap">
                         <span>@GetStartTimeVaule((AdditionalTime)context.DataItem)</span>
                     </div>
                 </CellDisplayTemplate>
             </DxGridDataColumn>
-            <DxGridDataColumn FieldName=@nameof(AdditionalTime.AddEndTime) Caption="結束時間" Width="180" >
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.AddEndTime) Caption='@L["AdditionalTime_EndTime"]' Width="180" >
                 <CellDisplayTemplate>
                     <div class="d-flex flex-row flex-wrap">
                         <span>@GetEndTimeVaule((AdditionalTime)context.DataItem)</span>
@@ -94,18 +94,18 @@
                         </DxCheckBox>
                 </CellDisplayTemplate>
             </DxGridDataColumn>
-            <DxGridDataColumn FieldName=@nameof(AdditionalTime.AddTimeDate) Caption="調整日期" Width="180" />
-            <DxGridDataColumn FieldName=@nameof(AdditionalTime.ReasonType) Caption="調整原因" MinWidth="90" />
-            <DxGridDataColumn FieldName=@nameof(AdditionalTime.Description) Caption="敘述" MinWidth="300" />
-            <DxGridDataColumn FieldName=@nameof(AdditionalTime.OPNO) Caption="產線人員" Width="108" />
-            <DxGridDataColumn FieldName=@nameof(AdditionalTime.AddStartTime) Caption="開始時間" Width="180">
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.AddTimeDate) Caption='@L["AdditionalTime_Date"]' Width="180" />
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.ReasonType) Caption='@L["AdditionalTime_ReasonType"]' MinWidth="90" />
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.Description) Caption='@L["AdditionalTime_Description"]' MinWidth="300" />
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.OPNO) Caption='@L["AdditionalTime_Operator"]' Width="108" />
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.AddStartTime) Caption='@L["AdditionalTime_StartTime"]' Width="180">
                 <CellDisplayTemplate>
                     <div class="d-flex flex-row flex-wrap">
                         <span>@GetStartTimeVaule((AdditionalTime)context.DataItem)</span>
                     </div>
                 </CellDisplayTemplate>
             </DxGridDataColumn>
-            <DxGridDataColumn FieldName=@nameof(AdditionalTime.AddEndTime) Caption="結束時間" Width="180">
+            <DxGridDataColumn FieldName=@nameof(AdditionalTime.AddEndTime) Caption='@L["AdditionalTime_EndTime"]' Width="180">
                 <CellDisplayTemplate>
                     <div class="d-flex flex-row flex-wrap">
                         <span>@GetEndTimeVaule((AdditionalTime)context.DataItem)</span>

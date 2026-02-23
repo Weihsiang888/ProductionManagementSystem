@@ -1,0 +1,636 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="SystemTitle" xml:space="preserve">
+    <value>Production Line (Report - ESOP) System</value>
+  </data>
+  <data name="NavHome" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="NavOperatorInfo" xml:space="preserve">
+    <value>Personnel Basic Data</value>
+  </data>
+  <data name="NavOperatorAbility" xml:space="preserve">
+    <value>Operator Skill Configuration</value>
+  </data>
+  <data name="NavTimePeriod" xml:space="preserve">
+    <value>Work Time Period</value>
+  </data>
+  <data name="NavOvertimeSchedule" xml:space="preserve">
+    <value>Overtime Schedule</value>
+  </data>
+  <data name="NavWorkingTypeGroup" xml:space="preserve">
+    <value>Production Stations</value>
+  </data>
+  <data name="NavWorkingType" xml:space="preserve">
+    <value>Station Work Procedures</value>
+  </data>
+  <data name="NavWorkingListRobotAssembly" xml:space="preserve">
+    <value>Dispatch - RobotAssembly</value>
+  </data>
+  <data name="NavWorkingResponse" xml:space="preserve">
+    <value>Online Work Reporting</value>
+  </data>
+  <data name="NavWorkingReport" xml:space="preserve">
+    <value>Dispatch Detail Report</value>
+  </data>
+  <data name="NavStatisticReport" xml:space="preserve">
+    <value>Work Order Statistics Report</value>
+  </data>
+  <data name="NavOperatorReport" xml:space="preserve">
+    <value>Operator Statistics Report</value>
+  </data>
+  <data name="NavESOP" xml:space="preserve">
+    <value>ESOP</value>
+  </data>
+  <data name="BtnLogin" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="BtnLogout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+  <data name="LoginGuest" xml:space="preserve">
+    <value>Login: Guest</value>
+  </data>
+  <data name="LanguageSwitcher_ZhTW" xml:space="preserve">
+    <value>繁體中文</value>
+  </data>
+  <data name="LanguageSwitcher_En" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="Col_Date" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="Col_Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Col_Operator" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="Col_WorkOrder" xml:space="preserve">
+    <value>Work Order</value>
+  </data>
+  <data name="Col_Station" xml:space="preserve">
+    <value>Station</value>
+  </data>
+  <data name="Col_WorkTime" xml:space="preserve">
+    <value>Work Time</value>
+  </data>
+  <data name="Col_Quantity" xml:space="preserve">
+    <value>Quantity</value>
+  </data>
+  <data name="Col_Department" xml:space="preserve">
+    <value>Department</value>
+  </data>
+  <data name="Col_Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Col_EnName" xml:space="preserve">
+    <value>English Name</value>
+  </data>
+  <data name="Col_Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Col_Phone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="Col_EmployeeNo" xml:space="preserve">
+    <value>Employee No</value>
+  </data>
+  <data name="Btn_Query" xml:space="preserve">
+    <value>Query</value>
+  </data>
+  <data name="Btn_ExportXlsx" xml:space="preserve">
+    <value>Export to XLSX</value>
+  </data>
+  <data name="Btn_Refresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Btn_Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Btn_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Btn_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Btn_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Lbl_StartDate" xml:space="preserve">
+    <value>Start Date</value>
+  </data>
+  <data name="Lbl_EndDate" xml:space="preserve">
+    <value>End Date</value>
+  </data>
+  <data name="Lbl_SelectPlaceholder" xml:space="preserve">
+    <value>Please select...</value>
+  </data>
+  <data name="Msg_ErrorTitle" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Msg_DeleteConfirm" xml:space="preserve">
+    <value>Confirm Delete</value>
+  </data>
+  <data name="AdditionalTime_Title" xml:space="preserve">
+    <value>Work Time Adjustment</value>
+  </data>
+  <data name="AdditionalTime_Date" xml:space="preserve">
+    <value>Adjustment Date</value>
+  </data>
+  <data name="AdditionalTime_ReasonType" xml:space="preserve">
+    <value>Reason Type</value>
+  </data>
+  <data name="AdditionalTime_Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="AdditionalTime_Operator" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="AdditionalTime_StartTime" xml:space="preserve">
+    <value>Start Time</value>
+  </data>
+  <data name="AdditionalTime_EndTime" xml:space="preserve">
+    <value>End Time</value>
+  </data>
+  <data name="Comparison_Title" xml:space="preserve">
+    <value>Station Comparison Table</value>
+  </data>
+  <data name="Comparison_Process" xml:space="preserve">
+    <value>Process</value>
+  </data>
+  <data name="Comparison_Station" xml:space="preserve">
+    <value>Station</value>
+  </data>
+  <data name="Comparison_SelectProcess" xml:space="preserve">
+    <value>Select process...</value>
+  </data>
+  <data name="ESOPCreate_Title" xml:space="preserve">
+    <value>Create ESOP List</value>
+  </data>
+  <data name="ESOPCreate_Directory" xml:space="preserve">
+    <value>SOP Directory</value>
+  </data>
+  <data name="ESOPCreate_DisplayName" xml:space="preserve">
+    <value>Display Name</value>
+  </data>
+  <data name="ESOPStatus_Title" xml:space="preserve">
+    <value>Create ESOP</value>
+  </data>
+  <data name="ESOPStatus_StationName" xml:space="preserve">
+    <value>Station Name</value>
+  </data>
+  <data name="ESOPStatus_ProcedureName" xml:space="preserve">
+    <value>Procedure Name</value>
+  </data>
+  <data name="ESOPStatus_ModelName" xml:space="preserve">
+    <value>Model/Part Name</value>
+  </data>
+  <data name="ESOPStatus_ESOP" xml:space="preserve">
+    <value>ESOP</value>
+  </data>
+  <data name="ESOPStatus_FileSite" xml:space="preserve">
+    <value>File Location</value>
+  </data>
+  <data name="ESOPSelection_Workstation" xml:space="preserve">
+    <value>Workstation</value>
+  </data>
+  <data name="ESOPSelection_WorkItem" xml:space="preserve">
+    <value>Work Item</value>
+  </data>
+  <data name="ESOPSelection_Module" xml:space="preserve">
+    <value>Module</value>
+  </data>
+  <data name="ESOPSelection_SelectStation" xml:space="preserve">
+    <value>Please select station ...</value>
+  </data>
+  <data name="ESOPSelection_SelectProcedure" xml:space="preserve">
+    <value>Please select procedure ...</value>
+  </data>
+  <data name="ESOPSelection_SelectModel" xml:space="preserve">
+    <value>Please select module ...</value>
+  </data>
+  <data name="ModelStatus_Title" xml:space="preserve">
+    <value>Model Settings</value>
+  </data>
+  <data name="ModelStatus_ModelName" xml:space="preserve">
+    <value>Model Name</value>
+  </data>
+  <data name="ModelStatus_Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="ModifyWorkOrder_Title" xml:space="preserve">
+    <value>Update Work Order</value>
+  </data>
+  <data name="ModifyWorkOrder_WorkOrder" xml:space="preserve">
+    <value>Work Order (click to edit)</value>
+  </data>
+  <data name="ModifyWorkOrder_CountTitle" xml:space="preserve">
+    <value>Update Work Order Quantity</value>
+  </data>
+  <data name="ModifyWorkOrder_Station" xml:space="preserve">
+    <value>Station</value>
+  </data>
+  <data name="ModifyWorkOrder_PassCount" xml:space="preserve">
+    <value>Pass Count (click to edit)</value>
+  </data>
+  <data name="ModifyWorkOrder_FailCount" xml:space="preserve">
+    <value>Fail Count (click to edit)</value>
+  </data>
+  <data name="ModifyWorkOrder_Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="ModifyWorkOrder_InputWO" xml:space="preserve">
+    <value>Enter work order number</value>
+  </data>
+  <data name="OperatorAbility_Title" xml:space="preserve">
+    <value>Operator Skill Configuration</value>
+  </data>
+  <data name="OperatorAbility_NotSelected" xml:space="preserve">
+    <value>Not Selected</value>
+  </data>
+  <data name="OperatorAbility_Selected" xml:space="preserve">
+    <value>Selected</value>
+  </data>
+  <data name="OperatorAbility_SaveSkill" xml:space="preserve">
+    <value>Save Skill Configuration</value>
+  </data>
+  <data name="OperatorInfo_Title" xml:space="preserve">
+    <value>Personnel Basic Data</value>
+  </data>
+  <data name="OperatorInfo_Department" xml:space="preserve">
+    <value>Department</value>
+  </data>
+  <data name="OperatorInfo_Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="OperatorInfo_EnName" xml:space="preserve">
+    <value>English Name</value>
+  </data>
+  <data name="OperatorInfo_Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="OperatorInfo_Phone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="OperatorInfo_EmployeeNo" xml:space="preserve">
+    <value>Employee No</value>
+  </data>
+  <data name="OperatorInfo_SPD" xml:space="preserve">
+    <value>SPD</value>
+  </data>
+  <data name="OperatorInfo_SelectDept" xml:space="preserve">
+    <value>Select department...</value>
+  </data>
+  <data name="Overtime_Title" xml:space="preserve">
+    <value>Production Overtime Schedule</value>
+  </data>
+  <data name="Overtime_Date" xml:space="preserve">
+    <value>Overtime Date</value>
+  </data>
+  <data name="Overtime_Period" xml:space="preserve">
+    <value>Overtime Period</value>
+  </data>
+  <data name="Overtime_Operator" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="ProcedureStatus_Title" xml:space="preserve">
+    <value>Procedure</value>
+  </data>
+  <data name="ProcedureStatus_ID" xml:space="preserve">
+    <value>Procedure ID</value>
+  </data>
+  <data name="ProcedureStatus_Name" xml:space="preserve">
+    <value>Procedure Name</value>
+  </data>
+  <data name="ReasonType_Title" xml:space="preserve">
+    <value>Work Time Adjustment Reason</value>
+  </data>
+  <data name="ReasonType_Code" xml:space="preserve">
+    <value>Code</value>
+  </data>
+  <data name="ReasonType_Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="StationStatus_Title" xml:space="preserve">
+    <value>Station</value>
+  </data>
+  <data name="StationStatus_ID" xml:space="preserve">
+    <value>Station ID</value>
+  </data>
+  <data name="StationStatus_Name" xml:space="preserve">
+    <value>Station Name</value>
+  </data>
+  <data name="TimePeriod_Title" xml:space="preserve">
+    <value>Work Time Period</value>
+  </data>
+  <data name="TimePeriod_ID" xml:space="preserve">
+    <value>ID</value>
+  </data>
+  <data name="TimePeriod_Name" xml:space="preserve">
+    <value>Period</value>
+  </data>
+  <data name="WorkingTypeGroup_Title" xml:space="preserve">
+    <value>Production Stations</value>
+  </data>
+  <data name="WorkingTypeGroup_ID" xml:space="preserve">
+    <value>Station ID</value>
+  </data>
+  <data name="WorkingTypeGroup_Name" xml:space="preserve">
+    <value>Station Name</value>
+  </data>
+  <data name="WorkingType_Title" xml:space="preserve">
+    <value>Station Work Procedures</value>
+  </data>
+  <data name="WorkingData_Title" xml:space="preserve">
+    <value>Production Staff Work Status</value>
+  </data>
+  <data name="WorkingData_WorkDate" xml:space="preserve">
+    <value>Work Date</value>
+  </data>
+  <data name="WorkingData_WorkType" xml:space="preserve">
+    <value>Work Period</value>
+  </data>
+  <data name="WorkingData_WorkID" xml:space="preserve">
+    <value>Work Procedure</value>
+  </data>
+  <data name="WorkingData_WorkDesc" xml:space="preserve">
+    <value>Work Procedure Description</value>
+  </data>
+  <data name="WorkingData_WorkGroup" xml:space="preserve">
+    <value>Station</value>
+  </data>
+  <data name="WorkingData_OperatorNo" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="WorkingData_Quantity" xml:space="preserve">
+    <value>Quantity (Output)</value>
+  </data>
+  <data name="WorkingList_Title" xml:space="preserve">
+    <value>Production Staff Dispatch</value>
+  </data>
+  <data name="WorkingList_WorkDate" xml:space="preserve">
+    <value>Work Date</value>
+  </data>
+  <data name="WorkingList_WorkDesc" xml:space="preserve">
+    <value>Work Procedure</value>
+  </data>
+  <data name="WorkingList_Operator" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="WorkingList_IsAssign" xml:space="preserve">
+    <value>Work Assignment</value>
+  </data>
+  <data name="WorkOrderResponse_Title" xml:space="preserve">
+    <value>Online Work Reporting</value>
+  </data>
+  <data name="WorkOrderResponse_Station" xml:space="preserve">
+    <value>Station</value>
+  </data>
+  <data name="WorkOrderResponse_WorkOrder" xml:space="preserve">
+    <value>Work Order</value>
+  </data>
+  <data name="WorkOrderResponse_SerialNo" xml:space="preserve">
+    <value>Serial No</value>
+  </data>
+  <data name="WorkOrderResponse_ReceiveTime" xml:space="preserve">
+    <value>Receive Time</value>
+  </data>
+  <data name="WorkOrderResponse_ReportTime" xml:space="preserve">
+    <value>Report Time</value>
+  </data>
+  <data name="WorkOrderResponse_Operator" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="WorkOrderResponse_Received" xml:space="preserve">
+    <value>Received - Not Reported</value>
+  </data>
+  <data name="WorkOrderResponse_NotReceived" xml:space="preserve">
+    <value>Not Received</value>
+  </data>
+  <data name="WorkingReport_Title" xml:space="preserve">
+    <value>Dispatch Detail</value>
+  </data>
+  <data name="StatisticReport_Title" xml:space="preserve">
+    <value>Work Order Statistics (Hours) Report</value>
+  </data>
+  <data name="StatisticReport_WO" xml:space="preserve">
+    <value>Work Order No</value>
+  </data>
+  <data name="StatisticReport_SN" xml:space="preserve">
+    <value>Serial Number</value>
+  </data>
+  <data name="StatisticReport_FirstReceive" xml:space="preserve">
+    <value>First Receive Date</value>
+  </data>
+  <data name="StatisticReport_LastResponse" xml:space="preserve">
+    <value>Last Report Date</value>
+  </data>
+  <data name="StatisticReport_TotalTime" xml:space="preserve">
+    <value>Total Hours</value>
+  </data>
+  <data name="StatisticReport_MaxTime" xml:space="preserve">
+    <value>Max Hours</value>
+  </data>
+  <data name="StatisticReport_MinTime" xml:space="preserve">
+    <value>Min Hours</value>
+  </data>
+  <data name="StatisticReport_AvgTime" xml:space="preserve">
+    <value>Avg Hours</value>
+  </data>
+  <data name="StatisticReport_OperatorGroup" xml:space="preserve">
+    <value>Operators</value>
+  </data>
+  <data name="StatisticReport_OperatorCount" xml:space="preserve">
+    <value>Operator Count</value>
+  </data>
+  <data name="OperatorReport_Title" xml:space="preserve">
+    <value>Operator Statistics (Hours) Report</value>
+  </data>
+  <data name="OperatorReport_StartDate" xml:space="preserve">
+    <value>Start Date</value>
+  </data>
+  <data name="OperatorReport_EndDate" xml:space="preserve">
+    <value>End Date</value>
+  </data>
+  <data name="OperatorReport_TotalTime" xml:space="preserve">
+    <value>Total Hours</value>
+  </data>
+  <data name="OperatorReport_WorkDate" xml:space="preserve">
+    <value>Work Date</value>
+  </data>
+  <data name="Report_ActualWork" xml:space="preserve">
+    <value>[Actual Work]</value>
+  </data>
+  <data name="Report_NotReceived" xml:space="preserve">
+    <value>Report [Not Received]</value>
+  </data>
+  <data name="Report_NotReported" xml:space="preserve">
+    <value>Report [Not Reported]</value>
+  </data>
+  <data name="Report_WorkHours" xml:space="preserve">
+    <value>Report [Work Hours]</value>
+  </data>
+  <data name="Report_DetailHoursWO" xml:space="preserve">
+    <value>Detailed Report [Hours-WO]</value>
+  </data>
+  <data name="Report_StationHours" xml:space="preserve">
+    <value>Hours Statistics [Station]</value>
+  </data>
+  <data name="Report_WOHours" xml:space="preserve">
+    <value>Hours Statistics [Work Order]</value>
+  </data>
+  <data name="Report_StationName" xml:space="preserve">
+    <value>Station</value>
+  </data>
+  <data name="Report_WorkTime" xml:space="preserve">
+    <value>Work Time</value>
+  </data>
+  <data name="Report_StartTime" xml:space="preserve">
+    <value>Start Time</value>
+  </data>
+  <data name="Report_EndTime" xml:space="preserve">
+    <value>End Time</value>
+  </data>
+  <data name="Report_PassCount" xml:space="preserve">
+    <value>Pass Count</value>
+  </data>
+  <data name="Report_FailCount" xml:space="preserve">
+    <value>Fail Count</value>
+  </data>
+  <data name="Report_Index" xml:space="preserve">
+    <value>Index</value>
+  </data>
+  <data name="Report_FilterWork" xml:space="preserve">
+    <value>Work Filter</value>
+  </data>
+  <data name="Report_Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="ESOP_OpenSOP" xml:space="preserve">
+    <value>Open SOP</value>
+  </data>
+  <data name="ESOP_ManualSelectSOP" xml:space="preserve">
+    <value>Manual SOP Selection</value>
+  </data>
+  <data name="ESOP_EditESOPList" xml:space="preserve">
+    <value>Edit ESOP List</value>
+  </data>
+  <data name="ESOPMap_Title" xml:space="preserve">
+    <value>ESOP Map</value>
+  </data>
+  <data name="Index_OnlineReporting" xml:space="preserve">
+    <value>Online Work Reporting</value>
+  </data>
+  <data name="Index_Description" xml:space="preserve">
+    <value>Used to manage human resources in manufacturing plants, ensuring effective assignment and scheduling of production line workers.</value>
+  </data>
+  <data name="Index_Features" xml:space="preserve">
+    <value>This system typically includes the following features:</value>
+  </data>
+  <data name="Index_Feature1" xml:space="preserve">
+    <value>1. Personnel Data Management: Records employee basic information, skills, and experience.</value>
+  </data>
+  <data name="Index_Feature2" xml:space="preserve">
+    <value>2. Production Scheduling: Assigns employees to appropriate workstations based on production plans and line requirements.</value>
+  </data>
+  <data name="Index_Feature3" xml:space="preserve">
+    <value>3. Work Progress Tracking: Tracks employee work progress and product flow on the production line.</value>
+  </data>
+  <data name="Index_Feature4" xml:space="preserve">
+    <value>4. Data Analysis and Reporting: Analyzes employee performance and production line efficiency.</value>
+  </data>
+  <data name="Index_Feature5" xml:space="preserve">
+    <value>5. Safety and Monitoring: Monitors the work environment and employee safety on the production line.</value>
+  </data>
+  <data name="Index_Conclusion" xml:space="preserve">
+    <value>Using the production line dispatch system can improve efficiency and product quality while reducing errors and delays.</value>
+  </data>
+  <data name="Index_SOPTitle" xml:space="preserve">
+    <value>Online SOP (Standard Operating Procedure)</value>
+  </data>
+  <data name="Index_SOPDescription" xml:space="preserve">
+    <value>Standard operating procedure documents compiled and managed on a digital platform.</value>
+  </data>
+  <data name="Index_SOPFeature1" xml:space="preserve">
+    <value>Unified Standards: Ensures all employees follow the same operational standards, reducing errors and rework.</value>
+  </data>
+  <data name="Index_SOPFeature2" xml:space="preserve">
+    <value>Simplified Training: New employees can self-learn through online SOPs, speeding up onboarding.</value>
+  </data>
+  <data name="Index_SOPFeature3" xml:space="preserve">
+    <value>Consistency: Ensures consistency in operations, improving work quality.</value>
+  </data>
+  <data name="Index_SOPFeature4" xml:space="preserve">
+    <value>Continuous Improvement: Continuously improves business processes through real-time updates and feedback.</value>
+  </data>
+  <data name="Index_SOPFeature5" xml:space="preserve">
+    <value>Reduced Paper and Printing Costs: Digital documents reduce the need for physical storage and printing.</value>
+  </data>
+  <data name="Index_SOPFeature6" xml:space="preserve">
+    <value>Time Savings: Improves work efficiency, reducing time wasted due to unclear processes or errors.</value>
+  </data>
+  <data name="Index_SOPFeature7" xml:space="preserve">
+    <value>Real-time Updates and Review: Ensures SOPs are consistent with the latest regulations and company policies.</value>
+  </data>
+  <data name="Index_SOPFeature8" xml:space="preserve">
+    <value>Clear Operating Procedures: All employees can easily access operating procedures and understand company processes.</value>
+  </data>
+</root>

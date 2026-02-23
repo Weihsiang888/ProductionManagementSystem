@@ -1,0 +1,18 @@
+@inject NavigationManager NavigationManager
+
+<div class="language-switcher">
+    <button class="btn btn-sm btn-outline-secondary me-1" @onclick='() => SwitchLanguage("zh-TW")'>繁體中文</button>
+    <button class="btn btn-sm btn-outline-secondary" @onclick='() => SwitchLanguage("en")'>English</button>
+</div>
+
+@code {
+    private void SwitchLanguage(string culture)
+    {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+        query["culture"] = culture;
+        query["ui-culture"] = culture;
+        var newUrl = uri.GetLeftPart(UriPartial.Path) + "?" + query.ToString();
+        NavigationManager.NavigateTo(newUrl, forceLoad: true);
+    }
+}

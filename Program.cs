@@ -1,5 +1,6 @@
 using CommonLibrary.AuthPack;
 using DxBlazorApplication7;
+using Microsoft.AspNetCore.Localization;
 using DxBlazorApplication7.Data;
 using DxBlazorApplication7.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -39,7 +40,7 @@ builder.Services.AddDevExpressBlazor(options => {
     options.SizeMode = DevExpress.Blazor.SizeMode.Medium;
 });
 
-#region 加入使用 Cookie 認證需要的宣告
+#region 嚙稼嚙皚嚙誕伐蕭 Cookie 嚙緹嚙課需要嚙踝蕭嚙褐告
 //builder.Services.Configure<CookiePolicyOptions>(options =>
 //{
 //    options.CheckConsentNeeded = context => true;
@@ -74,6 +75,7 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthentication>();
 builder.Services.AddScoped<IAuthDataService, UserDataService>();
+builder.Services.AddLocalization(opts => opts.ResourcesPath = "Resources");
 
 var app = builder.Build();
 
@@ -92,6 +94,13 @@ app.UseSwaggerUI(options =>
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "Web API");
 });
 
+var supportedCultures = new[] { "zh-TW", "en" };
+var localizationOptions = new RequestLocalizationOptions()
+    .SetDefaultCulture("zh-TW")
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures);
+localizationOptions.RequestCultureProviders.Insert(0, new QueryStringRequestCultureProvider { QueryStringKey = "culture", UIQueryStringKey = "ui-culture" });
+
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(@"\\172.25.210.8\01.product$\411 Standard Operation Procedure"),
@@ -107,6 +116,7 @@ app.UseStaticFiles(new StaticFileOptions
 
 //app.UseHttpsRedirection();
 
+app.UseRequestLocalization(localizationOptions);
 app.UseStaticFiles();
 
 app.UseRouting();

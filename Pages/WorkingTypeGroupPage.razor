@@ -3,9 +3,10 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inherits AuthComponentBase
 @inject DataService DataService
+@inject IStringLocalizer<SharedResources> L
 
 <br />
-<h3>產線工站</h3>
+<h3>@L["WorkingTypeGroup_Title"]</h3>
 <br />
 
 <DxGrid Data="_WorkingTypeGroups"
@@ -27,7 +28,7 @@
             </DxGridCommandColumn>
         }
         <DxGridDataColumn FieldName=@nameof(WorkingTypeGroup.TypeGroup) TextAlignment="GridTextAlignment.Left" Caption="工站編號 / 資格編號" MinWidth="90" />
-        <DxGridDataColumn FieldName=@nameof(WorkingTypeGroup.TypeGroupName) Caption="工站名稱" MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(WorkingTypeGroup.TypeGroupName) Caption='@L["WorkingTypeGroup_Name"]' MinWidth="90" />
         <DxGridDataColumn FieldName=@nameof(WorkingTypeGroup.ManufacturingProcess) Caption="SFC製程名稱" MinWidth="90" />
     </Columns>
     <EditFormTemplate Context="EditFormContext">

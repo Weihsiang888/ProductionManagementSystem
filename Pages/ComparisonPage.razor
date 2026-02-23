@@ -3,10 +3,10 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inherits AuthComponentBase
 @inject DataService DataService
+@inject IStringLocalizer<SharedResources> L
 
 <br />
-<h3>工站對照表</h3>
-<br />
+<h3>@L["Comparison_Title"]</h3>
 
 <DxGrid Data="_ComparisonTables"
         @ref="MyGrid"
@@ -26,8 +26,8 @@
                 </CellDisplayTemplate>
             </DxGridCommandColumn>
         }
-        <DxGridDataColumn FieldName=@nameof(ComparisonTable.ProcessName) Caption="作業" MinWidth="90" />
-        <DxGridDataColumn FieldName=@nameof(ComparisonTable.StationName) Caption="工站" MinWidth="120" />
+        <DxGridDataColumn FieldName=@nameof(ComparisonTable.ProcessName) Caption='@L["Comparison_Process"]' MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(ComparisonTable.StationName) Caption='@L["Comparison_Station"]' MinWidth="120" />
     </Columns>
     <EditFormTemplate Context="EditFormContext">
         @{
@@ -37,7 +37,7 @@
             <DxFormLayoutItem Caption="作業:" ColSpanMd="6">
                 <DxComboBox Data="@_ProcessNames"
                             AllowUserInput="true"
-                            NullText="作業選擇..."
+                            NullText='@L["Comparison_SelectProcess"]'
                             TextFieldName="@nameof(ComparisonTable.ProcessName)"
                             @bind-Text=_ComparisonTable.ProcessName
                             @bind-Value="@Value">

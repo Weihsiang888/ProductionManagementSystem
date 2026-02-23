@@ -2,8 +2,7 @@
 @using DevExpress.Export
 @using DxBlazorApplication7.Data
 @inject DataService DataService
-
-<style>
+@inject IStringLocalizer<SharedResources> L
     .dx-form-layout-width {
         max-width: 900px;
         width: 100%;
@@ -39,11 +38,11 @@
 
 
 <br />
-<h3>工單統計(工時)報表</h3>
+<h3>@L["StatisticReport_Title"]</h3>
 <br />
 
 <DxFormLayout>
-    <DxFormLayoutItem ColSpanMd="2" Caption="開始日期 :">
+    <DxFormLayoutItem ColSpanMd="2" Caption='@L["Lbl_StartDate"]'>
         <DxDateEdit @bind-Date="@BeginDateTimeValue"
                     @bind-DropDownVisible="@BeginCalendarVisible"
                     CssClass="dx-editor-width">
@@ -59,7 +58,7 @@
             </Buttons>
         </DxDateEdit>
     </DxFormLayoutItem>
-    <DxFormLayoutItem ColSpanMd="2" Caption="結束日期 :">
+    <DxFormLayoutItem ColSpanMd="2" Caption='@L["Lbl_EndDate"]'>
         <DxDateEdit @bind-Date="@EndDateTimeValue"
                     @bind-DropDownVisible="@EndCalendarVisible"
                     CssClass="dx-editor-width">
@@ -76,10 +75,10 @@
         </DxDateEdit>
     </DxFormLayoutItem>
     <DxFormLayoutItem ColSpanMd="1">
-        <DxButton RenderStyle="ButtonRenderStyle.Info" Text="查詢" Click="Search_Click" style="float:left" />
+        <DxButton RenderStyle="ButtonRenderStyle.Info" Text='@L["Btn_Query"]' Click="Search_Click" style="float:left" />
     </DxFormLayoutItem>
     <DxFormLayoutItem ColSpanMd="2" ColSpanLg="7">
-        <DxButton RenderStyle="ButtonRenderStyle.Success" Text="Export to XLSX" Click="ExportXlsx_Click" style="float:right" />
+        <DxButton RenderStyle="ButtonRenderStyle.Success" Text='@L["Btn_ExportXlsx"]' Click="ExportXlsx_Click" style="float:right" />
     </DxFormLayoutItem>
 </DxFormLayout>
 
@@ -99,16 +98,16 @@
                 <a class="oi oi-x" @onclick="@(() => Delete((OP_Report)context.DataItem))" style="text-decoration: none;" href="javascript:void(0);"></a>
             </CellDisplayTemplate>
         </DxGridCommandColumn>*@
-        <DxGridDataColumn FieldName=@nameof(WO_SN_Report.WO) Caption="工單號碼" MinWidth="90" />
-        <DxGridDataColumn FieldName=@nameof(WO_SN_Report.SN) Caption="手臂序號" MinWidth="75" />
-        <DxGridDataColumn FieldName=@nameof(WO_SN_Report.FirstReceiveTime) Caption="工單接收日期(最早)" MinWidth="90" DisplayFormat="G" />
-        <DxGridDataColumn FieldName=@nameof(WO_SN_Report.LastResponseTime) Caption="工單報工日期(最後)" MinWidth="90" DisplayFormat="G" />
-        <DxGridDataColumn FieldName=@nameof(WO_SN_Report.WorkTime) Caption="總工時" Width="75" />
-        <DxGridDataColumn FieldName=@nameof(WO_SN_Report.MaxWorkTime) Caption="最大工時" Width="75" />
-        <DxGridDataColumn FieldName=@nameof(WO_SN_Report.MinWorkTime) Caption="最小工時" Width="75" />
-        <DxGridDataColumn FieldName=@nameof(WO_SN_Report.AvgWorkTime) Caption="平均工時" Width="75" />
-        <DxGridDataColumn FieldName=@nameof(WO_SN_Report.OPGroup) Caption="作業人員" MinWidth="90" />
-        <DxGridDataColumn FieldName=@nameof(WO_SN_Report.WorkCount) Caption="作業人數" Width="75" />
+        <DxGridDataColumn FieldName=@nameof(WO_SN_Report.WO) Caption='@L["StatisticReport_WO"]' MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(WO_SN_Report.SN) Caption='@L["StatisticReport_SN"]' MinWidth="75" />
+        <DxGridDataColumn FieldName=@nameof(WO_SN_Report.FirstReceiveTime) Caption='@L["StatisticReport_FirstReceive"]' MinWidth="90" DisplayFormat="G" />
+        <DxGridDataColumn FieldName=@nameof(WO_SN_Report.LastResponseTime) Caption='@L["StatisticReport_LastResponse"]' MinWidth="90" DisplayFormat="G" />
+        <DxGridDataColumn FieldName=@nameof(WO_SN_Report.WorkTime) Caption='@L["StatisticReport_TotalTime"]' Width="75" />
+        <DxGridDataColumn FieldName=@nameof(WO_SN_Report.MaxWorkTime) Caption='@L["StatisticReport_MaxTime"]' Width="75" />
+        <DxGridDataColumn FieldName=@nameof(WO_SN_Report.MinWorkTime) Caption='@L["StatisticReport_MinTime"]' Width="75" />
+        <DxGridDataColumn FieldName=@nameof(WO_SN_Report.AvgWorkTime) Caption='@L["StatisticReport_AvgTime"]' Width="75" />
+        <DxGridDataColumn FieldName=@nameof(WO_SN_Report.OPGroup) Caption='@L["StatisticReport_OperatorGroup"]' MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(WO_SN_Report.WorkCount) Caption='@L["StatisticReport_OperatorCount"]' Width="75" />
     </Columns>
     <EditFormTemplate Context="EditFormContext">
         @{

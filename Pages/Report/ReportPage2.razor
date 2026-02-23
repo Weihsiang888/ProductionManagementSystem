@@ -1,6 +1,7 @@
 ﻿@using DevExpress.Export
 @using DxBlazorApplication7.Data
 @inject DataService DataService
+@inject IStringLocalizer<SharedResources> L
 
 <DxGrid Data="_WorkingOrderLists"
         @ref="MyGrid"

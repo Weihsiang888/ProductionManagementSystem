@@ -3,9 +3,10 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inherits AuthComponentBase
 @inject DataService DataService
+@inject IStringLocalizer<SharedResources> L
 
 <br />
-<h3>產線工作時段</h3>
+<h3>@L["TimePeriod_Title"]</h3>
 <br />
 
 <DxGrid Data="_TimePeriods"
@@ -26,8 +27,8 @@
                 </CellDisplayTemplate>
             </DxGridCommandColumn>
         }
-        <DxGridDataColumn FieldName=@nameof(TimePeriod.PeriodType) TextAlignment="GridTextAlignment.Left" Caption="編號" MinWidth="90" />
-        <DxGridDataColumn FieldName=@nameof(TimePeriod.PeriodName) Caption="時段" MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(TimePeriod.PeriodType) TextAlignment="GridTextAlignment.Left" Caption='@L["TimePeriod_ID"]' MinWidth="90" />
+        <DxGridDataColumn FieldName=@nameof(TimePeriod.PeriodName) Caption='@L["TimePeriod_Name"]' MinWidth="90" />
         <DxGridDataColumn FieldName=@nameof(TimePeriod.Description) Caption="描述" MinWidth="90" />
     </Columns>
     <EditFormTemplate Context="EditFormContext">
