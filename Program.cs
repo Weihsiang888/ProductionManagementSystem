@@ -34,12 +34,14 @@ builder.Services.AddTransient<DataLogService>();
 builder.Services.AddScoped<AuthorizeUserService, AuthorizeService>();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+
+// 合併 DevExpress 註冊：保留有 options 的版本
 builder.Services.AddDevExpressBlazor(options => {
     options.BootstrapVersion = DevExpress.Blazor.BootstrapVersion.v5;
     options.SizeMode = DevExpress.Blazor.SizeMode.Medium;
 });
 
-#region �[�J�ϥ� Cookie �{�һݭn���ŧi
+#region 加入使用 Cookie 認證需要的宣告
 //builder.Services.Configure<CookiePolicyOptions>(options =>
 //{
 //    options.CheckConsentNeeded = context => true;
@@ -49,7 +51,6 @@ builder.Services.AddDevExpressBlazor(options => {
 //    CookieAuthenticationDefaults.AuthenticationScheme)
 //    .AddCookie();
 #endregion
-
 
 //builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddSingleton<DataService>();
@@ -65,11 +66,10 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "Web API", Version = "V1" });
 });
-builder.Services.AddDevExpressBlazor();
 
 builder.Services.AddHttpClient();
 
-//user
+// user
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthentication>();
@@ -104,19 +104,19 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/mainesop"
 });
 
-
 //app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
 app.UseRouting();
 
+// Endpoint mapping：集中放一起
+app.MapControllers();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
-app.MapControllers();
-
-app.UseCookiePolicy();
-app.UseAuthentication();
+// 方案 2：先註解，避免與未啟用的 Cookie 認證造成混淆
+//app.UseCookiePolicy();
+//app.UseAuthentication();
 
 app.Run();
