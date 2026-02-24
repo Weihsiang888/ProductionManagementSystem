@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting.WindowsServices;
@@ -39,7 +40,7 @@ builder.Services.AddDevExpressBlazor(options => {
     options.SizeMode = DevExpress.Blazor.SizeMode.Medium;
 });
 
-#region 加入使用 Cookie 認證需要的宣告
+#region 嚙稼嚙皚嚙誕伐蕭 Cookie 嚙緹嚙課需要嚙踝蕭嚙褐告
 //builder.Services.Configure<CookiePolicyOptions>(options =>
 //{
 //    options.CheckConsentNeeded = context => true;
@@ -68,6 +69,22 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDevExpressBlazor();
 
 builder.Services.AddHttpClient();
+
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[] { "en-US", "zh-TW" };
+    options.DefaultRequestCulture = new RequestCulture("en-US");
+    options.SetDefaultCulture("en-US")
+           .AddSupportedCultures(supportedCultures)
+           .AddSupportedUICultures(supportedCultures);
+    options.RequestCultureProviders = new[]
+    {
+        new CookieRequestCultureProvider(),
+        new AcceptLanguageHeaderRequestCultureProvider()
+    };
+});
 
 //user
 builder.Services.AddCascadingAuthenticationState();
@@ -108,6 +125,8 @@ app.UseStaticFiles(new StaticFileOptions
 //app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+
+app.UseRequestLocalization();
 
 app.UseRouting();
 
