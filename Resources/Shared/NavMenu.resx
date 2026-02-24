@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Nav.Menu.Home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="Nav.Menu.OperatorMasterData" xml:space="preserve">
+    <value>Operator Master Data</value>
+  </data>
+  <data name="Nav.Menu.OperatorSkillMatrix" xml:space="preserve">
+    <value>Operator Skill Matrix</value>
+  </data>
+  <data name="Nav.Menu.ShiftTimePeriods" xml:space="preserve">
+    <value>Shift Time Periods</value>
+  </data>
+  <data name="Nav.Menu.OvertimeSchedule" xml:space="preserve">
+    <value>Overtime Schedule</value>
+  </data>
+  <data name="Nav.Menu.WorkStations" xml:space="preserve">
+    <value>Work Stations</value>
+  </data>
+  <data name="Nav.Menu.WorkStationProcedures" xml:space="preserve">
+    <value>Work Station Procedures</value>
+  </data>
+  <data name="Nav.Menu.Dispatch.RobotAssembly" xml:space="preserve">
+    <value>Dispatch (RobotAssembly)</value>
+  </data>
+  <data name="Nav.Menu.OnlineWorkReporting" xml:space="preserve">
+    <value>Online Work Reporting</value>
+  </data>
+  <data name="Nav.Menu.DispatchDetail.Report" xml:space="preserve">
+    <value>Dispatch Detail (Report)</value>
+  </data>
+  <data name="Nav.Menu.Reports.WorkOrderHours" xml:space="preserve">
+    <value>Work Order Statistics (Hours)</value>
+  </data>
+  <data name="Nav.Menu.Reports.OperatorHours" xml:space="preserve">
+    <value>Operator Statistics (Hours)</value>
+  </data>
+</root>
